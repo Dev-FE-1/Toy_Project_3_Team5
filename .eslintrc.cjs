@@ -21,6 +21,7 @@ module.exports = {
 		'@typescript-eslint/no-unused-vars': ['error'],
 		'prettier/prettier': 'error',
 		'react/react-in-jsx-scope': 'off',
+
 		'react/jsx-filename-extension': [
 			1,
 			{ extensions: ['.js', '.jsx', '.ts', '.tsx'] },
@@ -31,6 +32,13 @@ module.exports = {
 				devDependencies: true,
 				optionalDependencies: false,
 				peerDependencies: false,
+			},
+		],
+		'react/function-component-definition': [
+			2,
+			{
+				namedComponents: 'arrow-function',
+				unnamedComponents: 'arrow-function',
 			},
 		],
 		'import/order': [
@@ -51,10 +59,33 @@ module.exports = {
 				},
 			},
 		],
+		'import/no-unresolved': 'off',
+		'react/no-unknown-property': ['error', { ignore: ['css'] }],
+		'no-use-before-define': 'off',
+		'@typescript-eslint/no-use-before-define': [
+			'error',
+			{ variables: false, functions: false, classes: false },
+		],
+		'import/extensions': [
+			'error',
+			'ignorePackages',
+			{
+				js: 'never',
+				jsx: 'never',
+				ts: 'never',
+				tsx: 'never',
+			},
+		],
 	},
 	settings: {
 		react: {
 			version: 'detect',
+		},
+		'import/resolver': {
+			node: {
+				extensions: ['.js', '.jsx', '.ts', '.tsx'],
+				paths: ['src'],
+			},
 		},
 	},
 };

@@ -16,7 +16,13 @@ module.exports = {
 			jsx: true,
 		},
 	},
-	plugins: ['import-order'],
+	plugins: [
+		'@typescript-eslint',
+		'react',
+		'prettier',
+		'import',
+		'import-order',
+	],
 	rules: {
 		'@typescript-eslint/no-unused-vars': ['error'],
 		'prettier/prettier': ['error'],
@@ -62,6 +68,11 @@ module.exports = {
 	settings: {
 		react: {
 			version: 'detect',
+		},
+		'import/resolver': {
+			typescript: {
+				project: './tsconfig.json',
+			},
 		},
 	},
 };

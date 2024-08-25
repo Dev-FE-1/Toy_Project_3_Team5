@@ -1,6 +1,6 @@
 import { Global, css } from '@emotion/react';
-import colors from '../constants/color.ts';
-import { fontWeight } from '../constants/font.ts';
+import colors from '@/constants/color.ts';
+import { fontWeight } from '@/constants/font.ts';
 
 const GlobalStyles = () => {
 	return (

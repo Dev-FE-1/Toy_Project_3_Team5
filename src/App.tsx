@@ -1,4 +1,4 @@
-import GlobalStyles from './styles/GlobalStyles.tsx';
+import GlobalStyles from '@/styles/GlobalStyles.tsx';
 
 const App = () => {
 	return (

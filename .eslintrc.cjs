@@ -1,8 +1,6 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   extends: [
-    'airbnb',
-    'airbnb/hooks',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:import/errors',
@@ -22,15 +20,10 @@ module.exports = {
     'prettier',
     'import',
     'import-order',
+    'react-hooks',
   ],
   rules: {
-    '@typescript-eslint/no-unused-vars': ['error'],
-    'prettier/prettier': ['error'],
-    'react/react-in-jsx-scope': 'off',
-    'react/jsx-filename-extension': [
-      1,
-      { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
-    ],
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
     'react/function-component-definition': [
       2,
       {
@@ -38,14 +31,50 @@ module.exports = {
         unnamedComponents: 'arrow-function',
       },
     ],
-    'import/no-extraneous-dependencies': [
+
+    'arrow-body-style': ['error', 'as-needed'],
+
+    'react/jsx-pascal-case': 'error',
+
+    camelcase: ['error', { properties: 'never' }],
+    'react/jsx-handler-names': [
       'error',
       {
-        devDependencies: true,
-        optionalDependencies: false,
-        peerDependencies: false,
+        eventHandlerPropPrefix: 'on',
       },
     ],
+    'import/no-default-export': 'off',
+    'import/prefer-default-export': 'off',
+    'import/no-unresolved': 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react/prop-types': 'warn',
+    'prefer-const': 'error',
+    'no-var': 'error',
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    eqeqeq: 'error',
+    'prefer-destructuring': [
+      'error',
+      {
+        array: false,
+        object: true,
+      },
+    ],
+    'react/jsx-no-duplicate-props': ['error', { ignoreCase: true }],
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+      },
+    ],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    'no-useless-rename': 'error',
+    'object-shorthand': 'error',
+    'react/jsx-key': ['error', { checkFragmentShorthand: true }],
+    'react/react-in-jsx-scope': 'off',
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
     'import/order': [
       'error',
       {
@@ -70,8 +99,9 @@ module.exports = {
       version: 'detect',
     },
     'import/resolver': {
-      typescript: {
-        project: './tsconfig.json',
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        paths: ['src'],
       },
     },
   },

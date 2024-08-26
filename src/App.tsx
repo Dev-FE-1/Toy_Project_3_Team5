@@ -1,12 +1,10 @@
-import GlobalStyles from '@/styles/GlobalStyles.tsx';
+import GlobalStyles from '@/styles/GlobalStyles';
 
-const App = () => {
-  return (
-    <div>
-      <GlobalStyles />
-      <p>App</p>
-    </div>
-  );
-};
+const App = () => (
+  <div>
+    <GlobalStyles />
+    <p>App</p>
+  </div>
+);
 
 export default App;

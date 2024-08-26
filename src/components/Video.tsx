@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
+import { omittedText } from '@/utils/textUtils';
 
 interface VideoProps {
   imgUrl: string;
@@ -8,16 +9,17 @@ interface VideoProps {
   userName: string;
 }
 
+const MAXLENGTH = 50;
+
 const Video = ({ imgUrl, title, userName }: VideoProps) => (
   <div css={VideoContainer}>
     <img css={ThumbnailStyle} src={imgUrl} alt='썸네일' />
     <div css={VideoInfoStyle}>
-      <span css={TitleStyle}>{title}</span>
-      <span css={UserNameStyle}>{userName}</span>
+      <span css={TitleStyle}>{omittedText(title, MAXLENGTH)}</span>
+      <span css={UserNameStyle}>{omittedText(userName, MAXLENGTH)}</span>
     </div>
   </div>
 );
-
 const VideoContainer = css`
   display: flex;
   cursor: pointer;
@@ -41,10 +43,15 @@ const TitleStyle = css`
   font-size: ${fontSize.xl};
   font-weight: ${fontWeight.medium};
   color: ${colors.black};
+  height: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
 `;
 const UserNameStyle = css`
   font-size: ${fontSize.md};
   color: ${colors.gray05};
+  height: 50%;
 
   &:hover {
     text-decoration: underline;

@@ -20,6 +20,7 @@ module.exports = {
     'prettier',
     'import',
     'import-order',
+    'react-hooks',
   ],
   rules: {
     'no-console': ['warn', { allow: ['warn', 'error'] }],

@@ -1,5 +1,5 @@
 import { Global, css } from '@emotion/react';
-import colors from '@/constants/color.ts';
+import colors from '@/constants/colors.ts';
 import { fontWeight } from '@/constants/font.ts';
 
 const GlobalStyles = () => {
@@ -7,32 +7,6 @@ const GlobalStyles = () => {
     <Global
       styles={css`
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
-        html,
-        body,
-        #root {
-          width: 100%;
-          height: 100%;
-          font-family:
-            'Pretendard Variable',
-            Pretendard,
-            -apple-system,
-            BlinkMacSystemFont,
-            system-ui,
-            Roboto,
-            'Helvetica Neue',
-            'Segoe UI',
-            'Apple SD Gothic Neo',
-            'Noto Sans KR',
-            'Malgun Gothic',
-            'Apple Color Emoji',
-            'Segoe UI Emoji',
-            'Segoe UI Symbol',
-            sans-serif;
-          font-weight: ${fontWeight.regular};
-          font-size: 10px;
-          background-color: ${colors.white};
-          color: ${colors.black};
-        }
         html,
         body,
         div,
@@ -155,6 +129,32 @@ const GlobalStyles = () => {
         table {
           border-collapse: collapse;
           border-spacing: 0;
+        }
+        html,
+        body,
+        #root {
+          width: 100%;
+          height: 100%;
+          font-family:
+            'Pretendard Variable',
+            Pretendard,
+            -apple-system,
+            BlinkMacSystemFont,
+            system-ui,
+            Roboto,
+            'Helvetica Neue',
+            'Segoe UI',
+            'Apple SD Gothic Neo',
+            'Noto Sans KR',
+            'Malgun Gothic',
+            'Apple Color Emoji',
+            'Segoe UI Emoji',
+            'Segoe UI Symbol',
+            sans-serif;
+          font-size: 10px;
+          font-weight: ${fontWeight.regular};
+          background-color: ${colors.white};
+          color: ${colors.black};
         }
       `}
     />

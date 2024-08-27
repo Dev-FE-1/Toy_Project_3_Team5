@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { Switch } from '@headlessui/react';
-import colors from '@/constants/color';
+import colors from '@/constants/colors';
 
 type ToggleLabel = {
   active: string;

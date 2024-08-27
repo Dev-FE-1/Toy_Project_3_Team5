@@ -45,14 +45,14 @@ const IconButton: React.FC<IconButtonProps> = ({
     : 'none';
 
   return (
-    <button css={IconButtonStyle(size, selectColors)} onClick={onClick}>
+    <button css={iconButtonStyle(size, selectColors)} onClick={onClick}>
       <IconComponent size={size === 'md' ? 24 : 12} fill={selectFillColor} />
       {label}
     </button>
   );
 };
 
-const IconButtonStyle = (size: IconButtonSizeType, selectColors: string) => css`
+const iconButtonStyle = (size: IconButtonSizeType, selectColors: string) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;

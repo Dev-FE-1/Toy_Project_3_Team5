@@ -1,5 +1,6 @@
 import React from 'react';
 import { css } from '@emotion/react';
+import { useNavigate } from 'react-router-dom';
 import logo from '@/assets/logo.svg';
 
 interface LogoProps {
@@ -8,7 +9,11 @@ interface LogoProps {
 }
 
 const Logo: React.FC<LogoProps> = ({ logoWidth, clickable = false }) => {
-  const onLogoClick = () => {};
+  const navigate = useNavigate();
+
+  const onLogoClick = (): void => {
+    navigate('/');
+  };
 
   return (
     <img

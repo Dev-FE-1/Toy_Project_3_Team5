@@ -1,12 +1,15 @@
-import { Search } from 'lucide-react';
+// src/router.js
+
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/component/Layout';
+import ROUTES from '@/constants/route';
 import { Detail } from '@/pages/common/Detail';
 import { Following } from '@/pages/common/Following';
 import { HashTag } from '@/pages/common/HashTag';
 import { Home } from '@/pages/common/Home';
 import { NotFound } from '@/pages/common/NotFound';
 import { Popular } from '@/pages/common/Popular';
+import { Search } from '@/pages/common/Search';
 import { SignIn } from '@/pages/common/SignIn';
 import { SignUp } from '@/pages/common/SignUp';
 import { PlayList } from '@/pages/playlist/PlayList';
@@ -23,7 +26,7 @@ import { ProfileUpdate } from '@/pages/profile/ProfileUpdate';
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: ROUTES.ROOT,
     element: <Layout />,
     children: [
       {
@@ -31,35 +34,33 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: 'playlist/:userId',
+        path: ROUTES.PLAYLIST(),
         element: <PlayList />,
         children: [
           {
             index: true,
-            element: (
-              <PlayListHome />
-            ) /*	본인계정일때만, 좋아요 플리 기능과 crud 가능 하도록 ui 조정 + url조작으로 다른 사람의 플리 조작 못하게 막기 ex) 본인 id=10, url playlist/11/modify 접근 불가능하도록 	*/,
+            element: <PlayListHome />,
           },
           {
-            path: 'saved',
-            element: <PlayListSaved /> /*	전체 접근가능 	*/,
+            path: ROUTES.PLAYLIST_SAVED(),
+            element: <PlayListSaved />,
           },
           {
-            path: 'likes',
-            element: <PlayListLikes /> /*	본인계정만, 비공개	*/,
+            path: ROUTES.PLAYLIST_LIKES(),
+            element: <PlayListLikes />,
           },
           {
-            path: 'add',
-            element: <PlayListAdd /> /*	본인계정만 	*/,
+            path: ROUTES.PLAYLIST_ADD(),
+            element: <PlayListAdd />,
           },
           {
-            path: 'modify',
-            element: <PlayListUpdate /> /*	본인계정만 	*/,
+            path: ROUTES.PLAYLIST_MODIFY(),
+            element: <PlayListUpdate />,
           },
         ],
       },
       {
-        path: 'profile/:userId',
+        path: ROUTES.PROFILE(),
         element: <Profile />,
         children: [
           {
@@ -67,55 +68,55 @@ export const router = createBrowserRouter([
             element: <ProfileHome />,
           },
           {
-            path: 'modify',
+            path: ROUTES.PROFILE_MODIFY(),
             element: <ProfileUpdate />,
+          },
+          {
+            path: ROUTES.PROFILE_FOLLOWING(),
+            element: <ProfileFollowing />,
           },
         ],
       },
       {
-        path: '/popular',
+        path: ROUTES.POPULAR,
         element: <Popular />,
       },
       {
-        path: '/following',
+        path: ROUTES.FOLLOWING,
         element: <Following />,
       },
       {
-        path: '/search/:searchText',
+        path: ROUTES.SEARCH(),
         element: <Search />,
       },
       {
-        path: '/detail/:playListId',
+        path: ROUTES.DETAIL(),
         element: <Detail />,
       },
       {
-        path: 'follower/:id',
+        path: ROUTES.FOLLOWER(),
         element: <ProfileFollower />,
       },
       {
-        path: 'following/:id',
-        element: (
-          <ProfileFollowing />
-        ) /*	following 페이지와 profile/following/:id 페이지의 다른점은? -> 그냥 following/:id로 통일?	*/,
+        path: ROUTES.FOLLOWING,
+        element: <Following />,
       },
     ],
   },
-
   {
-    path: '/signIn',
+    path: ROUTES.SIGN_IN,
     element: <SignIn />,
   },
   {
-    path: '/signUp',
+    path: ROUTES.SIGN_UP,
     element: <SignUp />,
   },
   {
-    path: '/hashTag',
+    path: ROUTES.HASH_TAG,
     element: <HashTag />,
   },
-
   {
-    path: '*',
+    path: ROUTES.NOT_FOUND,
     element: <NotFound />,
   },
 ]);

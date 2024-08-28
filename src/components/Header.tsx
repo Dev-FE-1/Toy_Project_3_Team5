@@ -1,26 +1,44 @@
 import { css } from '@emotion/react';
 import { ChevronLeft } from 'lucide-react';
 import Logo from '@/components/Logo';
+import Profile from '@/components/Profile';
 import SearchBar from '@/components/SearchBar';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 
 type HeaderType = 'main' | 'sub' | 'detail';
 
+type ProfileProps = {
+  src: string;
+  alt: string;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+};
 interface HeaderProps {
   type: HeaderType;
   title?: string;
   profileImg?: string;
   onBack?: () => void;
   onSearch?: (query: string) => void;
+  profileProps: ProfileProps;
 }
 
-const Header = ({ type, title, onBack, onSearch }: HeaderProps) => (
+const Header = ({
+  type,
+  title,
+  onBack,
+  onSearch,
+  profileProps = { src: 'srcid', alt: '동혁쓰플필', size: 'xs' },
+}: HeaderProps) => (
   <header css={headerStyle}>
     {type === 'main' && (
       <>
         <Logo logoWidth={100} clickable={true}></Logo>
         {onSearch && <SearchBar onSearch={onSearch} />}
+        <Profile
+          src={profileProps.src}
+          alt={profileProps.alt}
+          size={profileProps.size}
+        />
       </>
     )}
     {type === 'sub' && (
@@ -32,6 +50,11 @@ const Header = ({ type, title, onBack, onSearch }: HeaderProps) => (
         <button>
           <Logo logoWidth={100} clickable={true}></Logo>
         </button>
+        <Profile
+          src={profileProps.src}
+          alt={profileProps.alt}
+          size={profileProps.size}
+        />
       </>
     )}
     {type === 'detail' && (

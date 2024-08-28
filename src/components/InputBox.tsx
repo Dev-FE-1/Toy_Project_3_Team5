@@ -13,6 +13,10 @@ interface InputBoxProps {
   labelStyle?: React.CSSProperties;
   width?: string;
   height?: string;
+  value?: string;
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
 }
 
 const InputBox: React.FC<InputBoxProps> = ({
@@ -24,12 +28,17 @@ const InputBox: React.FC<InputBoxProps> = ({
   labelStyle,
   width = '390px',
   height = '36px',
+  value: propValue,
+  onChange: propOnChange,
 }) => {
   const { value, onChangeValue, onFocusout, isValid, errorMessage } = useInput(
     '',
     validate
   );
 
+  const inputValue = propValue !== undefined ? propValue : value;
+  const handleChange =
+    propOnChange !== undefined ? propOnChange : onChangeValue;
   const hasValidation = !!validate;
 
   return (

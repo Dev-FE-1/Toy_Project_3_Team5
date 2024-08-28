@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { Transition } from '@headlessui/react';
 import { CircleCheck, CircleX } from 'lucide-react';
@@ -58,15 +58,14 @@ const Toast = ({
 const transStyle = css``;
 
 const toastStyle = css`
-  width: calc(100vw - 32px);
+  width: calc(100vw - 16px * 2);
+  max-width: 430px;
   position: fixed;
-  left: 50%;
-  margin-left: calc((-1) * (100vw - 32px) / 2);
-  bottom: 96px;
+  bottom: 96px; // navbar 크기만큼
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 16px 0;
+  margin-left: 16px;
+  padding: 16px;
   border-radius: 4px;
   background-color: ${colors.gray04};
   color: ${colors.white};
@@ -95,20 +94,9 @@ const toastStyle = css`
 
 const iconContainerStyle = css`
   position: relative;
-  background-color: ${colors.white};
   border-radius: 50%;
-  width: 16px;
-  height: 16px;
   margin-right: 0.5rem;
-
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    line-height: 1;
-  }
+  display: flex;
 `;
 
 const successStyle = css`

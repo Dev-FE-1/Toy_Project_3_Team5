@@ -2,6 +2,7 @@ import React from 'react';
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import logo from '@/assets/logo.svg';
+import ROUTES from '@/constants/route';
 
 interface LogoProps {
   logoWidth: number;
@@ -12,7 +13,7 @@ const Logo: React.FC<LogoProps> = ({ logoWidth, clickable = false }) => {
   const navigate = useNavigate();
 
   const onLogoClick = (): void => {
-    navigate('/');
+    navigate(ROUTES.ROOT);
   };
 
   return (

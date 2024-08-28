@@ -15,13 +15,13 @@ const SearchBar = ({
 }: SearchBarProps) => {
   const [query, setQuery] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(query);
   };
 
   return (
-    <form css={searchBarStyle} onSubmit={handleSubmit}>
+    <form css={searchBarStyle} onSubmit={onSubmit}>
       <input
         type='text'
         value={query}

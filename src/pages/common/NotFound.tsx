@@ -1,5 +1,5 @@
 import React from 'react';
-import { TempFooter } from '@/component/TempFooter';
+import { TempFooter } from '@/components/TempFooter';
 export const NotFound = () => (
   <>
     <div>NotFound</div>

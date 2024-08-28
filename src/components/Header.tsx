@@ -47,7 +47,7 @@ const Header = ({ type, title, onBack, onSearch }: HeaderProps) => (
 );
 
 const headerStyle = css`
-  max-height: 932px;
+  max-height: 5vh;
   max-width: 430px;
   display: flex;
   justify-content: space-between;
@@ -64,6 +64,7 @@ const headerStyle = css`
 const titleStyle = css`
   font-size: ${fontSize.md};
   font-weight: 600;
+  font-size: 2rem;
   flex: 1;
   text-align: center;
 `;

@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { ChevronLeft } from 'lucide-react';
-import SearchBar from './SearchBar'; // 새로 만든 SearchBar 컴포넌트를 import
+import SearchBar from '@/components/SearchBar';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 

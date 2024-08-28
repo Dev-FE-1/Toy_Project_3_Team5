@@ -4,15 +4,20 @@ import { ListFilter } from 'lucide-react';
 import colors from '@/constants/colors';
 import { fontWeight } from '@/constants/font';
 
-interface PopupFilterProps {
+interface FilterOptionGroup {
+  label: string;
   options: string[];
-  selectedIndex: number;
-  onFilterChange: (idx: number) => void;
+}
+
+interface PopupFilterProps {
+  optionGroups: FilterOptionGroup[];
+  selectedIndexes: number[];
+  onFilterChange: (groupIdx: number, idx: number) => void;
 }
 
 const PopupFilter: React.FC<PopupFilterProps> = ({
-  options,
-  selectedIndex,
+  optionGroups,
+  selectedIndexes,
   onFilterChange,
 }) => {
   const [filterActive, setFilterActive] = useState<boolean>(false);
@@ -50,20 +55,24 @@ const PopupFilter: React.FC<PopupFilterProps> = ({
         <ListFilter size={16} /> 필터
       </button>
       <div css={popupFilterStyle(filterActive)} ref={popupRef}>
-        <p>정렬</p>
-        <div css={optionWrapperStyle}>
-          {options.map((option, idx) => (
-            <span
-              key={idx}
-              css={optionStyle(idx, selectedIndex)}
-              onClick={() => {
-                onFilterChange(idx);
-              }}
-            >
-              {option}
-            </span>
-          ))}
-        </div>
+        {optionGroups.map((group, groupIdx) => (
+          <div key={group.label}>
+            <p css={filterLabelStyle}>{group.label}</p>
+            <div css={optionWrapperStyle}>
+              {group.options.map((option, idx) => (
+                <span
+                  key={idx}
+                  css={optionStyle(idx, selectedIndexes[groupIdx])}
+                  onClick={() => {
+                    onFilterChange(groupIdx, idx);
+                  }}
+                >
+                  {option}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -101,7 +110,7 @@ const popupFilterStyle = (filterActive: boolean) => css`
   flex-direction: column;
   padding: 20px;
   border-radius: 4px;
-  gap: 10px;
+  gap: 20px;
   top: 45px;
   box-shadow:
     0px 8px 10px -5px rgba(0, 0, 0, 0.2),
@@ -113,6 +122,10 @@ const popupFilterStyle = (filterActive: boolean) => css`
   p {
     font-weight: ${fontWeight.semiBold};
   }
+`;
+
+const filterLabelStyle = css`
+  margin-bottom: 8px;
 `;
 
 const optionWrapperStyle = css`

@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import { ChevronLeft } from 'lucide-react';
+import Logo from '@/components/Logo';
 import SearchBar from '@/components/SearchBar';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
@@ -18,9 +19,7 @@ const Header = ({ type, title, onBack, onSearch }: HeaderProps) => (
   <header css={headerStyle}>
     {type === 'main' && (
       <>
-        <button>
-          <img src='' alt='' />
-        </button>
+        <Logo logoWidth={100} clickable={true}></Logo>
         {onSearch && <SearchBar onSearch={onSearch} />}
       </>
     )}
@@ -31,7 +30,7 @@ const Header = ({ type, title, onBack, onSearch }: HeaderProps) => (
         </button>
         {onSearch && <SearchBar onSearch={onSearch} />}
         <button>
-          <img src='' alt='' />
+          <Logo logoWidth={100} clickable={true}></Logo>
         </button>
       </>
     )}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { TempFooter } from '@/component/TempFooter';
+import { TempFooter } from '@/components/TempFooter';
 
 export const Layout = () => (
   <div>

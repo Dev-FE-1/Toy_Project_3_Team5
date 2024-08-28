@@ -73,7 +73,7 @@ const ContainerStyles = css`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 `;
 
 const cardStyles = css`
@@ -104,7 +104,7 @@ const infoStyles = css`
   gap: 6px;
 
   .title {
-    font-size: ${fontSize.xl};
+    font-size: ${fontSize.lg};
   }
   .username {
     color: ${colors.gray05};
@@ -116,7 +116,6 @@ const infoStyles = css`
 
 const btnStyles = css`
   display: flex;
-  gap: 8px;
   color: ${colors.gray05};
 `;
 

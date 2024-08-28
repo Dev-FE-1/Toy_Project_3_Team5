@@ -20,31 +20,31 @@ const PopupFilter: React.FC<PopupFilterProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const onClickFilterOutside = (event: MouseEvent) => {
+      const targetNode = event.target as Node;
+
       if (
         popupRef.current &&
-        !popupRef.current.contains(event.target as Node) &&
+        !popupRef.current.contains(targetNode) &&
         buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
+        !buttonRef.current.contains(targetNode)
       ) {
         setFilterActive(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener('mousedown', onClickFilterOutside);
+    return () =>
+      document.removeEventListener('mousedown', onClickFilterOutside);
   }, []);
+
+  const toggleFilterActive = () => setFilterActive((prev) => !prev);
 
   return (
     <div css={containerStyle}>
       <button
         css={filterButtonStyle(filterActive)}
-        onClick={() => {
-          setFilterActive(!filterActive);
-        }}
+        onClick={toggleFilterActive}
         ref={buttonRef}
       >
         <ListFilter size={16} /> 필터
@@ -108,6 +108,7 @@ const popupFilterStyle = (filterActive: boolean) => css`
     0px 16px 24px 2px rgba(0, 0, 0, 0.14),
     0px 6px 30px 5px rgba(0, 0, 0, 0.12);
   background-color: ${colors.white};
+  z-index: 1;
 
   p {
     font-weight: ${fontWeight.semiBold};
@@ -120,13 +121,14 @@ const optionWrapperStyle = css`
 `;
 
 const optionStyle = (idx: number, selectedIndex: number) => css`
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
   border: 1px solid
     ${idx === selectedIndex ? colors.primaryLight : colors.gray02};
   border-radius: 50px;
   padding: 4px 12px;
+  white-space: nowrap;
   color: ${idx === selectedIndex ? colors.primaryNormal : colors.gray05};
   background-color: ${idx === selectedIndex
     ? `${colors.primaryLight}1A`

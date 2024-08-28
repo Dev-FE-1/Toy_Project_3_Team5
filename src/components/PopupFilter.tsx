@@ -12,13 +12,13 @@ interface FilterOptionGroup {
 interface PopupFilterProps {
   optionGroups: FilterOptionGroup[];
   selectedIndexes: number[];
-  onFilterChange: (groupIdx: number, idx: number) => void;
+  setSelectedIndexes: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 const PopupFilter: React.FC<PopupFilterProps> = ({
   optionGroups,
   selectedIndexes,
-  onFilterChange,
+  setSelectedIndexes,
 }) => {
   const [filterActive, setFilterActive] = useState<boolean>(false);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -45,6 +45,12 @@ const PopupFilter: React.FC<PopupFilterProps> = ({
 
   const toggleFilterActive = () => setFilterActive((prev) => !prev);
 
+  const onFilterChange = (groupIdx: number, idx: number) => {
+    const updatedIndexes = [...selectedIndexes];
+    updatedIndexes[groupIdx] = idx;
+    setSelectedIndexes(updatedIndexes);
+  };
+
   return (
     <div css={containerStyle}>
       <button
@@ -63,9 +69,7 @@ const PopupFilter: React.FC<PopupFilterProps> = ({
                 <span
                   key={idx}
                   css={optionStyle(idx, selectedIndexes[groupIdx])}
-                  onClick={() => {
-                    onFilterChange(groupIdx, idx);
-                  }}
+                  onClick={() => onFilterChange(groupIdx, idx)}
                 >
                   {option}
                 </span>

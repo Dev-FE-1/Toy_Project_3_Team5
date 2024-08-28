@@ -6,22 +6,20 @@ import { fontSize, fontWeight } from '@/constants/font';
 interface TextFilterProps {
   options: string[];
   selectedIndex: number;
-  onFilterChange: (idx: number) => void;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const TextFilter: React.FC<TextFilterProps> = ({
   options,
   selectedIndex,
-  onFilterChange,
+  setSelectedIndex,
 }) => (
   <div css={textFilterStyle}>
     {options.map((option, idx) => (
       <React.Fragment key={idx}>
         <span
           css={optionStyle(idx, selectedIndex)}
-          onClick={() => {
-            onFilterChange(idx);
-          }}
+          onClick={() => setSelectedIndex(idx)}
         >
           {option}
         </span>

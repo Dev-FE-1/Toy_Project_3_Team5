@@ -1,106 +1,106 @@
+import React, { useState } from 'react';
 import { css } from '@emotion/react';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, SearchIcon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import defaultProfile from '@/assets/profile_default.png';
+import IconButton from '@/components/IconButton';
 import Logo from '@/components/Logo';
 import Profile from '@/components/Profile';
-import SearchBar from '@/components/SearchBar';
 import colors from '@/constants/colors';
-import { fontSize } from '@/constants/font';
+import { fontSize, fontWeight } from '@/constants/font';
+import ROUTES from '@/constants/route';
 
-type HeaderType = 'main' | 'sub' | 'detail';
+type HeaderType = 'main' | 'searchResult' | 'detail';
 
-type ProfileProps = {
-  src: string;
-  alt: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-};
 interface HeaderProps {
   type: HeaderType;
-  title?: string;
-  profileImg?: string;
-  onBack?: () => void;
-  onSearch?: (query: string) => void;
-  profileProps: ProfileProps;
+  headerTitle?: string;
 }
 
-const Header = ({
-  type,
-  title,
-  onBack,
-  onSearch,
-  profileProps = { src: 'srcid', alt: '동혁쓰플필', size: 'xs' },
-}: HeaderProps) => (
-  <header css={headerStyle}>
-    {type === 'main' && (
-      <>
-        <Logo logoWidth={100} clickable={true}></Logo>
-        {onSearch && <SearchBar onSearch={onSearch} />}
-        <Profile
-          src={profileProps.src}
-          alt={profileProps.alt}
-          size={profileProps.size}
-        />
-      </>
-    )}
-    {type === 'sub' && (
-      <>
-        <button css={iconButtonStyle} onClick={onBack}>
-          <ChevronLeft size={24} />
-        </button>
-        {onSearch && <SearchBar onSearch={onSearch} />}
-        <button>
-          <Logo logoWidth={100} clickable={true}></Logo>
-        </button>
-        <Profile
-          src={profileProps.src}
-          alt={profileProps.alt}
-          size={profileProps.size}
-        />
-      </>
-    )}
-    {type === 'detail' && (
-      <>
-        <button css={iconButtonStyle} onClick={onBack}>
-          <ChevronLeft size={24} />
-        </button>
-        <h1 css={titleStyle}>{title}</h1>
-      </>
-    )}
-  </header>
-);
+const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
+  const [searchText, setSearchText] = useState<string>('');
+  const navigate = useNavigate();
+
+  return (
+    <header css={headerStyle}>
+      {type === 'main' ? (
+        <Logo logoWidth={100} clickable={true} />
+      ) : (
+        <IconButton IconComponent={ChevronLeft} onClick={() => navigate(-1)} />
+      )}
+      {type !== 'detail' ? (
+        <>
+          <div css={searchBarStyle}>
+            <input
+              css={searchInputStyle}
+              type='text'
+              value={searchText}
+              placeholder='검색'
+              onChange={(e) => {
+                setSearchText(e.target.value);
+              }}
+            />
+            <IconButton
+              IconComponent={SearchIcon}
+              onClick={() => navigate(ROUTES.SEARCH('검색어'))}
+              size='sm'
+            />
+          </div>
+          <Link to={ROUTES.PROFILE('1')}>
+            <Profile src={defaultProfile} alt='프로필 이미지' size='xs' />
+          </Link>
+        </>
+      ) : (
+        <span css={headerTitleStyle}>{headerTitle}</span>
+      )}
+    </header>
+  );
+};
 
 const headerStyle = css`
-  max-height: 5vh;
-  max-width: 430px;
+  width: 426px;
+  height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
+  padding: 8px 20px;
   background-color: ${colors.white};
-  border-bottom: 1px solid ${colors.gray02};
+  gap: 10px;
+  position: fixed;
+`;
 
-  img {
-    max-height: 600px;
+const searchBarStyle = css`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background-color: ${colors.gray01};
+  border-radius: 6px;
+  padding: 2px 10px;
+
+  button {
+    padding: 0px;
   }
 `;
 
-const titleStyle = css`
-  font-size: ${fontSize.md};
-  font-weight: 600;
-  font-size: 2rem;
+const searchInputStyle = css`
   flex: 1;
-  text-align: center;
+  border: none;
+  background: none;
+  font-size: ${fontSize.sm};
+  padding: 5px;
+  outline: none;
+
+  &::placeholder {
+    color: ${colors.gray03};
+  }
 `;
 
-const iconButtonStyle = css`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: ${colors.gray04};
-
-  &:hover {
-    color: ${colors.gray06};
-  }
+const headerTitleStyle = css`
+  position: absolute;
+  font-size: ${fontSize.lg};
+  font-weight: ${fontWeight.semiBold};
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 export default Header;

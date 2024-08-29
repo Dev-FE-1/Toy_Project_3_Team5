@@ -6,16 +6,7 @@ import colors from '@/constants/colors';
 
 export const Layout = () => (
   <div css={pageContainerStyles}>
-    <Header
-      type={'main'}
-      profileProps={{
-        src: '',
-        alt: '',
-      }}
-      onSearch={() => {
-        ('');
-      }}
-    />
+    <Header type='main' />
     <main>
       <Outlet />
     </main>

@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
 import Header from '@/components/Header';
-import { TempFooter } from '@/components/TempFooter';
+import Navbar from '@/components/Navbar';
 import colors from '@/constants/colors';
 
 export const Layout = () => (
@@ -10,7 +10,7 @@ export const Layout = () => (
     <main>
       <Outlet />
     </main>
-    <TempFooter />
+    <Navbar />
   </div>
 );
 

@@ -2,22 +2,23 @@
 
 const ROUTES = {
   ROOT: '/',
-  SIGN_IN: '/signIn',
-  SIGN_UP: '/signUp',
-  HASH_TAG: '/hashTag',
+  SIGN_IN: '/signin',
+  SIGN_UP: '/signup',
+  HASH_TAG: '/hashtag',
   POPULAR: '/popular',
   FOLLOWING: '/following',
+  DETAIL: (playListId = ':playlistId') => `/detail/${playListId}`,
   SEARCH: (searchText = ':searchText') => `/search/${searchText}`,
-  DETAIL: (playListId = ':playListId') => `/detail/${playListId}`,
-  FOLLOWER: (userId = ':userId') => `/follower/${userId}`,
-  PROFILE: (userId = ':userId') => `/profile/${userId}`,
-  PROFILE_MODIFY: (userId = ':userId') => `/profile/${userId}/modify`,
-  PROFILE_FOLLOWING: (userId = ':userId') => `/profile/${userId}/following`,
   PLAYLIST: (userId = ':userId') => `/playlist/${userId}`,
   PLAYLIST_SAVED: (userId = ':userId') => `/playlist/${userId}/saved`,
   PLAYLIST_LIKES: (userId = ':userId') => `/playlist/${userId}/likes`,
   PLAYLIST_ADD: (userId = ':userId') => `/playlist/${userId}/add`,
-  PLAYLIST_MODIFY: (userId = ':userId') => `/playlist/${userId}/modify`,
+  PLAYLIST_MODIFY: (playlistId = ':playlistId') =>
+    `/playlist/${playlistId}/modify`,
+  PROFILE: (userId = ':userId') => `/profile/${userId}`,
+  PROFILE_MODIFY: (userId = ':userId') => `/profile/${userId}/modify`,
+  PROFILE_FOLLOWER: (userId = ':userId') => `/profile/${userId}/follower`,
+  PROFILE_FOLLOWING: (userId = ':userId') => `/profile/${userId}/following`,
   NOT_FOUND: '*',
 };
 

@@ -49,11 +49,11 @@ export const router = createBrowserRouter([
             path: ROUTES.PLAYLIST_LIKES(),
             element: <PlayListLikes />,
           },
-          {
-            path: ROUTES.PLAYLIST_ADD(),
-            element: <PlayListAdd />,
-          },
         ],
+      },
+      {
+        path: ROUTES.PLAYLIST_ADD(),
+        element: <PlayListAdd />,
       },
       {
         path: ROUTES.PLAYLIST_MODIFY(),

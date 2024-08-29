@@ -9,13 +9,7 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
-
-type HeaderType = 'main' | 'searchResult' | 'detail';
-
-interface HeaderProps {
-  type: HeaderType;
-  headerTitle?: string;
-}
+import { HeaderProps } from '@/types/route';
 
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const [searchText, setSearchText] = useState<string>('');

@@ -5,6 +5,8 @@ import {
   MessageSquareMore,
   LockKeyhole,
   LockKeyholeOpen,
+  ListX,
+  ListPlus,
 } from 'lucide-react';
 import IconButton from '@/components/IconButton';
 import KebabButton from '@/components/KebabButton';
@@ -18,12 +20,24 @@ type CardSize = 'large' | 'small';
 interface PlaylistCardProps {
   playlistItem: PlayListDataProps;
   size: CardSize;
+  showAddButton?: boolean;
+  showLikeButton?: boolean;
+  showLockButton?: boolean;
+  showKebabMenu?: boolean;
 }
 
-const MAXLENGTH = 50;
+const MAXLENGTH = 20;
 
-const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlistItem, size }) => {
+const PlaylistCard: React.FC<PlaylistCardProps> = ({
+  playlistItem,
+  size,
+  showAddButton = false,
+  showLikeButton = false,
+  showLockButton = false,
+  showKebabMenu = false,
+}) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
   const menuItems = [
@@ -87,24 +101,37 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlistItem, size }) => {
         </section>
       </div>
       <div css={smallBtnStyles}>
-        <IconButton
-          IconComponent={Heart}
-          onClick={() => setIsLiked(!isLiked)}
-          color={isLiked ? 'red' : 'gray'}
-          fillColor={isLiked ? 'red' : undefined}
-        />
-        <IconButton
-          IconComponent={isLocked ? LockKeyhole : LockKeyholeOpen}
-          onClick={() => setIsLocked(!isLocked)}
-          color='gray'
-        />
-        <KebabButton menuItems={menuItems} />
+        {showAddButton && (
+          <IconButton
+            IconComponent={isAdded ? ListX : ListPlus}
+            onClick={() => setIsAdded(!isAdded)}
+            color='gray'
+          />
+        )}
+        {showLikeButton && (
+          <IconButton
+            IconComponent={Heart}
+            onClick={() => setIsLiked(!isLiked)}
+            color={isLiked ? 'red' : 'gray'}
+            fillColor={isLiked ? 'red' : undefined}
+          />
+        )}
+        {showLockButton && (
+          <IconButton
+            IconComponent={isLocked ? LockKeyhole : LockKeyholeOpen}
+            onClick={() => setIsLocked(!isLocked)}
+            color='gray'
+          />
+        )}
+        {showKebabMenu && <KebabButton menuItems={menuItems} />}
       </div>
     </article>
   );
 
   return size === 'large' ? renderLargeCard() : renderSmallCard();
 };
+
+const smallImgSize = '72px';
 
 const largeCardStyles = css`
   gap: 8px;
@@ -191,8 +218,10 @@ const smallCardStyles = css`
   }
 
   .img-container {
-    width: 72px;
-    height: 72px;
+    width: ${smallImgSize};
+    min-width: ${smallImgSize};
+    height: ${smallImgSize};
+    min-height: ${smallImgSize};
     overflow: hidden;
     border-radius: 6px;
     display: flex;
@@ -211,7 +240,7 @@ const smallInfoStyles = css`
   gap: 6px;
 
   .title {
-    font-size: ${fontSize.lg};
+    font-size: ${fontSize.md};
   }
   .username {
     color: ${colors.gray05};

@@ -40,13 +40,14 @@ const toggleStyle = css`
 const switchStyle = (enabled: boolean) => css`
   display: flex;
   align-items: center;
-  width: 48px;
+  width: 44px;
   height: 24px;
   padding: 2px;
   border-radius: 12px;
-  background-color: ${enabled ? colors.primaryNormal : colors.gray03};
+  background-color: ${enabled ? colors.primaryLight : colors.gray03};
   transition: background-color 0.2s ease-in-out;
   cursor: pointer;
+  border: none;
 `;
 
 const switchThumbStyle = (enabled: boolean) => css`

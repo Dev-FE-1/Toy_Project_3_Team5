@@ -4,7 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import ROUTES from '@/constants/route';
 import { Detail } from '@/pages/common/Detail';
-import { Following } from '@/pages/common/Following';
+import Following from '@/pages/common/Following';
 import { HashTag } from '@/pages/common/HashTag';
 import { Home } from '@/pages/common/Home';
 import { NotFound } from '@/pages/common/NotFound';
@@ -53,11 +53,11 @@ export const router = createBrowserRouter([
             path: ROUTES.PLAYLIST_ADD(),
             element: <PlayListAdd />,
           },
-          {
-            path: ROUTES.PLAYLIST_MODIFY(),
-            element: <PlayListUpdate />,
-          },
         ],
+      },
+      {
+        path: ROUTES.PLAYLIST_MODIFY(),
+        element: <PlayListUpdate />,
       },
       {
         path: ROUTES.PROFILE(),
@@ -94,12 +94,12 @@ export const router = createBrowserRouter([
         element: <Detail />,
       },
       {
-        path: ROUTES.FOLLOWER(),
+        path: ROUTES.PROFILE_FOLLOWER(),
         element: <ProfileFollower />,
       },
       {
-        path: ROUTES.FOLLOWING,
-        element: <Following />,
+        path: ROUTES.PROFILE_FOLLOWING(),
+        element: <ProfileFollowing />,
       },
     ],
   },

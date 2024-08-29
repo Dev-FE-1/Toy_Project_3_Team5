@@ -17,6 +17,7 @@ interface IconButtonProps {
   label?: string;
   size?: IconButtonSizeType;
   color?: IconButtonColorType;
+  labelColor?: IconButtonColorType;
   fillColor?: IconButtonColorType;
 }
 
@@ -36,10 +37,14 @@ const IconButton: React.FC<IconButtonProps> = ({
   onClick,
   label = '',
   size = 'md',
-  color = 'primary',
+  color = 'gray',
+  labelColor,
   fillColor,
 }) => {
   const selectColors = iconButtonColors[color].color;
+  const selectLabelColor = labelColor
+    ? iconButtonColors[labelColor].color
+    : selectColors;
   const selectFillColor = fillColor
     ? iconButtonColors[fillColor].color
     : 'none';
@@ -47,7 +52,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   return (
     <button css={iconButtonStyle(size, selectColors)} onClick={onClick}>
       <IconComponent size={size === 'md' ? 24 : 12} fill={selectFillColor} />
-      {label}
+      <span css={labelStyle(selectLabelColor)}>{label}</span>
     </button>
   );
 };
@@ -67,6 +72,10 @@ const iconButtonStyle = (size: IconButtonSizeType, selectColors: string) => css`
   &:hover {
     cursor: pointer;
   }
+`;
+
+const labelStyle = (selectLabelColor: string) => css`
+  color: ${selectLabelColor};
 `;
 
 export default IconButton;

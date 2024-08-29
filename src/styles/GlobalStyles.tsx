@@ -133,9 +133,6 @@ const GlobalStyles = () => (
         box-sizing: border-box;
         margin: 0;
       }
-      html {
-        font-size: 10px;
-      }
       body,
       #root {
         width: 100%;
@@ -160,6 +157,11 @@ const GlobalStyles = () => (
         font-weight: ${fontWeight.regular};
         background-color: ${colors.white};
         color: ${colors.black};
+      }
+      html {
+        font-size: 10px;
+        height: 100%;
+        width: 100%;
       }
     `}
   />

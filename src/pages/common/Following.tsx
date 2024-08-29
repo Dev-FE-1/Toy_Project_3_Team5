@@ -6,123 +6,13 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import { PlayListDataProps } from '@/hooks/usePlaylist';
-
-interface ProfileProps {
-  src: string;
-  alt: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  name: string;
-}
-
-interface TestDataProps {
-  following: ProfileProps[];
-  playlist: PlayListDataProps[];
-}
-
-const TEST_DATA: TestDataProps = {
-  following: [
-    {
-      alt: '썸네일',
-      src: '/src/assets/defaultThumbnail.jpg',
-      size: 'md',
-      name: '사용자1',
-    },
-    {
-      alt: '썸네일',
-      src: '/src/assets/defaultThumbnail2.jpg',
-      size: 'md',
-      name: '사용자2',
-    },
-    {
-      alt: '썸네일',
-      src: '/src/assets/defaultThumbnail.jpg',
-      size: 'md',
-      name: '사용자3',
-    },
-    {
-      alt: '썸네일',
-      src: '/src/assets/defaultThumbnail2.jpg',
-      size: 'md',
-      name: '사용자4',
-    },
-    {
-      alt: '썸네일',
-      src: '/src/assets/defaultThumbnail2.jpg',
-      size: 'md',
-      name: '사용자4',
-    },
-    {
-      alt: '썸네일',
-      src: '/src/assets/defaultThumbnail2.jpg',
-      size: 'md',
-      name: '사용자4',
-    },
-    {
-      alt: '썸네일',
-      src: '/src/assets/defaultThumbnail2.jpg',
-      size: 'md',
-      name: '사용자4',
-    },
-  ],
-  playlist: [
-    {
-      title: '한 여름 코딩하며 듣는 로파이 😊',
-      userName: 'user1',
-      tags: ['#발라드', '#힙합'],
-      numberOfComments: 20,
-      numberOfLikes: 100,
-      publicity: false,
-      links: [
-        '/src/assets/defaultThumbnail.jpg',
-        '/src/assets/defaultThumbnail2.jpg',
-        '/src/assets/defaultThumbnail.jpg',
-      ],
-    },
-    {
-      title: '프라하 여행가고 싶어지는 영상🍊',
-      userName: 'user2',
-      tags: ['#여행', '#프라하', '#귤'],
-      publicity: true,
-      numberOfComments: 2000,
-      numberOfLikes: 1000,
-      links: [
-        '/src/assets/defaultThumbnail2.jpg',
-        '/src/assets/defaultThumbnail.jpg',
-      ],
-    },
-    {
-      title: '한 여름 코딩하며 듣는 로파이 😊',
-      userName: 'user1',
-      tags: ['#발라드', '#힙합'],
-      numberOfComments: 20,
-      numberOfLikes: 100,
-      publicity: false,
-      links: [
-        '/src/assets/defaultThumbnail.jpg',
-        '/src/assets/defaultThumbnail2.jpg',
-        '/src/assets/defaultThumbnail.jpg',
-      ],
-    },
-    {
-      title: '프라하 여행가고 싶어지는 영상🍊',
-      userName: 'user2',
-      tags: ['#여행', '#프라하', '#귤'],
-      publicity: true,
-      numberOfComments: 2000,
-      numberOfLikes: 1000,
-      links: [
-        '/src/assets/defaultThumbnail2.jpg',
-        '/src/assets/defaultThumbnail.jpg',
-      ],
-    },
-  ],
-};
+import { TEST_DATA, TestProfileProps } from '@/mock/following-test';
 
 const Following = () => {
   const getFollowing = () => TEST_DATA.following;
   const getPlaylist = () => TEST_DATA.playlist;
 
-  const followingList: ProfileProps[] = getFollowing();
+  const followingList: TestProfileProps[] = getFollowing();
   const playlists: PlayListDataProps[] = getPlaylist();
 
   return (

@@ -1,79 +1,61 @@
-// import React, { useState, useEffect } from 'react';
-// import { css } from '@emotion/react';
-// import { Users, House, Library, Flame } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
-// import colors from '@/constants/colors';
-// import { fontSize } from '@/constants/font';
-// import ROUTES from '@/constants/route';
+import React from 'react';
+import { css } from '@emotion/react';
+import { Home, Flame, Library, Users } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import IconButton from '@/components/IconButton';
+import colors from '@/constants/colors';
+import ROUTES from '@/constants/route';
 
-// export const NavBar = () => {
-//   const navigate = useNavigate();
-//   const [activeTab, setActiveTab] = useState(ROUTES.ROOT);
-//   const userId = 'yourUserId'; //유저 아이디
-//   useEffect(() => {
-//     setActiveTab(window.location.pathname);
-//   }, [window.location.pathname]);
+interface NavList {
+  label: string;
+  icon: React.ComponentType;
+  to: string;
+}
 
-//   const navItems = [
-//     { icon: House, path: ROUTES.ROOT, label: '홈' },
-//     { icon: Flame, path: ROUTES.POPULAR, label: '인기' },
-//     { icon: Users, path: ROUTES.PROFILE, label: '프로필' },
-//     { icon: Library, path: ROUTES.FOLLOWING, label: '팔로잉' },
-//   ];
+const navList: NavList[] = [
+  { label: '홈', icon: Home, to: ROUTES.ROOT },
+  { label: '인기', icon: Flame, to: ROUTES.POPULAR },
+  { label: '마이플리', icon: Library, to: ROUTES.PLAYLIST('1') },
+  { label: '팔로잉', icon: Users, to: ROUTES.FOLLOWING },
+];
 
-//   const handleNavigation = (path) => {
-//     navigate(path);
-//     setActiveTab(path);
-//   };
+const Navbar: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-//   return (
-//     <nav css={styles.navbar}>
-//       {navItems.map((item) => (
-//         <button
-//           key={item.path}
-//           onClick={() => handleNavigation(item.path)}
-//           css={[
-//             styles.navItem,
-//             activeTab === item.path && styles.activeNavItem,
-//           ]}
-//         >
-//           <item.icon size={24} />
-//           <span>{item.label}</span>
-//         </button>
-//       ))}
-//     </nav>
-//   );
-// };
+  return (
+    <nav css={navbarStyle}>
+      {navList.map((list) => {
+        const isActive =
+          list.to === ROUTES.ROOT
+            ? location.pathname === list.to
+            : location.pathname.startsWith(list.to);
 
-// const styles = {
-//   navbar: css`
-//     display: flex;
-//     justify-content: space-around;
-//     align-items: center;
-//     position: fixed;
-//     bottom: 0;
-//     left: 0;
-//     right: 0;
-//     background-color: ${colors.white};
-//     padding: 10px 0;
-//     border-top: 1px solid ${colors.gray01};
-//   `,
-//   navItem: css`
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     color: ${colors.gray01};
-//     background: none;
-//     border: none;
-//     cursor: pointer;
-//     font-size: ${fontSize.sm};
-//     transition: color 0.3s ease;
+        return (
+          <IconButton
+            key={list.label}
+            IconComponent={list.icon}
+            onClick={() => navigate(list.to)}
+            label={list.label}
+            color={isActive ? 'primary' : 'gray'}
+          />
+        );
+      })}
+    </nav>
+  );
+};
 
-//     &:hover {
-//       color: ${colors.primaryDark};
-//     }
-//   `,
-//   activeNavItem: css`
-//     color: ${colors.primaryDark};
-//   `,
-// };
+const navbarStyle = css`
+  width: 426px;
+  height: 60px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  padding: 10px 20px;
+  background-color: ${colors.white};
+  border-top: 1px solid ${colors.gray02};
+`;
+
+export default Navbar;

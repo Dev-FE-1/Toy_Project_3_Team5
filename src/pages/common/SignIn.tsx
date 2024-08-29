@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import google from '@/assets/google_icon.svg';
 import Button from '@/components/Button';
@@ -9,13 +14,46 @@ import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import { auth } from '@/firebase/firbaseConfig';
 
 export const SignIn = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [a, seta] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const onSignUpClick = (): void => {
+  const onEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      navigate(ROUTES.ROOT);
+    } catch (error) {
+      console.error('로그인 중 오류 발생:', error);
+    }
+  };
+
+  const onGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const { user } = result;
+      navigate(ROUTES.ROOT);
+    } catch (error) {
+      console.error('Google 로그인 중 오류 발생:', error);
+    }
+  };
+
+  const onSignUpMessage = (): void => {
     navigate(ROUTES.SIGN_UP);
+  };
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email) ? '' : '올바른 이메일 주소를 입력해주세요';
   };
 
   const validatePassword = (value: string) =>
@@ -26,35 +64,45 @@ export const SignIn = () => {
       <div style={{ marginBottom: '20px' }}>
         <Logo logoWidth={180} clickable={false} />
       </div>
-      <InputBox label='아이디' placeholder='아이디' />
-      <InputBox
-        label='비밀번호'
-        placeholder='비밀번호'
-        validate={validatePassword}
-        isPassword
-      />
-      <div css={toggleStyle}>
-        <Toggle
-          enabled={a}
-          setEnabled={seta}
-          label={{ active: '로그인 정보 기억하기', inactive: '' }}
+      <form onSubmit={onEmailLogin}>
+        <InputBox
+          label='이메일'
+          placeholder='이메일'
+          value={email}
+          validate={validateEmail}
+          onChange={(e) => setEmail(e.target.value)}
         />
-      </div>
-      <div css={loginBtnStyle}>
-        <Button label='로그인' onClick={() => {}} size='lg' fullWidth={true} />
-        <div css={lineStyle}></div>
-        <Button
-          label='또는 구글로 로그인'
-          onClick={() => {}}
-          size='lg'
-          color='black'
-          IconComponent={google}
-          fullWidth={true}
+        <InputBox
+          label='비밀번호'
+          placeholder='비밀번호'
+          value={password}
+          validate={validatePassword}
+          onChange={(e) => setPassword(e.target.value)}
+          isPassword
         />
-      </div>
+        <div css={toggleStyle}>
+          <Toggle
+            enabled={a}
+            setEnabled={seta}
+            label={{ active: '로그인 정보 기억하기', inactive: '' }}
+          />
+        </div>
+        <Button label='로그인' size='lg' fullWidth={true} type='submit' />
+        <div css={loginBtnStyle}>
+          <div css={lineStyle}></div>
+          <Button
+            label='또는 구글로 로그인'
+            onClick={onGoogleLogin}
+            size='lg'
+            color='black'
+            IconComponent={google}
+            fullWidth={true}
+          />
+        </div>
+      </form>
       <div css={signUpMessageStyle}>
         계정이 없으신가요?{' '}
-        <span onClick={onSignUpClick} css={signUpStyle}>
+        <span onClick={onSignUpMessage} css={signUpStyle}>
           회원가입하기
         </span>
       </div>

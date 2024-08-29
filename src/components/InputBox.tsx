@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { css } from '@emotion/react';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
-import useInput from '@/hooks/useInput';
 
 interface InputBoxProps {
   label: string;
@@ -31,15 +30,29 @@ const InputBox: React.FC<InputBoxProps> = ({
   value: propValue,
   onChange: propOnChange,
 }) => {
-  const { value, onChangeValue, onFocusout, isValid, errorMessage } = useInput(
-    '',
-    validate
-  );
+  const [value, setValue] = useState(propValue || '');
+  const [isTouched, setIsTouched] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const isValid = !errorMessage;
 
-  const inputValue = propValue !== undefined ? propValue : value;
-  const handleChange =
-    propOnChange !== undefined ? propOnChange : onChangeValue;
-  const hasValidation = !!validate;
+  const onInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const inputValue = e.target.value;
+    setValue(inputValue);
+    if (propOnChange) propOnChange(e);
+
+    if (validate) {
+      setErrorMessage(validate(inputValue));
+    }
+  };
+
+  const onInputBlur = () => {
+    setIsTouched(true);
+    if (validate) {
+      setErrorMessage(validate(value));
+    }
+  };
 
   return (
     <>
@@ -51,21 +64,21 @@ const InputBox: React.FC<InputBoxProps> = ({
           <textarea
             placeholder={placeholder}
             value={value}
-            onChange={onChangeValue}
-            onFocus={onFocusout}
-            css={inputStyle(isValid, hasValidation, width, height, true)}
+            onChange={onInputChange}
+            onBlur={onInputBlur}
+            css={inputStyle(isValid, isTouched, width, height, true)}
           />
         ) : (
           <input
             type={isPassword ? 'password' : 'text'}
             placeholder={placeholder}
             value={value}
-            onChange={onChangeValue}
-            onFocus={onFocusout}
-            css={inputStyle(isValid, hasValidation, width, height, false)}
+            onChange={onInputChange}
+            onBlur={onInputBlur}
+            css={inputStyle(isValid, isTouched, width, height, false)}
           />
         )}
-        {errorMessage && (
+        {isTouched && errorMessage && (
           <span css={messageStyle(isValid)}>{errorMessage}</span>
         )}
       </div>
@@ -86,8 +99,8 @@ const labelStyleBase = css`
 `;
 
 const inputStyle = (
-  isValid: boolean | null,
-  hasValidation: boolean,
+  isValid: boolean,
+  isTouched: boolean,
   width: string,
   height: string,
   isTextarea: boolean
@@ -96,13 +109,11 @@ const inputStyle = (
   height: ${height};
   padding: 8px 12px;
   border: 1px solid
-    ${!hasValidation
+    ${!isTouched
       ? colors.gray02
-      : isValid === null
-        ? colors.gray02
-        : isValid
-          ? colors.primaryNormal
-          : colors.redNormal};
+      : isValid
+        ? colors.primaryNormal
+        : colors.redNormal};
   border-radius: 6px;
   font-size: ${fontSize.sm};
   resize: ${isTextarea ? 'vertical' : 'none'};
@@ -115,21 +126,13 @@ const inputStyle = (
 
   &:focus {
     outline: none;
-    border-color: ${isValid === null
-      ? colors.primaryNormal
-      : isValid
-        ? colors.primaryNormal
-        : colors.redNormal};
+    border-color: ${isValid ? colors.primaryNormal : colors.redNormal};
   }
 `;
 
-const messageStyle = (isValid: boolean | null) => css`
+const messageStyle = (isValid: boolean) => css`
   margin-top: 6px;
-  color: ${isValid === null
-    ? colors.gray02
-    : isValid
-      ? colors.primaryNormal
-      : colors.redNormal};
+  color: ${isValid ? colors.primaryNormal : colors.redNormal};
   font-size: ${fontSize.xs};
 `;
 

@@ -9,17 +9,22 @@ interface VideoProps {
   userName: string;
 }
 
-const MAXLENGTH = 50;
+const MAX_LENGTH = {
+  title: 50,
+  name: 15,
+};
 
 const Video = ({ imgUrl, title, userName }: VideoProps) => (
   <div css={VideoContainer}>
+    <></>
     <img css={ThumbnailStyle} src={imgUrl} alt='썸네일' />
     <div css={VideoInfoStyle}>
-      <span css={TitleStyle}>{omittedText(title, MAXLENGTH)}</span>
-      <span css={UserNameStyle}>{omittedText(userName, MAXLENGTH)}</span>
+      <span css={TitleStyle}>{omittedText(title, MAX_LENGTH.title)}</span>
+      <span css={UserNameStyle}>{omittedText(userName, MAX_LENGTH.name)}</span>
     </div>
   </div>
 );
+
 const VideoContainer = css`
   display: flex;
   cursor: pointer;
@@ -28,8 +33,8 @@ const VideoContainer = css`
 `;
 
 const ThumbnailStyle = css`
-  width: 200px;
-  height: 120px;
+  width: 128px;
+  height: 72px;
   margin-right: 10px;
   border-radius: 10px;
 `;
@@ -40,18 +45,16 @@ const VideoInfoStyle = css`
   padding: 5px 10px;
 `;
 const TitleStyle = css`
-  font-size: ${fontSize.xl};
+  font-size: ${fontSize.md};
   font-weight: ${fontWeight.medium};
   color: ${colors.black};
-  height: 50%;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
 `;
 const UserNameStyle = css`
-  font-size: ${fontSize.md};
+  font-size: ${fontSize.sm};
   color: ${colors.gray05};
-  height: 50%;
 
   &:hover {
     text-decoration: underline;

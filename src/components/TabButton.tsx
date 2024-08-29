@@ -1,20 +1,74 @@
-import React from 'react';
 import { css } from '@emotion/react';
 import { Tab } from '@headlessui/react';
+import PlaylistCard from '@/components/PlaylistCard';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
+import { PlayListDataProps } from '@/hooks/usePlaylist';
 
 interface TabBtnProps {
   isOwner: boolean;
   profileId: string | number;
-  componentList: React.ElementType[];
 }
 
-const TabButton = ({ isOwner, profileId, componentList }: TabBtnProps) => {
-  const tabs =
-    isOwner === true
-      ? ['마이플리', '저장 플리', '좋아요']
-      : ['마이플리', '저장 플리'];
+const TabButton = ({ isOwner, profileId }: TabBtnProps) => {
+  let tabs: string[];
+  let componentList: React.ElementType[];
+
+  const SmallPlaylistCard = (props: any) => (
+    <PlaylistCard {...props} size='small' />
+  ); //임시로 any
+
+  //id를 받아와서 dbfetch 후, playListDataProps형태로 props입력 따로 뻴 예정
+  let fetchedPlayListData: PlayListDataProps[];
+
+  const TestPlayListData: PlayListDataProps[] = [
+    {
+      title: '한 여름 코딩하며 듣는 로파이 😊',
+      userName: 'user1',
+      tags: ['#발라드', '#힙합'],
+      numberOfComments: 20,
+      numberOfLikes: 100,
+      publicity: false,
+      links: [
+        '/src/assets/defaultThumbnail.jpg',
+        '/src/assets/defaultThumbnail2.jpg',
+        '/src/assets/defaultThumbnail.jpg',
+      ],
+    },
+    {
+      title: '프라하 여행가고 싶어지는 영상🍊',
+      userName: 'user2',
+      tags: ['#여행', '#프라하', '#귤'],
+      publicity: true,
+      numberOfComments: 2000,
+      numberOfLikes: 1000,
+      links: [
+        '/src/assets/defaultThumbnail2.jpg',
+        '/src/assets/defaultThumbnail.jpg',
+      ],
+    },
+    {
+      title: '한 여름 코딩하며 듣는 로파이 😊',
+      userName: 'user1',
+      tags: ['#발라드', '#힙합'],
+      numberOfComments: 20,
+      numberOfLikes: 100,
+      publicity: false,
+      links: [
+        '/src/assets/defaultThumbnail.jpg',
+        '/src/assets/defaultThumbnail2.jpg',
+        '/src/assets/defaultThumbnail.jpg',
+      ],
+    },
+  ]; //테스트용 데이터입니다.
+
+  if (isOwner) {
+    tabs = ['마이플리', '저장 플리', '좋아요'];
+    componentList = [SmallPlaylistCard, SmallPlaylistCard, SmallPlaylistCard];
+  } else {
+    tabs = ['마이플리', '저장 플리'];
+    componentList = [SmallPlaylistCard, SmallPlaylistCard];
+  }
 
   return (
     <Tab.Group>
@@ -33,7 +87,13 @@ const TabButton = ({ isOwner, profileId, componentList }: TabBtnProps) => {
       <Tab.Panels>
         {componentList.map((Component, index) => (
           <Tab.Panel key={index}>
-            <Component />
+            <Component
+              playlistItem={
+                fetchedPlayListData !== undefined
+                  ? fetchedPlayListData[index]
+                  : TestPlayListData[index]
+              }
+            />
             {profileId}
           </Tab.Panel>
         ))}

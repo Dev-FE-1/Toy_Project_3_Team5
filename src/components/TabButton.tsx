@@ -14,20 +14,17 @@ const TabButton: React.FC<TabButtonProps> = ({ tabNames, tabLinks }) => {
 
   return (
     <div css={tabContainerStyle}>
-      {tabNames.map((name, index) => {
-        const to = tabLinks[index](userId);
-        return (
-          <NavLink
-            key={name}
-            to={to}
-            css={tabLinkStyle}
-            className={({ isActive }) => (isActive ? 'active' : '')}
-            end={index === 0}
-          >
-            {name}
-          </NavLink>
-        );
-      })}
+      {tabNames.map((name, index) => (
+        <NavLink
+          key={name}
+          to={tabLinks[index](userId)}
+          css={tabLinkStyle}
+          className={({ isActive }) => (isActive ? 'active' : '')}
+          end={index === 0}
+        >
+          {name}
+        </NavLink>
+      ))}
     </div>
   );
 };

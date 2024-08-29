@@ -33,7 +33,6 @@ const InputBox: React.FC<InputBoxProps> = ({
   const [value, setValue] = useState(propValue || '');
   const [isTouched, setIsTouched] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const isValid = !errorMessage;
 
   const onInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -43,16 +42,22 @@ const InputBox: React.FC<InputBoxProps> = ({
     if (propOnChange) propOnChange(e);
 
     if (validate) {
-      setErrorMessage(validate(inputValue));
+      const validationMessage = validate(inputValue);
+      setErrorMessage(validationMessage);
     }
   };
 
   const onInputBlur = () => {
     setIsTouched(true);
     if (validate) {
-      setErrorMessage(validate(value));
+      const validationMessage = validate(value);
+      setErrorMessage(validationMessage);
     }
   };
+
+  const isValid = validate
+    ? errorMessage === '' || errorMessage === '사용 가능한 비밀번호입니다.'
+    : null;
 
   return (
     <>
@@ -99,7 +104,7 @@ const labelStyleBase = css`
 `;
 
 const inputStyle = (
-  isValid: boolean,
+  isValid: boolean | null,
   isTouched: boolean,
   width: string,
   height: string,
@@ -111,9 +116,11 @@ const inputStyle = (
   border: 1px solid
     ${!isTouched
       ? colors.gray02
-      : isValid
-        ? colors.primaryNormal
-        : colors.redNormal};
+      : isValid === null
+        ? colors.gray02
+        : isValid
+          ? colors.primaryNormal
+          : colors.redNormal};
   border-radius: 6px;
   font-size: ${fontSize.sm};
   resize: ${isTextarea ? 'vertical' : 'none'};
@@ -126,14 +133,23 @@ const inputStyle = (
 
   &:focus {
     outline: none;
-    border-color: ${isValid ? colors.primaryNormal : colors.redNormal};
+    border-color: ${!isTouched
+      ? colors.gray02
+      : isValid === null
+        ? colors.gray02
+        : isValid
+          ? colors.primaryNormal
+          : colors.redNormal};
   }
 `;
 
-const messageStyle = (isValid: boolean) => css`
+const messageStyle = (isValid: boolean | null) => css`
   margin-top: 6px;
-  color: ${isValid ? colors.primaryNormal : colors.redNormal};
+  color: ${isValid === null
+    ? colors.gray02
+    : isValid
+      ? colors.primaryNormal
+      : colors.redNormal};
   font-size: ${fontSize.xs};
 `;
-
 export default InputBox;

@@ -4,16 +4,15 @@ import { Tab } from '@headlessui/react';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 
-type TabType = 'owner' | 'visit';
 interface TabBtnProps {
-  type: TabType;
+  isOwner: boolean;
   profileId: string | number;
   componentList: React.ElementType[];
 }
 
-const TabButton = ({ type, profileId, componentList }: TabBtnProps) => {
+const TabButton = ({ isOwner, profileId, componentList }: TabBtnProps) => {
   const tabs =
-    type === 'owner'
+    isOwner === true
       ? ['마이플리', '저장 플리', '좋아요']
       : ['마이플리', '저장 플리'];
 

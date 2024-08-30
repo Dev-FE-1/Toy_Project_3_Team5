@@ -62,6 +62,11 @@ const containerStyle = css``;
 const followingHeaderStyle = css`
   display: flex;
   padding: 10px;
+  position: fixed;
+  z-index: 10;
+  background: ${colors.white};
+  width: 430px;
+  height: 100px;
 `;
 
 const followingListStyle = css`
@@ -90,13 +95,10 @@ const followingTextStyle = css`
 `;
 
 const playlistContainer = css`
-  padding: 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: calc(100vh - 64px - 64px - 80px); // header, footer, main padding-top
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding: 100px 20px 20px 20px;
 `;
 
 const recommandStyles = css`

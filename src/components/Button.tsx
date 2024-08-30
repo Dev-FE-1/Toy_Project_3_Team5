@@ -6,6 +6,7 @@ type ButtonShapeType = 'block' | 'line' | 'round' | 'text';
 type ButtonSizeType = 'sm' | 'md' | 'lg';
 type ButtonColorType = 'primary' | 'gray' | 'red' | 'black';
 type ButtonIconType = React.ComponentType<IconProps> | string | undefined;
+type ButtonActionType = 'submit' | 'button' | 'reset';
 
 interface IconProps {
   size?: string | number;
@@ -19,6 +20,7 @@ interface ButtonProps {
   color?: ButtonColorType;
   IconComponent?: ButtonIconType;
   fullWidth?: boolean;
+  type?: ButtonActionType;
   disabled?: boolean;
 }
 
@@ -53,6 +55,7 @@ const Button: React.FC<ButtonProps> = ({
   size = 'md',
   color = 'primary',
   IconComponent = undefined,
+  type = 'button',
   fullWidth = false,
   disabled = false,
 }) => {
@@ -62,6 +65,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       css={buttonStyle(shape, selectSizes, selectColors, fullWidth, disabled)}
+      type={type}
       onClick={onClick}
       disabled={disabled}
     >

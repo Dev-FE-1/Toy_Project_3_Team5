@@ -26,7 +26,7 @@ interface PlaylistCardProps {
   showKebabMenu?: boolean;
 }
 
-const MAXLENGTH = 20;
+const MAXLENGTH = 50;
 
 const PlaylistCard: React.FC<PlaylistCardProps> = ({
   playlistItem,

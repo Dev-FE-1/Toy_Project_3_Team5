@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
 };
 
 const headerStyle = css`
-  width: 426px;
+  width: 430px;
   height: 60px;
   display: flex;
   justify-content: space-between;

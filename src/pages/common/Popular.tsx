@@ -3,33 +3,29 @@ import { css } from '@emotion/react';
 import Button from '@/components/Button';
 import PlaylistCard from '@/components/PlaylistCard';
 import { fontSize } from '@/constants/font';
-import { PlayListDataProps } from '@/hooks/usePlaylist';
-import { playlistsDummyData } from '@/mock/popularPlaylist-test';
+import useTagFetch from '@/hooks/useTagFetch';
 
 export const Popular = () => {
-  const tagMapper: { [key: string]: string } = {
-    '인기 급상승 동영상': 'hot',
-    Developer: 'develop',
-    먹방: 'mukbang',
-    Vlog: 'vlog',
-  };
-  const tags: string[] = ['인기 급상승 동영상', 'Developer', '먹방', 'Vlog']; //fetch 해올꺼 시작할때 useEffect
+  const tags: string[] = ['인기 급상승 동영상', 'Developer', '먹방', 'Vlog'];
   const [clickedBtn, setClickedBtn] = useState(tags[0]);
+
+  const { data: playListCardData } = useTagFetch({
+    collectionName: 'playlist',
+    tag: clickedBtn,
+  });
 
   const onButtonClick = (tag: string) => () => {
     setClickedBtn(tag);
   };
 
-  const selectedKey = tagMapper[clickedBtn];
-  const playListCardData: PlayListDataProps[] = playlistsDummyData[selectedKey];
   return (
     <div css={contentContainerStyle}>
       <div css={tagContainerStyle}>
         {tags.map((tag, index) => (
           <Button
-            key={tags[index]}
-            label={`#${tags[index]}`}
-            onClick={onButtonClick(tags[index])}
+            key={tag}
+            label={`#${tag}`}
+            onClick={onButtonClick(tag)}
             size='lg'
             color={clickedBtn === tags[index] ? 'primary' : 'lightGray'}
           ></Button>
@@ -37,13 +33,19 @@ export const Popular = () => {
       </div>
       <div css={titleContainerStyle}>{clickedBtn}</div>
       <div css={playlistContainerStyle}>
-        {playListCardData.map((playlistCard, index) => (
-          <PlaylistCard key={index} playlistItem={playlistCard} size='large' />
-        ))}
+        {playListCardData &&
+          playListCardData.map((playlistCard, index) => (
+            <PlaylistCard
+              key={index}
+              playlistItem={playlistCard}
+              size='large'
+            />
+          ))}
       </div>
     </div>
   );
 };
+
 const contentContainerStyle = css`
   box-sizing: border-box;
   height: calc(100vh - 64px - 64px);

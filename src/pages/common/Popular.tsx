@@ -3,70 +3,77 @@ import { css } from '@emotion/react';
 import Button from '@/components/Button';
 import PlaylistCard from '@/components/PlaylistCard';
 import { fontSize } from '@/constants/font';
-import useTagFetch from '@/hooks/useTagFetch';
+import { PlayListDataProps } from '@/hooks/usePlaylist';
+import { playlistsDummyData } from '@/mock/popularPlaylist-test';
 
 export const Popular = () => {
-  const tags: string[] = ['인기 급상승 동영상', 'Developer', '먹방', 'Vlog'];
+  const tagMapper: { [key: string]: string } = {
+    '인기 급상승 동영상': 'hot',
+    Developer: 'develop',
+    먹방: 'mukbang',
+    Vlog: 'vlog',
+  };
+  const tags: string[] = ['인기 급상승 동영상', 'Developer', '먹방', 'Vlog']; //fetch 해올꺼 시작할때 useEffect
   const [clickedBtn, setClickedBtn] = useState(tags[0]);
-
-  const { data: playListCardData } = useTagFetch({
-    collectionName: 'playlist',
-    tag: clickedBtn,
-  });
 
   const onButtonClick = (tag: string) => () => {
     setClickedBtn(tag);
   };
 
+  const selectedKey = tagMapper[clickedBtn];
+  const playListCardData: PlayListDataProps[] = playlistsDummyData[selectedKey];
   return (
     <div css={contentContainerStyle}>
       <div css={tagContainerStyle}>
         {tags.map((tag, index) => (
           <Button
-            key={tag}
-            label={`#${tag}`}
-            onClick={onButtonClick(tag)}
+            key={tags[index]}
+            label={`#${tags[index]}`}
+            onClick={onButtonClick(tags[index])}
             size='lg'
-            color={clickedBtn === tag ? 'primary' : 'gray'}
-          />
+            color={clickedBtn === tags[index] ? 'primary' : 'lightGray'}
+          ></Button>
         ))}
       </div>
-      <h1>{clickedBtn}</h1>
+      <div css={titleContainerStyle}>{clickedBtn}</div>
       <div css={playlistContainerStyle}>
-        {playListCardData &&
-          playListCardData.map((playlistCard, index) => (
-            <PlaylistCard
-              key={index}
-              playlistItem={playlistCard}
-              size='large'
-            />
-          ))}
+        {playListCardData.map((playlistCard, index) => (
+          <PlaylistCard key={index} playlistItem={playlistCard} size='large' />
+        ))}
       </div>
     </div>
   );
 };
-
 const contentContainerStyle = css`
+  box-sizing: border-box;
+  height: calc(100vh - 64px - 64px);
   display: flex;
   flex-direction: column;
-
-  h1 {
-    min-height: 10vh;
-    display: flex;
-    align-items: center;
-    padding-left: 10px;
-    font-size: ${fontSize.xxxl};
-  }
+  overflow: hidden;
 `;
 
 const tagContainerStyle = css`
+  height: 10vh;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
+  gap: 8px;
+  padding-left: 15px;
+  padding-right: 15px;
+`;
+
+const titleContainerStyle = css`
+  height: 20vh;
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+  padding-left: 15px;
+  font-size: ${fontSize.xxxl};
 `;
 
 const playlistContainerStyle = css`
-  padding-left: 16px;
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: 20px;
 `;

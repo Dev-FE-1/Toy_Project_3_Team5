@@ -33,8 +33,8 @@ const useTagFetch = ({ collectionName, tag, limitNumber = 10 }: FetchInfo) => {
       if (tag && tag !== '인기 급상승 동영상') {
         fetchQuery = query(
           collection(db, collectionName),
-          where('tags', 'array-contains', tag),
-          // orderBy('likes', 'desc'),
+          where('tags', 'array-contains', `#${tag}`),
+          orderBy('likes', 'desc'),
           limit(limitNumber)
         );
       } else {

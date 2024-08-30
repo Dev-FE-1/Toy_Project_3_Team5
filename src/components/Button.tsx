@@ -4,8 +4,9 @@ import colors from '@/constants/colors';
 
 type ButtonShapeType = 'block' | 'line' | 'round' | 'text';
 type ButtonSizeType = 'sm' | 'md' | 'lg';
-type ButtonColorType = 'primary' | 'gray' | 'red' | 'black';
+type ButtonColorType = 'primary' | 'lightGray' | 'gray' | 'red' | 'black';
 type ButtonIconType = React.ComponentType<IconProps> | string | undefined;
+type ButtonActionType = 'submit' | 'button' | 'reset';
 
 interface IconProps {
   size?: string | number;
@@ -19,6 +20,7 @@ interface ButtonProps {
   color?: ButtonColorType;
   IconComponent?: ButtonIconType;
   fullWidth?: boolean;
+  type?: ButtonActionType;
   disabled?: boolean;
 }
 
@@ -29,6 +31,7 @@ type ButtonColors = {
 
 const buttonColors: Record<ButtonColorType, ButtonColors> = {
   primary: { color: colors.primaryNormal, hoverColor: colors.primaryDark },
+  lightGray: { color: colors.gray02, hoverColor: colors.primaryNormal },
   gray: { color: colors.gray05, hoverColor: colors.gray06 },
   red: { color: colors.redNormal, hoverColor: colors.redDark },
   black: { color: colors.black, hoverColor: colors.gray04 },
@@ -53,6 +56,7 @@ const Button: React.FC<ButtonProps> = ({
   size = 'md',
   color = 'primary',
   IconComponent = undefined,
+  type = 'button',
   fullWidth = false,
   disabled = false,
 }) => {
@@ -62,6 +66,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       css={buttonStyle(shape, selectSizes, selectColors, fullWidth, disabled)}
+      type={type}
       onClick={onClick}
       disabled={disabled}
     >
@@ -106,7 +111,7 @@ const buttonStyle = (
     : shape === 'text' || shape === 'line'
       ? 'transparent'
       : selectColors.color};
-  color: ${disabled
+  color: ${disabled || colors.gray02
     ? colors.black
     : shape === 'text' || shape === 'line'
       ? selectColors.color

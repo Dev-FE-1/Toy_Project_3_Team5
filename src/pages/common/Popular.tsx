@@ -31,7 +31,7 @@ export const Popular = () => {
             label={`#${tags[index]}`}
             onClick={onButtonClick(tags[index])}
             size='lg'
-            color={clickedBtn === tags[index] ? 'primary' : 'gray'}
+            color={clickedBtn === tags[index] ? 'primary' : 'lightGray'}
           ></Button>
         ))}
       </div>

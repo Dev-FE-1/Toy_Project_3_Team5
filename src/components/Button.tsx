@@ -4,7 +4,7 @@ import colors from '@/constants/colors';
 
 type ButtonShapeType = 'block' | 'line' | 'round' | 'text';
 type ButtonSizeType = 'sm' | 'md' | 'lg';
-type ButtonColorType = 'primary' | 'gray' | 'red' | 'black';
+type ButtonColorType = 'primary' | 'lightGray' | 'gray' | 'red' | 'black';
 type ButtonIconType = React.ComponentType<IconProps> | string | undefined;
 type ButtonActionType = 'submit' | 'button' | 'reset';
 
@@ -31,6 +31,7 @@ type ButtonColors = {
 
 const buttonColors: Record<ButtonColorType, ButtonColors> = {
   primary: { color: colors.primaryNormal, hoverColor: colors.primaryDark },
+  lightGray: { color: colors.gray02, hoverColor: colors.primaryNormal },
   gray: { color: colors.gray05, hoverColor: colors.gray06 },
   red: { color: colors.redNormal, hoverColor: colors.redDark },
   black: { color: colors.black, hoverColor: colors.gray04 },
@@ -110,7 +111,7 @@ const buttonStyle = (
     : shape === 'text' || shape === 'line'
       ? 'transparent'
       : selectColors.color};
-  color: ${disabled
+  color: ${disabled || colors.gray02
     ? colors.black
     : shape === 'text' || shape === 'line'
       ? selectColors.color

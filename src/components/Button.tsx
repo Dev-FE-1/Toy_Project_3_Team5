@@ -111,7 +111,7 @@ const buttonStyle = (
     : shape === 'text' || shape === 'line'
       ? 'transparent'
       : selectColors.color};
-  color: ${disabled || colors.gray02
+  color: ${disabled || selectColors.color === colors.gray02
     ? colors.black
     : shape === 'text' || shape === 'line'
       ? selectColors.color

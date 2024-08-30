@@ -67,6 +67,7 @@ const headerStyle = css`
   background-color: ${colors.white};
   gap: 10px;
   position: fixed;
+  z-index: 10;
 `;
 
 const searchBarStyle = css`

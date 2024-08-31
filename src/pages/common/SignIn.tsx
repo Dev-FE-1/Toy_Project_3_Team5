@@ -25,12 +25,9 @@ export const SignIn = () => {
   const onEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const user = await signInWithEmailAndPassword(auth, email, password);
       navigate(ROUTES.ROOT);
+      return user;
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
     }
@@ -42,6 +39,7 @@ export const SignIn = () => {
       const result = await signInWithPopup(auth, provider);
       const { user } = result;
       navigate(ROUTES.ROOT);
+      return user;
     } catch (error) {
       console.error('Google 로그인 중 오류 발생:', error);
     }

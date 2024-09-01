@@ -17,10 +17,13 @@ import ROUTES from '@/constants/route';
 import { auth } from '@/firebase/firbaseConfig';
 import { useAuthStore } from '@/stores/useAuthStore';
 
+const DOMAIN = '@gmail.com';
+
 export const SignIn = () => {
-  const [email, setEmail] = useState('');
+  const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [isEmailRemembered, setIsEmailRemembered] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   const setUser = useAuthStore((state) => state.setUser);
@@ -28,7 +31,7 @@ export const SignIn = () => {
   useEffect(() => {
     const savedEmail = localStorage.getItem('savedEmail');
     if (savedEmail) {
-      setEmail(savedEmail);
+      setId(savedEmail);
       setIsEmailRemembered(true);
     }
   }, []);
@@ -36,7 +39,7 @@ export const SignIn = () => {
   const handleToggleChange = (enabled: boolean) => {
     setIsEmailRemembered(enabled);
     if (enabled) {
-      localStorage.setItem('savedEmail', email);
+      localStorage.setItem('savedEmail', id);
     } else {
       localStorage.removeItem('savedEmail');
     }
@@ -44,7 +47,9 @@ export const SignIn = () => {
 
   const onEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage('');
     try {
+      const email = `${id}${DOMAIN}`;
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -54,6 +59,7 @@ export const SignIn = () => {
       navigate(ROUTES.ROOT);
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
+      setErrorMessage('아이디와 비밀번호를 확인해주세요');
     }
   };
 
@@ -65,6 +71,9 @@ export const SignIn = () => {
       navigate(ROUTES.ROOT);
     } catch (error) {
       console.error('Google 로그인 중 오류 발생:', error);
+      setErrorMessage(
+        'Google 로그인 중 오류가 발생했습니다. 다시 시도해주세요.'
+      );
     }
   };
 
@@ -72,13 +81,13 @@ export const SignIn = () => {
     navigate(ROUTES.SIGN_UP);
   };
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email) ? '' : '올바른 이메일 주소를 입력해주세요';
-  };
+  const validateId = (id: string) =>
+    id.length > 0 ? '' : '아이디를 입력해주세요';
 
   const validatePassword = (value: string) =>
-    value.length >= 6 ? '' : '비밀번호를 확인해주세요';
+    value.length > 0 ? '' : '비밀번호를 확인해주세요';
+
+  const isLoginDisabled = id.length === 0 || password.length === 0;
 
   return (
     <div css={containerStyle}>
@@ -87,12 +96,12 @@ export const SignIn = () => {
       </div>
       <form onSubmit={onEmailLogin}>
         <InputBox
-          label='이메일'
-          placeholder='이메일'
-          value={email}
-          validate={validateEmail}
+          label='아이디'
+          placeholder='아이디'
+          value={id}
+          validate={validateId}
           onChange={(e) => {
-            setEmail(e.target.value);
+            setId(e.target.value);
             if (isEmailRemembered) {
               localStorage.setItem('savedEmail', e.target.value);
             }
@@ -106,6 +115,7 @@ export const SignIn = () => {
           onChange={(e) => setPassword(e.target.value)}
           isPassword
         />
+        {errorMessage && <div css={errorMessageStyle}>{errorMessage}</div>}
         <div css={toggleStyle}>
           <Toggle
             enabled={isEmailRemembered}
@@ -113,7 +123,14 @@ export const SignIn = () => {
             label={{ active: '로그인 정보 기억하기', inactive: '' }}
           />
         </div>
-        <Button label='로그인' size='lg' fullWidth={true} type='submit' />
+        <Button
+          label='로그인'
+          size='lg'
+          fullWidth={true}
+          type='submit'
+          onClick={() => {}}
+          disabled={isLoginDisabled}
+        />
         <div css={loginBtnStyle}>
           <div css={lineStyle}></div>
           <Button
@@ -175,4 +192,11 @@ const signUpStyle = css`
   &:hover {
     font-weight: ${fontWeight.semiBold};
   }
+`;
+
+const errorMessageStyle = css`
+  color: ${colors.redNormal};
+  font-size: ${fontSize.sm};
+  margin-bottom: 10px;
+  margin-top: -10px;
 `;

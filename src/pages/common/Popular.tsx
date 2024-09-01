@@ -9,11 +9,10 @@ export const Popular = () => {
   const tags: string[] = ['인기 급상승 동영상', 'Developer', '먹방', 'Vlog'];
   const [clickedBtn, setClickedBtn] = useState(tags[0]);
 
-  const { data: playListCardData } = useTagFetch({
+  const { data: playlistCollectionData } = useTagFetch({
     collectionName: 'playlist',
     tag: clickedBtn,
   });
-
   const onButtonClick = (tag: string) => () => {
     setClickedBtn(tag);
   };
@@ -33,8 +32,8 @@ export const Popular = () => {
       </div>
       <div css={titleContainerStyle}>{clickedBtn}</div>
       <div css={playlistContainerStyle}>
-        {playListCardData &&
-          playListCardData.map((playlistCard, index) => (
+        {playlistCollectionData &&
+          playlistCollectionData.map((playlistCard, index) => (
             <PlaylistCard
               key={index}
               playlistItem={playlistCard}

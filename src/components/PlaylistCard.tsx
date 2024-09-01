@@ -12,9 +12,11 @@ import { useNavigate } from 'react-router-dom';
 import IconButton from '@/components/IconButton';
 import KebabButton from '@/components/KebabButton';
 import Modal from '@/components/Modal';
+import Toast from '@/components/Toast';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 import { PlayListDataProps } from '@/types/playlistType';
 import { omittedText } from '@/utils/textUtils';
@@ -64,6 +66,17 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
       },
     });
   };
+  const [toastActive, setToastActive] = useState(false);
+
+  const { user } = useAuthStore();
+
+  const onClickHeart = () => {
+    if (!user) {
+      setToastActive(true);
+    } else {
+      setIsLiked(!isLiked);
+    }
+  };
 
   const menuItems = [
     {
@@ -107,7 +120,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
           <div className='icon'>
             <IconButton
               IconComponent={Heart}
-              onClick={() => setIsLiked(!isLiked)}
+              onClick={onClickHeart}
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
             />
@@ -160,7 +173,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         {showLikeButton && (
           <IconButton
             IconComponent={Heart}
-            onClick={() => setIsLiked(!isLiked)}
+            onClick={onClickHeart}
             color={isLiked ? 'red' : 'gray'}
             fillColor={isLiked ? 'red' : undefined}
           />
@@ -178,7 +191,17 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
     </article>
   );
 
-  return size === 'large' ? renderLargeCard() : renderSmallCard();
+  return (
+    <>
+      {size === 'large' ? renderLargeCard() : renderSmallCard()}
+      <Toast
+        isActive={toastActive}
+        toastMsg='로그인이 필요합니다.'
+        status='fail'
+        onClose={() => setToastActive(false)}
+      />
+    </>
+  );
 };
 
 const smallImgSize = '72px';

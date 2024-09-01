@@ -9,13 +9,14 @@ export const Popular = () => {
   const tags: string[] = ['인기 급상승 동영상', 'Developer', '먹방', 'Vlog'];
   const [clickedBtn, setClickedBtn] = useState(tags[0]);
 
+  const onButtonClick = (tag: string) => () => {
+    setClickedBtn(tag);
+    console.log('data', playlistCollectionData);
+  };
   const { data: playlistCollectionData } = useTagFetch({
     collectionName: 'playlist',
     tag: clickedBtn,
   });
-  const onButtonClick = (tag: string) => () => {
-    setClickedBtn(tag);
-  };
 
   return (
     <div css={contentContainerStyle}>

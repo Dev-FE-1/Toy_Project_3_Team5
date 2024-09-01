@@ -20,18 +20,38 @@ export const Layout = () => {
   );
 };
 
-const headerHeight = '60px';
+const headerNavbarHeight = '60px';
 
 const pageContainerStyles = css`
   position: relative;
   width: 100%;
   max-width: 430px;
-  height: 100%;
-  border-left: 2px solid ${colors.gray01};
-  border-right: 2px solid ${colors.gray01};
+
   margin: 0 auto;
 
   main {
-    padding-top: ${headerHeight};
+    padding-top: ${headerNavbarHeight};
+    padding-bottom: ${headerNavbarHeight};
+  }
+
+  &::before {
+    left: 50%;
+    transform: translateX(-215px);
+  }
+
+  &::after {
+    right: 50%;
+    transform: translateX(215px);
+  }
+
+  &::before,
+  &::after {
+    width: 1px;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    background-color: ${colors.gray02};
+    content: '';
+    z-index: 99999;
   }
 `;

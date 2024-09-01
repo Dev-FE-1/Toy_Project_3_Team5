@@ -163,6 +163,7 @@ const GlobalStyles = () => (
         font-size: 10px;
         height: 100%;
         width: 100%;
+        overflow-y: auto;
       }
     `}
   />

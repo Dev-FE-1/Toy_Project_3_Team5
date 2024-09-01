@@ -87,8 +87,6 @@ const Home: React.FC = () => {
 const containerStyle = css`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px);
-  overflow-y: auto;
   padding: 20px;
   gap: 20px;
 `;

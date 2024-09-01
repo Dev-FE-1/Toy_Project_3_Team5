@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
 };
 
 const headerStyle = css`
-  width: 426px;
+  width: 430px;
   height: 60px;
   display: flex;
   justify-content: space-between;
@@ -61,6 +61,7 @@ const headerStyle = css`
   background-color: ${colors.white};
   gap: 10px;
   position: fixed;
+  z-index: 10;
 `;
 
 const searchBarStyle = css`

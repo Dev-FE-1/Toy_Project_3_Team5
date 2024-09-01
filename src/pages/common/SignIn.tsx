@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import {
   signInWithEmailAndPassword,
@@ -19,8 +19,25 @@ import { auth } from '@/firebase/firbaseConfig';
 export const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [a, seta] = useState<boolean>(false);
+  const [isEmailRemembered, setIsEmailRemembered] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('savedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setIsEmailRemembered(true);
+    }
+  }, []);
+
+  const handleToggleChange = (enabled: boolean) => {
+    setIsEmailRemembered(enabled);
+    if (enabled) {
+      localStorage.setItem('savedEmail', email);
+    } else {
+      localStorage.removeItem('savedEmail');
+    }
+  };
 
   const onEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,7 +82,12 @@ export const SignIn = () => {
           placeholder='이메일'
           value={email}
           validate={validateEmail}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (isEmailRemembered) {
+              localStorage.setItem('savedEmail', e.target.value);
+            }
+          }}
         />
         <InputBox
           label='비밀번호'
@@ -77,8 +99,8 @@ export const SignIn = () => {
         />
         <div css={toggleStyle}>
           <Toggle
-            enabled={a}
-            setEnabled={seta}
+            enabled={isEmailRemembered}
+            setEnabled={handleToggleChange}
             label={{ active: '로그인 정보 기억하기', inactive: '' }}
           />
         </div>

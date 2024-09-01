@@ -27,7 +27,6 @@ export const SignIn = () => {
     try {
       const user = await signInWithEmailAndPassword(auth, email, password);
       navigate(ROUTES.ROOT);
-      return user;
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
     }
@@ -37,9 +36,7 @@ export const SignIn = () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      const { user } = result;
       navigate(ROUTES.ROOT);
-      return user;
     } catch (error) {
       console.error('Google 로그인 중 오류 발생:', error);
     }

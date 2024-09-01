@@ -1,5 +1,4 @@
 // src/router.js
-
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import ROUTES from '@/constants/route';
@@ -23,6 +22,7 @@ import { ProfileFollower } from '@/pages/profile/ProfileFollower';
 import { ProfileFollowing } from '@/pages/profile/ProfileFollowing';
 import { ProfileHome } from '@/pages/profile/ProfileHome';
 import { ProfileUpdate } from '@/pages/profile/ProfileUpdate';
+import ProtectedRoute from '@/router/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
@@ -35,7 +35,11 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTES.PLAYLIST(),
-        element: <PlayList />,
+        element: (
+          <ProtectedRoute>
+            <PlayList />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,
@@ -57,11 +61,19 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTES.PLAYLIST_MODIFY(),
-        element: <PlayListUpdate />,
+        element: (
+          <ProtectedRoute>
+            <PlayListUpdate />
+          </ProtectedRoute>
+        ),
       },
       {
         path: ROUTES.PROFILE(),
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,
@@ -83,7 +95,11 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTES.FOLLOWING,
-        element: <Following />,
+        element: (
+          <ProtectedRoute>
+            <Following />
+          </ProtectedRoute>
+        ),
       },
       {
         path: ROUTES.SEARCH(),

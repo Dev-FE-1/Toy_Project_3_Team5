@@ -46,6 +46,6 @@ const pageContainerStyles = css`
     bottom: 0px;
     background-color: ${colors.gray02};
     content: '';
-    z-index: 10;
+    z-index: 11;
   }
 `;

@@ -15,8 +15,8 @@ import Modal from '@/components/Modal';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { PlayListDataProps } from '@/interface/playlist';
 import useModalStore from '@/stores/useModalStore';
+import { PlayListDataProps } from '@/types/playlistType';
 import { omittedText } from '@/utils/textUtils';
 
 type CardSize = 'large' | 'small';

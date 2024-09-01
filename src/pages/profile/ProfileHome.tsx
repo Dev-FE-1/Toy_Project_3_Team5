@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { signOut, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import { Trash2, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
@@ -11,7 +9,8 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { auth, onUserStateChanged, db } from '@/firebase/firbaseConfig';
+import { auth } from '@/firebase/firbaseConfig';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const comments = [
   {
@@ -32,55 +31,25 @@ const comments = [
 ];
 
 export const ProfileHome = () => {
-  const [profileImage, setProfileImage] = useState<string>('');
-  const [user, setUser] = useState<User | null>(null);
-  const [channelName, setChannelName] = useState<string>('');
-  const [playlist, setPlaylist] = useState<number>(0);
-  const [channelFollower, setChannelFollower] = useState<number>(0);
-  const [channelFollowing, setChannelFollowing] = useState<number>(0);
+  const navigate = useNavigate();
+  const {
+    profileImage,
+    channelName,
+    playlistCount,
+    followerCount,
+    followingCount,
+    clearUser,
+  } = useAuthStore();
 
   const infoData = [
-    { count: playlist, label: '플레이리스트' },
-    { count: channelFollower, label: '팔로워' },
-    { count: channelFollowing, label: '팔로잉' },
+    { count: playlistCount, label: '플레이리스트' },
+    { count: followerCount, label: '팔로워' },
+    { count: followingCount, label: '팔로잉' },
   ];
-
-  useEffect(() => {
-    onUserStateChanged(async (user: User | null) => {
-      setUser(user);
-      if (user) {
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const docSnapshot = await getDoc(userDocRef);
-          if (docSnapshot.exists()) {
-            const data = docSnapshot.data();
-            if (data && data.profileImg) {
-              setProfileImage(data.profileImg);
-            }
-            if (data && data.channelName) {
-              setChannelName(data.channelName);
-            }
-            if (data && data.followingPlaylist) {
-              setPlaylist(data.followingPlaylist.length);
-            }
-            if (data && data.channelFollower) {
-              setChannelFollower(data.channelFollower.length);
-            }
-            if (data && data.channelFollowing) {
-              setChannelFollowing(data.channelFollowing.length);
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching user data: ', error);
-        }
-      }
-    });
-  }, []);
-
-  const navigate = useNavigate();
 
   const logout = async () => {
     await signOut(auth).then(() => {
+      clearUser();
       navigate(ROUTES.ROOT);
     });
   };

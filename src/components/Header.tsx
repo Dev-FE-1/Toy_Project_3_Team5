@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { css } from '@emotion/react';
-import { User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { ChevronLeft, Pointer, SearchIcon } from 'lucide-react';
+import { ChevronLeft, SearchIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import defaultProfile from '@/assets/profile_default.png';
 import IconButton from '@/components/IconButton';
@@ -11,7 +9,7 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { onUserStateChanged, db } from '@/firebase/firbaseConfig';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 type HeaderType = 'main' | 'searchResult' | 'detail';
 
@@ -22,31 +20,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const [searchText, setSearchText] = useState<string>('');
-  const [user, setUser] = useState<User | null>(null);
-  const [profileImage, setProfileImage] = useState<string>(defaultProfile);
-
-  useEffect(() => {
-    const unsubscribe = onUserStateChanged(async (user: User | null) => {
-      setUser(user);
-      if (user) {
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const docSnapshot = await getDoc(userDocRef);
-          if (docSnapshot.exists()) {
-            const data = docSnapshot.data();
-            if (data && data.profileImg) {
-              setProfileImage(data.profileImg);
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching user data: ', error);
-        }
-      } else {
-        setProfileImage(defaultProfile);
-      }
-    });
-  }, []);
-
+  const { user, profileImage } = useAuthStore();
   const navigate = useNavigate();
 
   const onProfileClick = () => {
@@ -83,7 +57,11 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
             />
           </div>
           <div onClick={onProfileClick} css={profileStyle}>
-            <Profile src={profileImage} alt='프로필 이미지' size='xs' />
+            <Profile
+              src={profileImage || defaultProfile}
+              alt='프로필 이미지'
+              size='xs'
+            />
           </div>
         </>
       ) : (

@@ -15,12 +15,15 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import { auth } from '@/firebase/firbaseConfig';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isEmailRemembered, setIsEmailRemembered] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  const setUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('savedEmail');
@@ -42,7 +45,12 @@ export const SignIn = () => {
   const onEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const user = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      setUser(userCredential.user);
       navigate(ROUTES.ROOT);
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
@@ -53,6 +61,7 @@ export const SignIn = () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
+      setUser(result.user);
       navigate(ROUTES.ROOT);
     } catch (error) {
       console.error('Google 로그인 중 오류 발생:', error);

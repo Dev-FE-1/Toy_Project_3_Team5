@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import { ChevronLeft, SearchIcon } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { ChevronLeft, Pointer, SearchIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import defaultProfile from '@/assets/profile_default.png';
 import IconButton from '@/components/IconButton';
 import Logo from '@/components/Logo';
@@ -9,6 +11,7 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import { onUserStateChanged, db } from '@/firebase/firbaseConfig';
 
 type HeaderType = 'main' | 'searchResult' | 'detail';
 
@@ -19,7 +22,40 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const [searchText, setSearchText] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
+  const [profileImage, setProfileImage] = useState<string>(defaultProfile);
+
+  useEffect(() => {
+    const unsubscribe = onUserStateChanged(async (user: User | null) => {
+      setUser(user);
+      if (user) {
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const docSnapshot = await getDoc(userDocRef);
+          if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            if (data && data.profileImg) {
+              setProfileImage(data.profileImg);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user data: ', error);
+        }
+      } else {
+        setProfileImage(defaultProfile);
+      }
+    });
+  }, []);
+
   const navigate = useNavigate();
+
+  const onProfileClick = () => {
+    if (user) {
+      navigate(ROUTES.PROFILE(user.uid));
+    } else {
+      navigate(ROUTES.SIGN_IN);
+    }
+  };
 
   return (
     <header css={headerStyle}>
@@ -46,9 +82,9 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
               size='sm'
             />
           </div>
-          <Link to={ROUTES.PROFILE('1')}>
-            <Profile src={defaultProfile} alt='프로필 이미지' size='xs' />
-          </Link>
+          <div onClick={onProfileClick} css={profileStyle}>
+            <Profile src={profileImage} alt='프로필 이미지' size='xs' />
+          </div>
         </>
       ) : (
         <span css={headerTitleStyle}>{headerTitle}</span>
@@ -94,6 +130,10 @@ const searchInputStyle = css`
   &::placeholder {
     color: ${colors.gray03};
   }
+`;
+
+const profileStyle = css`
+  cursor: pointer;
 `;
 
 const headerTitleStyle = css`

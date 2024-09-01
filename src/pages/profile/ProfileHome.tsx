@@ -1,8 +1,9 @@
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { signOut } from 'firebase/auth';
+import { signOut, User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { Trash2, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import defaultProfile from '@/assets/profile_default.png';
 import Button from '@/components/Button';
 import CheckBox from '@/components/CheckBox';
 import IconButton from '@/components/IconButton';
@@ -10,13 +11,7 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { auth } from '@/firebase/firbaseConfig';
-
-const infoData = [
-  { count: 54, label: '플레이리스트' },
-  { count: 129, label: '팔로워' },
-  { count: 19, label: '팔로잉' },
-];
+import { auth, onUserStateChanged, db } from '@/firebase/firbaseConfig';
 
 const comments = [
   {
@@ -37,6 +32,51 @@ const comments = [
 ];
 
 export const ProfileHome = () => {
+  const [profileImage, setProfileImage] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
+  const [channelName, setChannelName] = useState<string>('');
+  const [playlist, setPlaylist] = useState<number>(0);
+  const [channelFollower, setChannelFollower] = useState<number>(0);
+  const [channelFollowing, setChannelFollowing] = useState<number>(0);
+
+  const infoData = [
+    { count: playlist, label: '플레이리스트' },
+    { count: channelFollower, label: '팔로워' },
+    { count: channelFollowing, label: '팔로잉' },
+  ];
+
+  useEffect(() => {
+    onUserStateChanged(async (user: User | null) => {
+      setUser(user);
+      if (user) {
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const docSnapshot = await getDoc(userDocRef);
+          if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            if (data && data.profileImg) {
+              setProfileImage(data.profileImg);
+            }
+            if (data && data.channelName) {
+              setChannelName(data.channelName);
+            }
+            if (data && data.followingPlaylist) {
+              setPlaylist(data.followingPlaylist.length);
+            }
+            if (data && data.channelFollower) {
+              setChannelFollower(data.channelFollower.length);
+            }
+            if (data && data.channelFollowing) {
+              setChannelFollowing(data.channelFollowing.length);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user data: ', error);
+        }
+      }
+    });
+  }, []);
+
   const navigate = useNavigate();
 
   const logout = async () => {
@@ -48,8 +88,8 @@ export const ProfileHome = () => {
   return (
     <div css={containerStyle}>
       <div css={profileContainerStyle}>
-        <Profile src={defaultProfile} alt='프로필 이미지' size='xl' />
-        <span css={profileNameStyle}>Irene</span>
+        <Profile src={profileImage} alt='프로필 이미지' size='xl' />
+        <span css={profileNameStyle}>{channelName}</span>
         <button css={profileBtnStyle}>프로필 수정</button>
         <div css={infoContainerStyle}>
           {infoData.map(({ count, label }) => (
@@ -75,7 +115,7 @@ export const ProfileHome = () => {
           {comments.map(({ id, ply, text }) => (
             <li key={id} css={commentStyle}>
               <CheckBox />
-              <Profile src={defaultProfile} alt='프로필 이미지' size='sm' />
+              <Profile src={profileImage} alt='프로필 이미지' size='sm' />
               <div css={commentDesStyle}>
                 <span>{ply}</span>
                 <div>{text}</div>

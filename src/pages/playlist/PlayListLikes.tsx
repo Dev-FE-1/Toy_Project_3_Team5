@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -8,25 +7,35 @@ import PopupFilter from '@/components/PopupFilter';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { usePlaylist } from '@/hooks/usePlaylist';
+import { usePlaylist, PageType } from '@/queries/usePlaylist';
 
 export const PlayListLikes = () => {
   const navigate = useNavigate();
-  const [num, setNum] = useState<number[]>([0, 0]);
-  const playlist = usePlaylist();
-
-  const optionGroups = [
-    { label: '정렬', options: ['최신순', '좋아요순', '댓글순'] },
-    { label: '공개여부', options: ['전체', '공개', '비공개'] },
-  ];
+  const {
+    playlists,
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    num,
+    setNum,
+    optionGroups,
+  } = usePlaylist('likedPlaylist' as PageType);
 
   const onAddBtnClick = (): void => {
     navigate(ROUTES.PLAYLIST_ADD());
   };
 
+  const onPopularBtnClick = (): void => {
+    navigate(ROUTES.POPULAR);
+  };
+
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <>
-      <section css={homeContainerStyles}>
+      <section css={homeContainerStyles(playlists.length > 0)}>
         <div className='filter-area'>
           <PopupFilter
             optionGroups={optionGroups}
@@ -40,25 +49,40 @@ export const PlayListLikes = () => {
             onClick={onAddBtnClick}
           />
         </div>
-        <p>총 12개의 플리</p>
-        <ul css={cardContainerStyles}>
-          {playlist.map((playlistItem, index) => (
-            <li key={index}>
-              <PlaylistCard
-                size='small'
-                playlistItem={playlistItem}
-                showLikeButton={true}
-              />
-            </li>
-          ))}
-        </ul>
+        {playlists.length > 0 && <p>총 {playlists.length}개의 플리</p>}
+        {playlists.length === 0 ? (
+          <div css={emptyStateStyles}>
+            <img src='/src/assets/folderIcon.png' alt='아이콘 이미지' />
+            <div className='textContainer'>
+              <p>아직 좋아요한 플리가 없네요.</p>
+              <p>인기 플리로 채워볼까요?</p>
+            </div>
+            <Button label='인기 플리 구경하기' onClick={onPopularBtnClick} />
+          </div>
+        ) : (
+          <ul css={cardContainerStyles}>
+            {playlists.map((playlistItem, index) => (
+              <li key={index}>
+                <PlaylistCard
+                  size='small'
+                  playlistItem={playlistItem}
+                  showLikeButton={true}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+        {isFetchingNextPage && <div>더 불러오는 중...</div>}
+        {!hasNextPage && playlists.length > 0 && (
+          <div>모든 플레이리스트를 불러왔습니다.</div>
+        )}
         <Outlet />
       </section>
     </>
   );
 };
 
-const homeContainerStyles = css`
+const homeContainerStyles = (hasPlaylists: boolean) => css`
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -67,7 +91,7 @@ const homeContainerStyles = css`
   .filter-area {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: ${hasPlaylists ? 'space-between' : 'flex-end'};
   }
 
   p {
@@ -80,4 +104,25 @@ const cardContainerStyles = css`
   display: flex;
   flex-direction: column;
   gap: 16px;
+`;
+
+const emptyStateStyles = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 80px;
+
+  p {
+    font-size: ${fontSize.md};
+    line-height: 2.2rem;
+  }
+
+  .textContainer {
+    text-align: center;
+  }
+
+  img {
+    width: 50%;
+  }
 `;

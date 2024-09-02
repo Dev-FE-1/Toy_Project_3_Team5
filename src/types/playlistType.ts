@@ -9,4 +9,6 @@ export interface PlayListDataProps {
   tags: string[];
   thumbNail: string;
   userId: string;
+  ownerChannelName: string;
+  commentCount: number;
 }

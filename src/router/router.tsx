@@ -53,10 +53,6 @@ export const router = createBrowserRouter([
             path: ROUTES.PLAYLIST_LIKES(),
             element: <PlayListLikes />,
           },
-          {
-            path: ROUTES.PLAYLIST_ADD(),
-            element: <PlayListAdd />,
-          },
         ],
       },
       {
@@ -64,6 +60,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PlayListUpdate />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: ROUTES.PLAYLIST_ADD(),
+        element: (
+          <ProtectedRoute>
+            <PlayListAdd />
           </ProtectedRoute>
         ),
       },

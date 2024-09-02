@@ -1,5 +1,5 @@
 import ROUTES from '@/constants/route';
-import { HeaderProps } from '@/types/route';
+import { HeaderProps } from '@/types/header';
 
 const HEADER_FILTER = {
   main: [],

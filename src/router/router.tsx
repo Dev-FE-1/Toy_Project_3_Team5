@@ -68,6 +68,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: ROUTES.PLAYLIST_ADD(),
+        element: (
+          <ProtectedRoute>
+            <PlayListAdd />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: ROUTES.PROFILE(),
         element: (
           <ProtectedRoute>

@@ -10,7 +10,7 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { HeaderProps } from '@/types/route';
+import { HeaderProps } from '@/types/header';
 
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const [searchText, setSearchText] = useState<string>('');
@@ -25,6 +25,15 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
     }
   };
 
+  const onSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (searchText.trim()) {
+      const encodedKeyword = encodeURIComponent(searchText.trim());
+      navigate(ROUTES.SEARCH(`keyword=${encodedKeyword}`));
+    }
+  };
+
   return (
     <header css={headerStyle}>
       {type === 'main' ? (
@@ -34,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
       )}
       {type !== 'detail' ? (
         <>
-          <div css={searchBarStyle}>
+          <form css={searchBarStyle} onSubmit={onSearchSubmit}>
             <input
               css={searchInputStyle}
               type='text'
@@ -46,10 +55,10 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
             />
             <IconButton
               IconComponent={SearchIcon}
-              onClick={() => navigate(ROUTES.SEARCH('검색어'))}
+              onClick={() => onSearchSubmit}
               size='sm'
             />
-          </div>
+          </form>
           <div onClick={onProfileClick} css={profileStyle}>
             <Profile
               src={profileImage || defaultProfile}

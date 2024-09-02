@@ -145,6 +145,12 @@ export const SignUp = () => {
     return '';
   };
 
+  const isSignUpDisabled =
+    id.length === 0 ||
+    password.length === 0 ||
+    passwordConfirm.length === 0 ||
+    channelName.length === 0;
+
   return (
     <div>
       <Header type='detail' headerTitle='회원가입' />
@@ -217,6 +223,7 @@ export const SignUp = () => {
             size='lg'
             type='submit'
             fullWidth={true}
+            disabled={isSignUpDisabled}
           />
         </div>
       </form>

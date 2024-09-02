@@ -64,10 +64,9 @@ const tagContainerStyle = css`
 `;
 
 const titleContainerStyle = css`
-  height: 20vh;
-  display: flex;
   align-items: center;
-  padding-top: 10px;
+  padding-top: 50px;
+  padding-bottom: 20px;
   padding-left: 15px;
   font-size: ${fontSize.xxxl};
 `;

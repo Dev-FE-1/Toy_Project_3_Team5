@@ -18,16 +18,18 @@ export interface FetchInfo {
   limitNumber?: number;
 }
 
+export const loginInfo = await signInWithEmailAndPassword(
+  auth,
+  'ldh921126@gmail.com',
+  '102030'
+);
+
 const useTagFetch = ({ collectionName, tag, limitNumber = 10 }: FetchInfo) => {
   const [data, setData] = useState<any[]>([]);
 
   const fetchData = useCallback(async () => {
     //로그인 로직 완성되면 없애기
-    const loginInfo = await signInWithEmailAndPassword(
-      auth,
-      'ldh921126@gmail.com',
-      '102030'
-    );
+
     console.log('로그인정보', loginInfo);
     console.log('로그인uid', loginInfo.user.uid); //유저정보 콘솔로그
     //여기까지 없애기

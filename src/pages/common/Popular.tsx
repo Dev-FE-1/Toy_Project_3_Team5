@@ -20,18 +20,20 @@ export const Popular = () => {
 
   return (
     <div css={contentContainerStyle}>
-      <div css={tagContainerStyle}>
-        {tags.map((tag, index) => (
-          <Button
-            key={tag}
-            label={`#${tag}`}
-            onClick={onButtonClick(tag)}
-            size='lg'
-            color={clickedBtn === tags[index] ? 'primary' : 'lightGray'}
-          ></Button>
-        ))}
+      <div css={headerContainerStyle}>
+        <div css={tagContainerStyle}>
+          {tags.map((tag, index) => (
+            <Button
+              key={tag}
+              label={`#${tag}`}
+              onClick={onButtonClick(tag)}
+              size='lg'
+              color={clickedBtn === tags[index] ? 'primary' : 'lightGray'}
+            ></Button>
+          ))}
+        </div>
+        <div css={titleContainerStyle}>{clickedBtn}</div>
       </div>
-      <div css={titleContainerStyle}>{clickedBtn}</div>
       <div css={playlistContainerStyle}>
         {playlistCollectionData &&
           playlistCollectionData.map((playlistCard, index) => (
@@ -45,37 +47,35 @@ export const Popular = () => {
     </div>
   );
 };
-
 const contentContainerStyle = css`
   box-sizing: border-box;
-  height: calc(100vh - 64px - 64px);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  position: relative;
+`;
+const headerContainerStyle = css`
+  position: sticky;
 `;
 
 const tagContainerStyle = css`
-  height: 10vh;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   padding-left: 15px;
   padding-right: 15px;
+  position: sticky;
 `;
 
 const titleContainerStyle = css`
-  height: 20vh;
-  display: flex;
   align-items: center;
   padding-top: 10px;
   padding-left: 15px;
   font-size: ${fontSize.xxxl};
+  position: sticky;
 `;
 
 const playlistContainerStyle = css`
-  flex-grow: 1;
-  padding: 10px;
+  padding: 20px;
   overflow-y: auto;
-  overflow-x: hidden;
   gap: 20px;
 `;

@@ -1,18 +1,24 @@
 import { css } from '@emotion/react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from '@/components/Header';
 import Navbar from '@/components/Navbar';
 import colors from '@/constants/colors';
+import { checkHeaderType } from '@/utils/headerUtils';
 
-export const Layout = () => (
-  <div css={pageContainerStyles}>
-    <Header type='main' />
-    <main>
-      <Outlet />
-    </main>
-    <Navbar />
-  </div>
-);
+export const Layout = () => {
+  const { pathname } = useLocation();
+  const headerType = checkHeaderType(pathname);
+
+  return (
+    <div css={pageContainerStyles}>
+      <Header type={headerType.type} headerTitle={headerType?.headerTitle} />
+      <main>
+        <Outlet />
+      </main>
+      <Navbar />
+    </div>
+  );
+};
 
 const headerNavbarHeight = '60px';
 

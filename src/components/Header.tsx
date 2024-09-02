@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/react';
 import { ChevronLeft, SearchIcon } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import defaultProfile from '@/assets/profile_default.png';
 import IconButton from '@/components/IconButton';
 import Logo from '@/components/Logo';
@@ -9,6 +9,7 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 type HeaderType = 'main' | 'searchResult' | 'detail';
 
@@ -19,7 +20,16 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const [searchText, setSearchText] = useState<string>('');
+  const { user, profileImage } = useAuthStore();
   const navigate = useNavigate();
+
+  const onProfileClick = () => {
+    if (user) {
+      navigate(ROUTES.PROFILE(user.uid));
+    } else {
+      navigate(ROUTES.SIGN_IN);
+    }
+  };
 
   return (
     <header css={headerStyle}>
@@ -46,9 +56,13 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
               size='sm'
             />
           </div>
-          <Link to={ROUTES.PROFILE('1')}>
-            <Profile src={defaultProfile} alt='프로필 이미지' size='xs' />
-          </Link>
+          <div onClick={onProfileClick} css={profileStyle}>
+            <Profile
+              src={profileImage || defaultProfile}
+              alt='프로필 이미지'
+              size='xs'
+            />
+          </div>
         </>
       ) : (
         <span css={headerTitleStyle}>{headerTitle}</span>
@@ -58,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
 };
 
 const headerStyle = css`
-  width: 426px;
+  width: 430px;
   height: 60px;
   display: flex;
   justify-content: space-between;
@@ -67,6 +81,7 @@ const headerStyle = css`
   background-color: ${colors.white};
   gap: 10px;
   position: fixed;
+  z-index: 10;
 `;
 
 const searchBarStyle = css`
@@ -93,6 +108,10 @@ const searchInputStyle = css`
   &::placeholder {
     color: ${colors.gray03};
   }
+`;
+
+const profileStyle = css`
+  cursor: pointer;
 `;
 
 const headerTitleStyle = css`

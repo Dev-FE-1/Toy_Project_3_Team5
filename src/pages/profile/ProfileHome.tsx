@@ -1,18 +1,16 @@
 import { css } from '@emotion/react';
+import { signOut } from 'firebase/auth';
 import { Trash2, LogOut } from 'lucide-react';
-import defaultProfile from '@/assets/profile_default.png';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import CheckBox from '@/components/CheckBox';
 import IconButton from '@/components/IconButton';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
-
-const infoData = [
-  { count: 54, label: '플레이리스트' },
-  { count: 129, label: '팔로워' },
-  { count: 19, label: '팔로잉' },
-];
+import ROUTES from '@/constants/route';
+import { auth } from '@/firebase/firbaseConfig';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const comments = [
   {
@@ -32,63 +30,88 @@ const comments = [
   },
 ];
 
-export const ProfileHome = () => (
-  <div css={containerStyle}>
-    <div css={profileContainerStyle}>
-      <Profile src={defaultProfile} alt='프로필 이미지' size='xl' />
-      <span css={profileNameStyle}>Irene</span>
-      <button css={profileBtnStyle}>프로필 수정</button>
-      <div css={infoContainerStyle}>
-        {infoData.map(({ count, label }) => (
-          <div key={label} css={infoStyle}>
-            <div>{count}</div>
-            <div>{label}</div>
-          </div>
-        ))}
+export const ProfileHome = () => {
+  const navigate = useNavigate();
+  const {
+    profileImage,
+    channelName,
+    playlistCount,
+    followerCount,
+    followingCount,
+    clearUser,
+  } = useAuthStore();
+
+  const infoData = [
+    { count: playlistCount, label: '플레이리스트' },
+    { count: followerCount, label: '팔로워' },
+    { count: followingCount, label: '팔로잉' },
+  ];
+
+  const logout = async () => {
+    await signOut(auth).then(() => {
+      clearUser();
+      navigate(ROUTES.ROOT);
+    });
+  };
+
+  return (
+    <div css={containerStyle}>
+      <div css={profileContainerStyle}>
+        <Profile src={profileImage} alt='프로필 이미지' size='xl' />
+        <span css={profileNameStyle}>{channelName}</span>
+        <button css={profileBtnStyle}>프로필 수정</button>
+        <div css={infoContainerStyle}>
+          {infoData.map(({ count, label }) => (
+            <div key={label} css={infoStyle}>
+              <div>{count}</div>
+              <div>{label}</div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-    <div css={commentContainerStyle}>
-      <div css={commentHeaderStyle}>내가 쓴 댓글 30</div>
-      <div css={deleteContainerStyle}>
-        <button css={allSelectBtnStyle}>전체 선택</button>
-        <IconButton
-          IconComponent={Trash2}
+      <div css={commentContainerStyle}>
+        <div css={commentHeaderStyle}>내가 쓴 댓글 30</div>
+        <div css={deleteContainerStyle}>
+          <button css={allSelectBtnStyle}>전체 선택</button>
+          <IconButton
+            IconComponent={Trash2}
+            onClick={() => {}}
+            size='md'
+            color='red'
+          />
+        </div>
+        <ul css={commentSelectStyle}>
+          {comments.map(({ id, ply, text }) => (
+            <li key={id} css={commentStyle}>
+              <CheckBox />
+              <Profile src={profileImage} alt='프로필 이미지' size='sm' />
+              <div css={commentDesStyle}>
+                <span>{ply}</span>
+                <div>{text}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <Button
+          label='더보기'
           onClick={() => {}}
-          size='md'
-          color='red'
+          size='lg'
+          fullWidth
+          color='gray'
         />
       </div>
-      <ul css={commentSelectStyle}>
-        {comments.map(({ id, ply, text }) => (
-          <li key={id} css={commentStyle}>
-            <CheckBox />
-            <Profile src={defaultProfile} alt='프로필 이미지' size='sm' />
-            <div css={commentDesStyle}>
-              <span>{ply}</span>
-              <div>{text}</div>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <Button
-        label='더보기'
-        onClick={() => {}}
-        size='lg'
-        fullWidth
-        color='gray'
-      />
+      <div css={logoutStyle} onClick={logout}>
+        <IconButton
+          IconComponent={LogOut}
+          onClick={logout}
+          size='md'
+          color='gray'
+        />
+        로그아웃
+      </div>
     </div>
-    <div css={logoutStyle}>
-      <IconButton
-        IconComponent={LogOut}
-        onClick={() => {}}
-        size='md'
-        color='gray'
-      />
-      로그아웃
-    </div>
-  </div>
-);
+  );
+};
 
 const containerStyle = css`
   display: flex;

@@ -64,7 +64,7 @@ const toastStyle = css`
   bottom: 96px; // navbar 크기만큼
   display: flex;
   align-items: center;
-  margin-left: 16px;
+  /* margin-left: 16px; */
   padding: 16px;
   border-radius: 4px;
   background-color: ${colors.gray04};

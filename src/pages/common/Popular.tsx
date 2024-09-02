@@ -35,7 +35,7 @@ export const Popular = () => {
           ></Button>
         ))}
       </div>
-      <h1>{clickedBtn}</h1>
+      <div css={titleContainerStyle}>{clickedBtn}</div>
       <div css={playlistContainerStyle}>
         {playListCardData.map((playlistCard, index) => (
           <PlaylistCard key={index} playlistItem={playlistCard} size='large' />
@@ -45,27 +45,35 @@ export const Popular = () => {
   );
 };
 const contentContainerStyle = css`
+  box-sizing: border-box;
+  height: calc(100vh - 64px - 64px);
   display: flex;
   flex-direction: column;
-
-  h1 {
-    min-height: 10vh;
-    display: flex;
-    align-items: center;
-    padding-left: 10px;
-    font-size: ${fontSize.xxxl};
-  }
+  overflow: hidden;
 `;
+
 const tagContainerStyle = css`
+  height: 10vh;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
+  gap: 8px;
+  padding-left: 15px;
+  padding-right: 15px;
 `;
+
+const titleContainerStyle = css`
+  height: 20vh;
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+  padding-left: 15px;
+  font-size: ${fontSize.xxxl};
+`;
+
 const playlistContainerStyle = css`
-  padding-left: 16px;
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: 20px;
 `;
-// const modifiedButtonStyle = css`
-//   background-color: ${colors.greenNormal};
-// `;

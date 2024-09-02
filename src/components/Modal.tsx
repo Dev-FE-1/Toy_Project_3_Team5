@@ -56,7 +56,8 @@ const modalBackgroundStyles = css`
   left: 0;
   bottom: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.12);
+  z-index: 100;
   .modal {
     position: absolute;
     flex-direction: column;

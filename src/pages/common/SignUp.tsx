@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  setDoc,
+  getDoc,
+} from 'firebase/firestore';
 import Button from '@/components/Button';
 import Header from '@/components/Header';
 import InputBox from '@/components/InputBox';
+import { auth, db } from '@/firebase/firbaseConfig';
 
 export const SignUp = () => {
   const [id, setId] = useState<string>('');
@@ -10,11 +21,107 @@ export const SignUp = () => {
   const [passwordConfirm, setPasswordConfirm] = useState<string>('');
   const [channelName, setChannelName] = useState<string>('');
 
-  const validateId = (value: string) => {
-    if (value.length < 6) {
-      return '아이디는 6자리 이상이어야 합니다';
+  const [idCheckMessage, setIdCheckMessage] = useState<string>('');
+  const [channelNameCheckMessage, setChannelNameCheckMessage] =
+    useState<string>('');
+
+  const checkChannelNameExists = async (
+    channelName: string
+  ): Promise<boolean> => {
+    const q = query(
+      collection(db, 'users'),
+      where('channelName', '==', channelName)
+    );
+
+    try {
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error('채널 이름 중복 체크 오류:', error);
+      throw new Error('중복 체크에 실패했습니다.');
     }
-    return '';
+  };
+
+  const checkIdExists = async (id: string): Promise<boolean> => {
+    const q = query(collection(db, 'users'), where('id', '==', id));
+    try {
+      const docRef = doc(db, 'users', id);
+      const docSnap = await getDoc(docRef);
+      return docSnap.exists();
+    } catch (error) {
+      console.error('아이디 중복 체크 오류:', error);
+      throw new Error('중복 체크에 실패했습니다.');
+    }
+  };
+
+  const onIdCheck = async () => {
+    try {
+      const idExists = await checkIdExists(id);
+      if (idExists) {
+        setIdCheckMessage('이미 사용 중인 아이디입니다.');
+      } else {
+        setIdCheckMessage('사용 가능한 아이디입니다.');
+      }
+    } catch (error) {
+      console.log('아이디 중복 검사 오류:', error);
+      setIdCheckMessage('아이디 중복 검사에 실패했습니다.');
+    }
+  };
+
+  const onChannelNameCheck = async () => {
+    try {
+      const exists = await checkChannelNameExists(channelName.trim());
+      if (exists) {
+        setChannelNameCheckMessage('이미 사용 중인 채널 이름입니다.');
+      } else {
+        setChannelNameCheckMessage('사용 가능한 채널 이름입니다.');
+      }
+    } catch (error) {
+      console.error('채널 이름 중복 검사 오류:', error);
+      setChannelNameCheckMessage('채널 이름 중복 검사에 실패했습니다.');
+    }
+  };
+
+  const onSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = `${id}@gmail.com`;
+
+    try {
+      const idExists = await checkIdExists(id);
+      if (idExists) {
+        setIdCheckMessage('이미 사용 중인 아이디입니다.');
+        return;
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const { user } = userCredential;
+
+      await setDoc(doc(db, 'users', id), {
+        uid: user.uid,
+        channelName,
+        channelFollower: [],
+        channelFollowing: [],
+        followingPlaylist: [],
+        likePlaylist: [],
+        profileImg: '',
+        tags: [],
+      });
+
+      console.log('회원가입 및 Firestore 데이터 저장 성공:', user);
+    } catch (error) {
+      console.error('회원가입 중 오류 발생:', error);
+    }
+  };
+
+  const validateId = (value: string) => {
+    if (value.length < 5) {
+      return '아이디는 5자리 이상이어야 합니다';
+    }
+    return '사용 가능한 아이디입니다.';
   };
 
   const validatePassword = (value: string) => {
@@ -23,27 +130,27 @@ export const SignUp = () => {
     if (!regex.test(value)) {
       return '비밀번호는 5자리 이상, 특수문자 포함이어야 합니다';
     }
-    return '';
+    return '사용 가능한 비밀번호입니다.';
   };
 
   const validatePasswordConfirm = (value: string) => {
     if (value !== password) {
       return '비밀번호가 다릅니다';
     }
-    return '';
+    return '비밀번호가 일치합니다.';
   };
 
   const validateChannelName = (value: string) => {
     if (value.length < 2) {
       return '채널 이름은 2자리 이상이어야 합니다';
     }
-    return '';
+    return '사용 가능한 채널 이름입니다.';
   };
 
   return (
     <div>
       <Header type='detail' headerTitle='회원가입' />
-      <form onSubmit={() => {}} css={signUpContainerStyle}>
+      <form onSubmit={onSignUp} css={signUpContainerStyle}>
         <div css={duplicateStyle}>
           <InputBox
             label='아이디'
@@ -60,10 +167,11 @@ export const SignUp = () => {
               label='중복검사'
               color='gray'
               size='md'
-              onClick={() => {}}
+              onClick={onIdCheck}
             />
           </div>
         </div>
+        {idCheckMessage && <p>{idCheckMessage}</p>}
         <InputBox
           label='비밀번호'
           placeholder='비밀번호를 입력해주세요'
@@ -96,9 +204,14 @@ export const SignUp = () => {
             width='315px'
           />
           <div style={{ marginLeft: `5px` }}>
-            <Button label='중복검사' color='gray' onClick={() => {}} />
+            <Button
+              label='중복검사'
+              color='gray'
+              onClick={onChannelNameCheck}
+            />
           </div>
         </div>
+        {channelNameCheckMessage && <p>{channelNameCheckMessage}</p>}{' '}
         <div style={{ width: `390px` }}>
           <Button
             label='회원가입'

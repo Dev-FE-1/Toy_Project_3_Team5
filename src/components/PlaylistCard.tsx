@@ -8,11 +8,15 @@ import {
   ListX,
   ListPlus,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import IconButton from '@/components/IconButton';
 import KebabButton from '@/components/KebabButton';
+import Modal from '@/components/Modal';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
-import { PlayListDataProps } from '@/hooks/usePlaylist';
+import ROUTES from '@/constants/route';
+import useModalStore from '@/stores/useModalStore';
+import { PlayListDataProps } from '@/types/playlistType';
 import { omittedText } from '@/utils/textUtils';
 
 type CardSize = 'large' | 'small';
@@ -36,35 +40,69 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   showLockButton = false,
   showKebabMenu = false,
 }) => {
+  const { openModal } = useModalStore();
+  const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
+  const [isLocked, setIsLocked] = useState(!playlistItem.isPublic);
+
+  const onCardClick = (): void => {
+    navigate(ROUTES.DETAIL());
+  };
+
+  const onEditBtnClick = (): void => {
+    navigate(ROUTES.PLAYLIST_MODIFY());
+  };
+
+  const onDeleteBtnClick = () => {
+    openModal({
+      type: 'delete',
+      title: '플레이리스트 삭제',
+      content: '{플레이리스트명}을 삭제하시겠습니까?',
+      onAction: () => {
+        ('');
+      },
+    });
+  };
 
   const menuItems = [
     {
       label: '수정',
-      onClick: () => '',
+      onClick: onEditBtnClick,
     },
     {
       label: '삭제',
-      onClick: () => '',
+      onClick: onDeleteBtnClick,
     },
   ];
 
   const renderLargeCard = () => (
     <article css={largeCardStyles}>
-      <div css={largeCardImgStyles}>
+      <div css={largeCardImgStyles} onClick={onCardClick}>
         <span></span>
         <figure className='img-container'>
-          <img src={playlistItem.links[0]} alt='썸네일 이미지' />
+          <img
+            src={
+              playlistItem.thumbNail
+                ? playlistItem.thumbNail
+                : playlistItem.links[0]
+            }
+            alt='썸네일 이미지'
+          />
         </figure>
       </div>
       <section css={largeInfoStyles}>
-        <h2 className='title'>{omittedText(playlistItem.title, MAXLENGTH)}</h2>
+        <h2 className='title' onClick={onCardClick}>
+          {omittedText(playlistItem.title, MAXLENGTH)}
+        </h2>
         <p className='username'>
-          {playlistItem.userName} · 트랙 {playlistItem.links.length}개
+          {'소유자명'} · 트랙 {playlistItem.links.length}개
         </p>
-        <p className='tags'>{playlistItem.tags}</p>
+        <ul className='tags'>
+          {playlistItem.tags.map((tag, index) => (
+            <li key={index}>{tag}</li>
+          ))}
+        </ul>
         <div className='icons-container'>
           <div className='icon'>
             <IconButton
@@ -73,11 +111,11 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
             />
-            {playlistItem.numberOfLikes}
+            {playlistItem.likes}
           </div>
           <div className='icon'>
             <MessageSquareMore />
-            {playlistItem.numberOfComments}
+            {'0'}
           </div>
         </div>
       </section>
@@ -86,18 +124,29 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
 
   const renderSmallCard = () => (
     <article css={smallContainerStyles}>
-      <div css={smallCardStyles}>
+      <div css={smallCardStyles} onClick={onCardClick}>
         <figure className='img-container'>
-          <img src={playlistItem.links[0]} alt='썸네일 이미지' />
+          <img
+            src={
+              playlistItem.thumbNail
+                ? playlistItem.thumbNail
+                : playlistItem.links[0]
+            }
+            alt='썸네일 이미지'
+          />
         </figure>
         <section css={smallInfoStyles}>
           <h2 className='title'>
             {omittedText(playlistItem.title, MAXLENGTH)}
           </h2>
           <p className='username'>
-            {playlistItem.userName} · 트랙 {playlistItem.links.length}개
+            {'소유자명'} · 트랙 {playlistItem.links.length}개
           </p>
-          <p className='tags'>{playlistItem.tags}</p>
+          <ul className='tags'>
+            {playlistItem.tags.map((tag, index) => (
+              <li key={index}>{tag}</li>
+            ))}
+          </ul>
         </section>
       </div>
       <div css={smallBtnStyles}>
@@ -125,6 +174,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         )}
         {showKebabMenu && <KebabButton menuItems={menuItems} />}
       </div>
+      <Modal />
     </article>
   );
 
@@ -134,14 +184,14 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
 const smallImgSize = '72px';
 
 const largeCardStyles = css`
-  gap: 8px;
+  gap: 10px;
   flex-direction: column;
   display: flex;
 `;
 
 const largeCardImgStyles = css`
   position: relative;
-  height: 230px;
+  height: 210px;
   max-width: 390px;
   align-items: center;
   display: flex;
@@ -158,7 +208,7 @@ const largeCardImgStyles = css`
     position: absolute;
     width: 100%;
     top: 8px;
-    height: 220px;
+    height: 200px;
     border-radius: 10px;
     border: 1px solid ${colors.white};
     overflow: hidden;
@@ -179,12 +229,18 @@ const largeInfoStyles = css`
   display: flex;
   padding: 0 10px;
   .title {
-    font-size: ${fontSize.xl};
+    font-size: ${fontSize.lg};
+    :hover {
+      cursor: pointer;
+    }
   }
   .username {
     color: ${colors.gray05};
   }
   .tags {
+    display: flex;
+    gap: 4px;
+    font-size: ${fontSize.md};
     color: ${colors.primaryLight};
   }
   .icons-container {
@@ -246,6 +302,9 @@ const smallInfoStyles = css`
     color: ${colors.gray05};
   }
   .tags {
+    display: flex;
+    gap: 4px;
+    font-size: ${fontSize.sm};
     color: ${colors.primaryLight};
   }
 `;

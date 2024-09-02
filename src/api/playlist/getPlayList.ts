@@ -151,7 +151,7 @@ export const getSavedPlaylist = async (
     }
 
     const userData = userDocSnap.data();
-    const savedPlaylistsIds = userData?.savedPlaylist || [];
+    const savedPlaylistsIds = userData?.followingPlaylist || [];
 
     const validSavedPlaylistIds = savedPlaylistsIds
       .map((id: unknown) => id?.toString())

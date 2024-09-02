@@ -14,15 +14,17 @@ import { loginInfo } from '@/hooks/useTagFetch';
 console.log('아이디', loginInfo.user.uid);
 const Following = () => {
   const [selectedChannel, setSelectedChannel] = useState(loginInfo.user.uid);
-  console.log('선택한 채널', selectedChannel);
-  console.log('가져온 플리', useFollowingPlaylistFetch(selectedChannel));
 
   const { channels } = useChannelFetch(selectedChannel); // 채널 데이터 가져오기
   const playlists: PlayListDataProps[] =
     useFollowingPlaylistFetch(selectedChannel);
 
   const onFollowingChannelCLick = (channelId: string) => {
-    setSelectedChannel(channelId);
+    if (channelId === selectedChannel) {
+      setSelectedChannel(loginInfo.user.uid);
+    } else {
+      setSelectedChannel(channelId);
+    }
   };
 
   const followingList = channels.map((channel) => ({
@@ -32,8 +34,6 @@ const Following = () => {
     size: 'md' as const,
     name: channel.channelName,
   }));
-  console.log('채널', channels);
-  console.log('포맷팅 채널', followingList);
 
   return (
     <div css={containerStyle}>
@@ -96,8 +96,7 @@ const followingListStyle = css`
   flex-grow: 1;
   display: flex;
   gap: 10px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
 `;
 
 const followingCoverStyle = (isSelected: boolean) => css`

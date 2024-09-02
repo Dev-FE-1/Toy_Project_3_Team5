@@ -13,6 +13,7 @@ import {
 import Button from '@/components/Button';
 import Header from '@/components/Header';
 import InputBox from '@/components/InputBox';
+import Toast from '@/components/Toast';
 import { auth, db } from '@/firebase/firbaseConfig';
 
 export const SignUp = () => {
@@ -24,6 +25,13 @@ export const SignUp = () => {
   const [idCheckMessage, setIdCheckMessage] = useState<string>('');
   const [channelNameCheckMessage, setChannelNameCheckMessage] =
     useState<string>('');
+
+  const [isIdChecked, setIsIdChecked] = useState<boolean>(false);
+  const [isChannelNameChecked, setIsChannelNameChecked] =
+    useState<boolean>(false);
+  const [isToastActive, setIsToastActive] = useState<boolean>(false);
+  const [isSignUpSuccessToastActive, setIsSignUpSuccessToastActive] =
+    useState<boolean>(false);
 
   const checkChannelNameExists = async (
     channelName: string
@@ -59,8 +67,10 @@ export const SignUp = () => {
       const idExists = await checkIdExists(id);
       if (idExists) {
         setIdCheckMessage('이미 사용 중인 아이디입니다.');
+        setIsIdChecked(false);
       } else {
         setIdCheckMessage('사용 가능한 아이디입니다.');
+        setIsIdChecked(true);
       }
     } catch (error) {
       console.log('아이디 중복 검사 오류:', error);
@@ -72,8 +82,10 @@ export const SignUp = () => {
       const exists = await checkChannelNameExists(channelName.trim());
       if (exists) {
         setChannelNameCheckMessage('이미 사용 중인 채널 이름입니다.');
+        setIsChannelNameChecked(false);
       } else {
         setChannelNameCheckMessage('사용 가능한 채널 이름입니다.');
+        setIsChannelNameChecked(true);
       }
     } catch (error) {
       console.error('채널 이름 중복 검사 오류:', error);
@@ -82,6 +94,12 @@ export const SignUp = () => {
 
   const onSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isIdChecked || !isChannelNameChecked) {
+      setIsToastActive(true);
+      return;
+    }
+
     const email = `${id}@gmail.com`;
 
     try {
@@ -108,8 +126,8 @@ export const SignUp = () => {
         profileImg: '',
         tags: [],
       });
-
       console.log('회원가입 및 Firestore 데이터 저장 성공:', user);
+      setIsSignUpSuccessToastActive(true);
     } catch (error) {
       console.error('회원가입 중 오류 발생:', error);
     }
@@ -146,10 +164,10 @@ export const SignUp = () => {
   };
 
   const isSignUpDisabled =
-    id.length === 0 ||
-    password.length === 0 ||
-    passwordConfirm.length === 0 ||
-    channelName.length === 0;
+    id.length < 5 ||
+    password.length < 5 ||
+    passwordConfirm.length < 5 ||
+    channelName.length < 2;
 
   return (
     <div>
@@ -171,7 +189,7 @@ export const SignUp = () => {
             <Button
               label='중복검사'
               color='gray'
-              size='md'
+              size='lg'
               onClick={onIdCheck}
             />
           </div>
@@ -213,6 +231,7 @@ export const SignUp = () => {
               label='중복검사'
               color='gray'
               onClick={onChannelNameCheck}
+              size='lg'
             />
           </div>
         </div>
@@ -227,6 +246,18 @@ export const SignUp = () => {
           />
         </div>
       </form>
+      <Toast
+        isActive={isToastActive}
+        status='fail'
+        toastMsg='중복 검사를 진행해주세요.'
+        onClose={() => setIsToastActive(false)}
+      />
+      <Toast
+        isActive={isSignUpSuccessToastActive}
+        status='success'
+        toastMsg={`회원가입 완료!🥳 로그인 화면으로 돌아가 로그인해주세요.`}
+        onClose={() => setIsSignUpSuccessToastActive(false)}
+      />
     </div>
   );
 };
@@ -242,5 +273,4 @@ const signUpContainerStyle = css`
 const duplicateStyle = css`
   display: flex;
   align-items: center;
-  justify-content: center;
 `;

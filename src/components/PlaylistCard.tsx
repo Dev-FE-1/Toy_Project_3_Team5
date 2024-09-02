@@ -12,10 +12,10 @@ import { useNavigate } from 'react-router-dom';
 import IconButton from '@/components/IconButton';
 import KebabButton from '@/components/KebabButton';
 import Modal from '@/components/Modal';
-import Toast from '@/components/Toast';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 import { PlayListDataProps } from '@/types/playlistType';
@@ -66,13 +66,13 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
       },
     });
   };
-  const [toastActive, setToastActive] = useState(false);
+  const { toastTrigger } = useToast();
 
   const { user } = useAuthStore();
 
   const onClickHeart = () => {
     if (!user) {
-      setToastActive(true);
+      toastTrigger('로그인이 필요합니다.');
     } else {
       setIsLiked(!isLiked);
     }
@@ -191,17 +191,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
     </article>
   );
 
-  return (
-    <>
-      {size === 'large' ? renderLargeCard() : renderSmallCard()}
-      <Toast
-        isActive={toastActive}
-        toastMsg='로그인이 필요합니다.'
-        status='fail'
-        onClose={() => setToastActive(false)}
-      />
-    </>
-  );
+  return <>{size === 'large' ? renderLargeCard() : renderSmallCard()}</>;
 };
 
 const smallImgSize = '72px';

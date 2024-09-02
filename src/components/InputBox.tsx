@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
@@ -33,6 +33,10 @@ const InputBox: React.FC<InputBoxProps> = ({
   const [value, setValue] = useState(propValue || '');
   const [isTouched, setIsTouched] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  useEffect(() => {
+    setValue(propValue || '');
+  }, [propValue]);
 
   const onInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

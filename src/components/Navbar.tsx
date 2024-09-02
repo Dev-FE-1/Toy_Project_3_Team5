@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
 };
 
 const navbarStyle = css`
-  width: 426px;
+  width: 430px;
   height: 60px;
   display: flex;
   justify-content: space-around;
@@ -58,6 +58,7 @@ const navbarStyle = css`
   padding: 10px 20px;
   background-color: ${colors.white};
   border-top: 1px solid ${colors.gray02};
+  z-index: 10;
 `;
 
 const iconWrapperStyle = css`

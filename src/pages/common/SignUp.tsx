@@ -64,7 +64,6 @@ export const SignUp = () => {
       }
     } catch (error) {
       console.log('아이디 중복 검사 오류:', error);
-      setIdCheckMessage('아이디 중복 검사에 실패했습니다.');
     }
   };
 
@@ -78,7 +77,6 @@ export const SignUp = () => {
       }
     } catch (error) {
       console.error('채널 이름 중복 검사 오류:', error);
-      setChannelNameCheckMessage('채널 이름 중복 검사에 실패했습니다.');
     }
   };
 
@@ -121,14 +119,14 @@ export const SignUp = () => {
     if (value.length < 5) {
       return '아이디는 5자리 이상이어야 합니다';
     }
-    return '사용 가능한 아이디입니다.';
+    return '';
   };
 
   const validatePassword = (value: string) => {
     const regex =
       /^(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{5,}$/;
     if (!regex.test(value)) {
-      return '비밀번호는 5자리 이상, 특수문자 포함이어야 합니다';
+      return '비밀번호는 5자리 이상, 특수문자(!,@,-,$,*)포함이어야 합니다';
     }
     return '사용 가능한 비밀번호입니다.';
   };
@@ -144,7 +142,7 @@ export const SignUp = () => {
     if (value.length < 2) {
       return '채널 이름은 2자리 이상이어야 합니다';
     }
-    return '사용 가능한 채널 이름입니다.';
+    return '';
   };
 
   return (
@@ -161,6 +159,7 @@ export const SignUp = () => {
               setId(e.target.value);
             }}
             width='315px'
+            externalErrorMessage={idCheckMessage}
           />
           <div style={{ marginLeft: `5px` }}>
             <Button
@@ -171,7 +170,6 @@ export const SignUp = () => {
             />
           </div>
         </div>
-        {idCheckMessage && <p>{idCheckMessage}</p>}
         <InputBox
           label='비밀번호'
           placeholder='비밀번호를 입력해주세요'
@@ -202,6 +200,7 @@ export const SignUp = () => {
               setChannelName(e.target.value);
             }}
             width='315px'
+            externalErrorMessage={channelNameCheckMessage}
           />
           <div style={{ marginLeft: `5px` }}>
             <Button
@@ -211,7 +210,6 @@ export const SignUp = () => {
             />
           </div>
         </div>
-        {channelNameCheckMessage && <p>{channelNameCheckMessage}</p>}{' '}
         <div style={{ width: `390px` }}>
           <Button
             label='회원가입'

@@ -22,6 +22,7 @@ import { tagging } from '@/utils/textUtils';
 import { getVideoId } from '@/utils/videoUtils';
 
 const TEXT = {
+  toggle: { active: '공개', inactive: '비공개' },
   title: {
     label: '플레이리스트 제목',
     placeholder: '플레이리스트 제목을 입력해주세요.',
@@ -46,8 +47,15 @@ const TEXT = {
     limit: '해시태그는 5개까지 등록할 수 있습니다.',
     validDuplmsg: '중복된 해시태그입니다.',
   },
+  thumbnail: {
+    label: '썸네일',
+    desc: '플레이리스트 메인 썸네일을 선택해주세요.',
+  },
+  preview: {
+    large: '미리보기 (large)',
+    small: '미리보기 (small)',
+  },
   createButton: { label: '플레이리스트 생성하기', loading: '생성 중...' },
-  toggle: { active: '공개', inactive: '비공개' },
   toast: { success: '플레이리스트 생성이 완료되었습니다.' },
 };
 
@@ -125,7 +133,7 @@ const PlayListAdd = () => {
       return '';
     },
     hashtag: (value: string) => {
-      if (value.trim().length < 1) {
+      if (value.trim().length < 1 || value.trim() === '#') {
         toastTrigger(TEXT.hashtag.required);
         return false;
       }
@@ -205,6 +213,12 @@ const PlayListAdd = () => {
       setAddedHashtag(addedHashtag.filter((tag) => tag.id !== id));
     },
     createPlaylist: async () => {
+      const checkResult = check.required();
+      if (!!!checkResult.status) {
+        toastTrigger(checkResult.msg);
+        return;
+      }
+
       const playlist: PlayListDataProps = {
         ...preview,
         thumbnailFile: thumbnail?.file,
@@ -220,6 +234,22 @@ const PlayListAdd = () => {
   };
 
   const check = {
+    required: (): {
+      status: boolean;
+      msg: string;
+    } => {
+      if (title.trim().length < 1)
+        return { status: false, msg: TEXT.title.required };
+      if (videoList.length < 1)
+        return { status: false, msg: TEXT.link.required };
+      if (addedHashtag.length < 1)
+        return {
+          status: false,
+          msg: TEXT.hashtag.required,
+        };
+
+      return { status: true, msg: '' };
+    },
     dupl: {
       hashtag: (inputTag: string): boolean => {
         let result = false;
@@ -341,11 +371,11 @@ const PlayListAdd = () => {
         <HashTag onRemove={onClick.removeHashtag} tags={addedHashtag} />
       </div>
       <div css={thumbnailStyle}>
-        <label style={labelStyle}>썸네일</label>
+        <label style={labelStyle}>{TEXT.thumbnail.label}</label>
         <label
           style={{ fontSize: `${fontSize.sm}`, color: `${colors.gray04}` }}
         >
-          플레이리스트 메인 썸네일을 선택해주세요.
+          {TEXT.thumbnail.desc}
         </label>
 
         <Button
@@ -378,9 +408,9 @@ const PlayListAdd = () => {
         )}
       </div>
       <div css={previewStyle}>
-        <label style={labelStyle}>미리보기(large)</label>
+        <label style={labelStyle}>{TEXT.preview.large}</label>
         <PlaylistCard playlistItem={preview} size='large' />
-        <label style={labelStyle}>미리보기(small)</label>
+        <label style={labelStyle}>{TEXT.preview.small}</label>
         <PlaylistCard playlistItem={preview} size='small' />
       </div>
 

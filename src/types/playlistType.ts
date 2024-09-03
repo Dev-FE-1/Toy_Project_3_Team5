@@ -8,5 +8,6 @@ export interface PlayListDataProps {
   regDate: string;
   tags: string[];
   thumbNail: string;
+  thumbnailFile?: File;
   userId: string;
 }

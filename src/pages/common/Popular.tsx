@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import Button from '@/components/Button';
 import PlaylistCard from '@/components/PlaylistCard';
+import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import useTagFetch from '@/hooks/useTagFetch';
 
@@ -47,35 +48,40 @@ export const Popular = () => {
     </div>
   );
 };
+
 const contentContainerStyle = css`
-  box-sizing: border-box;
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
+  box-sizing: border-box;
 `;
 const headerContainerStyle = css`
-  position: sticky;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  position: fixed;
+  z-index: 10;
+  background: ${colors.white};
+  height: 200px;
+  width: 430px;
 `;
-
 const tagContainerStyle = css`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: 5px;
   padding-left: 15px;
   padding-right: 15px;
-  position: sticky;
 `;
 
 const titleContainerStyle = css`
+  height: 100px;
   align-items: center;
-  padding-top: 10px;
+  padding-top: 30px;
+  padding-bottom: 20px;
   padding-left: 15px;
   font-size: ${fontSize.xxxl};
-  position: sticky;
 `;
 
 const playlistContainerStyle = css`
-  padding: 20px;
-  overflow-y: auto;
-  gap: 20px;
+  padding-top: 200px;
 `;

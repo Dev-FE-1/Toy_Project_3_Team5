@@ -59,11 +59,14 @@ const HashTag: React.FC = () => {
 
 const hashtagConainerStyle = css`
   width: 100%;
-  height: calc(100vh - 75px);
+  max-width: 430px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
+  margin: 0 auto;
 `;
 
 const titleStyle = css`
@@ -87,8 +90,8 @@ const hashtagStyle = css`
 `;
 
 const skipContainerStyle = css`
+  position: absolute;
   width: 100%;
-  position: fixed;
   padding: 24px;
   bottom: 0px;
   right: 0px;

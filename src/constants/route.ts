@@ -8,7 +8,7 @@ const ROUTES = {
   POPULAR: '/popular',
   FOLLOWING: '/following',
   DETAIL: (playListId = ':playlistId') => `/detail/${playListId}`,
-  SEARCH: (searchText = ':searchText') => `/search/${searchText}`,
+  SEARCH: (keyword = ':keyword') => `/search/${keyword}`,
   PLAYLIST: (userId = ':userId') => `/playlist/${userId}`,
   PLAYLIST_SAVED: (userId = ':userId') => `/playlist/${userId}/saved`,
   PLAYLIST_LIKES: (userId = ':userId') => `/playlist/${userId}/likes`,

@@ -30,7 +30,7 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
 
     if (searchText.trim()) {
       const encodedKeyword = encodeURIComponent(searchText.trim());
-      navigate(ROUTES.SEARCH(`keyword=${encodedKeyword}`));
+      navigate(ROUTES.SEARCH(encodedKeyword));
     }
   };
 

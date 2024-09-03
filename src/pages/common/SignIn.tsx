@@ -36,7 +36,7 @@ export const SignIn = () => {
     }
   }, []);
 
-  const handleToggleChange = (enabled: boolean) => {
+  const onToggleChange = (enabled: boolean) => {
     setIsEmailRemembered(enabled);
     if (enabled) {
       localStorage.setItem('savedEmail', id);
@@ -119,7 +119,7 @@ export const SignIn = () => {
         <div css={toggleStyle}>
           <Toggle
             enabled={isEmailRemembered}
-            setEnabled={handleToggleChange}
+            setEnabled={onToggleChange}
             label={{ active: '로그인 정보 기억하기', inactive: '' }}
           />
         </div>

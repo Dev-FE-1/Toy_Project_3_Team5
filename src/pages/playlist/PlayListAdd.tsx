@@ -42,6 +42,9 @@ const TEXT = {
     label: '해시태그',
     desc: '최대 5개까지 입력 가능합니다.',
     placeholder: '#',
+    required: '해시태그를 입력해주세요',
+    limit: '해시태그는 5개까지 등록할 수 있습니다.',
+    validDuplmsg: '중복된 해시태그입니다.',
   },
   createButton: { label: '플레이리스트 생성하기', loading: '생성 중...' },
   toggle: { active: '공개', inactive: '비공개' },
@@ -106,20 +109,13 @@ const PlayListAdd = () => {
 
   const onKeydown = {
     link: (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (validation.link(link)) {
-        return;
-      }
       if (e.key === 'Enter') onClick.addVideoLink();
     },
     hashtag: (e: React.KeyboardEvent<HTMLInputElement>) => {
-      // 입력 valid 체크
-      // const valid = validation.hashtag;
-      // if (e.key === ' ') console.log('a');
       if (e.key === 'Enter') onClick.addHashtag();
     },
   };
 
-  // true: 조건에 걸림, false: 통과
   const validation = {
     link: (value: string) => {
       if (!Regex.youtube.test(value)) return TEXT.link.validmsg;
@@ -128,13 +124,22 @@ const PlayListAdd = () => {
       if (videoId && check.dupl.link(videoId)) return TEXT.link.validDuplmsg;
       return '';
     },
-    // duplLink: (videoId: string) => {
-    //   let result = false;
-    //   videoList.map((video) => {
-    //     if (video.videoId === videoId) return (result = true);
-    //   });
-    //   return result;
-    // },
+    hashtag: (value: string) => {
+      if (value.trim().length < 1) {
+        toastTrigger(TEXT.hashtag.required);
+        return false;
+      }
+      if (addedHashtag.length >= 5) {
+        toastTrigger(TEXT.hashtag.limit);
+        return false;
+      }
+      const taggedValue = tagging(value);
+      if (check.dupl.hashtag(taggedValue)) {
+        toastTrigger(TEXT.hashtag.validDuplmsg);
+        return false;
+      }
+      return true;
+    },
   };
 
   const methods = {
@@ -180,6 +185,7 @@ const PlayListAdd = () => {
       if (fileInputRef.current) fileInputRef.current.value = '';
     },
     addHashtag: () => {
+      if (!!!validation.hashtag(hashtag)) return;
       const taggedValue = tagging(hashtag);
 
       setAddedHashtag([
@@ -215,6 +221,14 @@ const PlayListAdd = () => {
 
   const check = {
     dupl: {
+      hashtag: (inputTag: string): boolean => {
+        let result = false;
+
+        addedHashtag.map((hashtag) => {
+          if (hashtag.label === inputTag) return (result = true);
+        });
+        return result;
+      },
       link: (videoId: string): boolean => {
         let result = false;
         videoList.map((video) => {

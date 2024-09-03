@@ -16,6 +16,7 @@ interface InputBoxProps {
   onChange?: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  externalErrorMessage?: string;
 }
 
 const InputBox: React.FC<InputBoxProps> = ({
@@ -29,6 +30,7 @@ const InputBox: React.FC<InputBoxProps> = ({
   height = '36px',
   value: propValue,
   onChange: propOnChange,
+  externalErrorMessage,
 }) => {
   const [value, setValue] = useState(propValue || '');
   const [isTouched, setIsTouched] = useState(false);
@@ -59,8 +61,11 @@ const InputBox: React.FC<InputBoxProps> = ({
     }
   };
 
+  const errorMessageToShow = externalErrorMessage || errorMessage;
   const isValid = validate
-    ? errorMessage === '' || errorMessage === '사용 가능한 비밀번호입니다.'
+    ? errorMessageToShow === '' ||
+      errorMessageToShow.includes('가능한') ||
+      errorMessageToShow.includes('일치')
     : null;
 
   return (
@@ -87,8 +92,8 @@ const InputBox: React.FC<InputBoxProps> = ({
             css={inputStyle(isValid, isTouched, width, height, false)}
           />
         )}
-        {isTouched && errorMessage && (
-          <span css={messageStyle(isValid)}>{errorMessage}</span>
+        {isTouched && errorMessageToShow && (
+          <span css={messageStyle(isValid)}>{errorMessageToShow}</span>
         )}
       </div>
     </>

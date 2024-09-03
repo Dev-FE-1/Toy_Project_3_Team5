@@ -12,7 +12,7 @@ import { Search } from '@/pages/common/Search';
 import { SignIn } from '@/pages/common/SignIn';
 import { SignUp } from '@/pages/common/SignUp';
 import { PlayList } from '@/pages/playlist/PlayList';
-import { PlayListAdd } from '@/pages/playlist/PlayListAdd';
+import PlayListAdd from '@/pages/playlist/PlayListAdd';
 import { PlayListHome } from '@/pages/playlist/PlayListHome';
 import { PlayListLikes } from '@/pages/playlist/PlayListLikes';
 import { PlayListSaved } from '@/pages/playlist/PlayListSaved';
@@ -56,18 +56,18 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: ROUTES.PLAYLIST_MODIFY(),
-        element: (
-          <ProtectedRoute>
-            <PlayListUpdate />
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: ROUTES.PLAYLIST_ADD(),
         element: (
           <ProtectedRoute>
             <PlayListAdd />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: ROUTES.PLAYLIST_MODIFY(),
+        element: (
+          <ProtectedRoute>
+            <PlayListUpdate />
           </ProtectedRoute>
         ),
       },

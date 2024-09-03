@@ -29,7 +29,6 @@ const VideoContainer = css`
   display: flex;
   cursor: pointer;
   margin-bottom: 10px;
-  padding: 0px 10px;
 `;
 
 const ThumbnailStyle = css`

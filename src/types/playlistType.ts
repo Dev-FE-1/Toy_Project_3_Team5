@@ -1,5 +1,5 @@
 export interface PlayListDataProps {
-  playlistId: string;
+  playlistId?: string;
   title: string;
   description: string;
   isPublic: boolean;
@@ -7,6 +7,7 @@ export interface PlayListDataProps {
   links: string[];
   regDate: string;
   tags: string[];
-  thumbNail: string;
+  thumbnail: string;
+  thumbnailFile?: File;
   userId: string;
 }

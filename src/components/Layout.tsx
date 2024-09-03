@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '@/components/Header';
 import Navbar from '@/components/Navbar';
+import Toast from '@/components/Toast';
 import colors from '@/constants/colors';
 import { checkHeaderType } from '@/utils/headerUtils';
 
@@ -15,6 +16,7 @@ export const Layout = () => {
       <main>
         <Outlet />
       </main>
+      <Toast />
       <Navbar />
     </div>
   );

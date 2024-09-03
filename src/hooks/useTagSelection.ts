@@ -1,20 +1,20 @@
 import { useState } from 'react';
 
-const useTagSelection = (initialSelectedTags: number[] = []) => {
+const useTagSelection = (initialSelectedTags: string[] = []) => {
   const [selectedTags, setSelectedTags] =
-    useState<number[]>(initialSelectedTags);
+    useState<string[]>(initialSelectedTags);
 
-  const onTagSelection = (id: number, removable: boolean) => {
+  const onTagSelection = (label: string, removable: boolean) => {
     if (removable) return;
 
     setSelectedTags((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((tagId) => tagId !== id);
+      if (prev.includes(label)) {
+        return prev.filter((tagLabel) => tagLabel !== label);
       } else {
         if (prev.length >= 10) {
           return prev;
         }
-        return [...prev, id];
+        return [...prev, label];
       }
     });
   };

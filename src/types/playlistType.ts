@@ -7,6 +7,6 @@ export interface PlayListDataProps {
   links: string[];
   regDate: string;
   tags: string[];
-  thumbNail: string;
+  thumbnail: string;
   userId: string;
 }

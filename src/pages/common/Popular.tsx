@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import Button from '@/components/Button';
 import PlaylistCard from '@/components/PlaylistCard';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import useTagFetch from '@/hooks/useTagFetch';
+import { PlayListDataProps } from '@/types/playlistType';
 
 export const Popular = () => {
   const tags: string[] = ['인기 급상승 동영상', 'Developer', '먹방', 'Vlog'];
@@ -12,9 +13,8 @@ export const Popular = () => {
 
   const onButtonClick = (tag: string) => () => {
     setClickedBtn(tag);
-    console.log('data', playlistCollectionData);
   };
-  const { data: playlistCollectionData } = useTagFetch({
+  const playlistCollectionData: PlayListDataProps[] = useTagFetch({
     collectionName: 'playlist',
     tag: clickedBtn,
   });

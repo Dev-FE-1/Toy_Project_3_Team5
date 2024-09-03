@@ -3,8 +3,8 @@ import { Switch } from '@headlessui/react';
 import colors from '@/constants/colors';
 
 type ToggleLabel = {
-  active: string;
-  inactive: string;
+  active?: string;
+  inactive?: string;
 };
 
 interface ToggleProps {
@@ -18,7 +18,11 @@ const Toggle = ({ enabled, setEnabled, label }: ToggleProps) => {
 
   return (
     <div css={toggleStyle}>
-      {label && <span>{label.inactive}</span>}
+      {label?.inactive && (
+        <span css={labelStyle(enabled)} className='inactive'>
+          {label.inactive}
+        </span>
+      )}
       <Switch
         css={switchStyle(enabled)}
         onClick={onToggle}
@@ -26,7 +30,11 @@ const Toggle = ({ enabled, setEnabled, label }: ToggleProps) => {
       >
         <span css={switchThumbStyle(enabled)} />
       </Switch>
-      {label && <span>{label.active}</span>}
+      {label?.active && (
+        <span css={labelStyle(enabled)} className='active'>
+          {label.active}
+        </span>
+      )}
     </div>
   );
 };
@@ -58,6 +66,18 @@ const switchThumbStyle = (enabled: boolean) => css`
   background-color: ${colors.white};
   transform: ${enabled ? 'translateX(20px)' : 'translateX(0)'};
   transition: transform 0.2s ease-in-out;
+`;
+
+const labelStyle = (enabled: boolean) => css`
+  &.active {
+    padding-left: 5px;
+    color: ${enabled ? colors.black : colors.gray03};
+  }
+
+  &.inactive {
+    padding-right: 5px;
+    color: ${!!!enabled ? colors.black : colors.gray03};
+  }
 `;
 
 export default Toggle;

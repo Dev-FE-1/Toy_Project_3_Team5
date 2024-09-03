@@ -12,18 +12,32 @@ export interface Tag {
 interface TagProps {
   tags: Tag[];
   onRemove: (id: number) => void;
+  margin?: string;
+  onTagClick?: (id: number, removable: boolean) => void;
 }
 
-const HashTag: React.FC<TagProps> = ({ tags, onRemove }) => {
+const HashTag: React.FC<TagProps> = ({
+  tags,
+  onRemove,
+  margin = '3px',
+  onTagClick,
+}) => {
   const { selectedTags, onTagSelection } = useTagSelection();
+
+  const onSelectedTagClick = (id: number, removable: boolean) => {
+    onTagSelection(id, removable);
+    if (onTagClick) {
+      onTagClick(id, removable);
+    }
+  };
 
   return (
     <div>
       {tags.map((tag) => (
         <div
           key={tag.id}
-          css={tagStyle(selectedTags.includes(tag.id), tag.removable)}
-          onClick={() => onTagSelection(tag.id, tag.removable)}
+          css={tagStyle(selectedTags.includes(tag.id), tag.removable, margin)}
+          onClick={() => onSelectedTagClick(tag.id, tag.removable)}
         >
           {tag.label}
           {tag.removable && (
@@ -43,10 +57,14 @@ const HashTag: React.FC<TagProps> = ({ tags, onRemove }) => {
   );
 };
 
-const tagStyle = (isSelected: boolean, removable: boolean) => css`
+const tagStyle = (
+  isSelected: boolean,
+  removable: boolean,
+  margin: string
+) => css`
   display: inline-flex;
   align-items: center;
-  margin-right: 3px;
+  margin: ${margin};
   border: 1px solid ${colors.gray02};
   font-size: ${fontSize.sm};
   font-weight: ${fontWeight.medium};

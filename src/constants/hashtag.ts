@@ -25,5 +25,5 @@ export const HASHTAGS: Tag[] = [
   { id: 22, label: '#자기계발', removable: false },
   { id: 23, label: '#발레', removable: false },
   { id: 24, label: '#Fashion', removable: false },
-  { id: 25, label: '#smallbusiness', removable: false },
+  { id: 25, label: '#드라마', removable: false },
 ];

@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -19,26 +19,6 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const auth = getAuth(app);
-
-export const onUserStateChanged = (
-  callback: (user: (User & { profileImg?: string }) | null) => void
-) => {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists()) {
-        callback({ ...user, profileImg: userDoc.data().profileImg } as User & {
-          profileImg?: string;
-        });
-      } else {
-        callback(user);
-      }
-    } else {
-      callback(null);
-    }
-  });
-};
 
 export const COLLECTION = {
   users: 'users',

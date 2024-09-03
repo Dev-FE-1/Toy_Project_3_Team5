@@ -49,7 +49,9 @@ const ProfileFollowing = () => {
                 <Profile src={data.src} alt={data.alt} size={data.size} />
                 <span>{data.name}</span>
               </span>
-              <UserMinus css={userMinusStyle} />
+              <button css={userMinusStyle}>
+                <UserMinus css={userMinusStyle} />
+              </button>
             </div>
           ))}
         </div>
@@ -94,7 +96,9 @@ const profileContainerStyle = css`
 `;
 
 const userMinusStyle = css`
-  margin-right: 20px;
+  margin-right: 10px;
+  background: none;
+  border: none;
 `;
 
 export default ProfileFollowing;

@@ -121,8 +121,8 @@ export const SignUp = () => {
         channelName,
         channelFollower: [],
         channelFollowing: [],
-        followingPlaylist: [],
-        likePlaylist: [],
+        savedPlaylist: [],
+        likedPlaylist: [],
         profileImg: '',
         tags: [],
       });

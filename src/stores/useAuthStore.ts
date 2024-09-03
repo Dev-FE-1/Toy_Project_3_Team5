@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>(
           set({
             profileImage: data?.profileImg || '',
             channelName: data?.channelName || '',
-            playlistCount: data?.followingPlaylist?.length || 0,
+            playlistCount: data?.savedPlaylist?.length || 0,
             followerCount: data?.channelFollower?.length || 0,
             followingCount: data?.channelFollowing?.length || 0,
           });

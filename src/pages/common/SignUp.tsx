@@ -170,7 +170,7 @@ export const SignUp = () => {
     channelName.length < 2;
 
   return (
-    <div>
+    <div css={containerStyle}>
       <Header type='detail' headerTitle='회원가입' />
       <form onSubmit={onSignUp} css={signUpContainerStyle}>
         <div css={duplicateStyle}>
@@ -261,6 +261,12 @@ export const SignUp = () => {
     </div>
   );
 };
+
+const containerStyle = css`
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+`;
 
 const signUpContainerStyle = css`
   display: flex;

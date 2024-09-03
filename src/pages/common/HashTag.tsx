@@ -21,9 +21,7 @@ const HashTag: React.FC = () => {
   };
 
   const onTagClick = (id: number, removable: boolean) => {
-    if (!removable) {
-      onTagSelection(id, removable);
-    }
+    onTagSelection(id, removable);
   };
 
   const onSkip = () => {

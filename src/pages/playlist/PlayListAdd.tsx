@@ -380,9 +380,6 @@ const containerStyle = css`
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: calc(100vh - 60px - 60px);
 
   & > div {
     padding: 5px 0;

@@ -11,9 +11,9 @@ export interface Tag {
 
 interface TagProps {
   tags: Tag[];
-  onRemove: (id: number) => void;
+  onRemove: (label: string) => void;
   margin?: string;
-  onTagClick?: (id: number, removable: boolean) => void;
+  onTagClick?: (label: string, removable: boolean) => void;
 }
 
 const HashTag: React.FC<TagProps> = ({
@@ -24,10 +24,10 @@ const HashTag: React.FC<TagProps> = ({
 }) => {
   const { selectedTags, onTagSelection } = useTagSelection();
 
-  const onSelectedTagClick = (id: number, removable: boolean) => {
-    onTagSelection(id, removable);
+  const onSelectedTagClick = (label: string, removable: boolean) => {
+    onTagSelection(label, removable);
     if (onTagClick) {
-      onTagClick(id, removable);
+      onTagClick(label, removable);
     }
   };
 
@@ -36,8 +36,12 @@ const HashTag: React.FC<TagProps> = ({
       {tags.map((tag) => (
         <div
           key={tag.id}
-          css={tagStyle(selectedTags.includes(tag.id), tag.removable, margin)}
-          onClick={() => onSelectedTagClick(tag.id, tag.removable)}
+          css={tagStyle(
+            selectedTags.includes(tag.label),
+            tag.removable,
+            margin
+          )}
+          onClick={() => onSelectedTagClick(tag.label, tag.removable)}
         >
           {tag.label}
           {tag.removable && (
@@ -45,7 +49,7 @@ const HashTag: React.FC<TagProps> = ({
               css={removeButtonStyle}
               onClick={(e) => {
                 e.stopPropagation();
-                onRemove(tag.id);
+                onRemove(tag.label);
               }}
             >
               X

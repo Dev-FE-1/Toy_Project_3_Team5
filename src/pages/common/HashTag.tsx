@@ -9,22 +9,27 @@ import { fontSize, fontWeight } from '@/constants/font';
 import { HASHTAGS } from '@/constants/hashtag';
 import ROUTES from '@/constants/route';
 import useTagSelection from '@/hooks/useTagSelection';
+import { updateFirstLogin, useAuthStore } from '@/stores/useAuthStore';
 
 const HashTag: React.FC = () => {
   const [tags, setTags] = useState<Tag[]>(HASHTAGS);
   const { selectedTags, onTagSelection } = useTagSelection();
   const navigate = useNavigate();
 
-  const onTagRemove = (id: number) => {
-    setTags(tags.filter((tag) => tag.id !== id));
-    onTagSelection(id, true);
+  const { userId } = useAuthStore();
+
+  const onTagRemove = (label: string) => {
+    setTags(tags.filter((tag) => tag.label !== label));
+    onTagSelection(label, true);
   };
 
-  const onTagClick = (id: number, removable: boolean) => {
-    onTagSelection(id, removable);
+  const onTagClick = (label: string, removable: boolean) => {
+    onTagSelection(label, removable);
   };
 
-  const onSkip = () => {
+  const onSkip = async () => {
+    await updateFirstLogin(userId, selectedTags);
+    useAuthStore.setState({ isFirstLogin: false });
     navigate(ROUTES.ROOT);
   };
 

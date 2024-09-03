@@ -6,6 +6,7 @@ import {
   query,
   where,
   getDocs,
+  updateDoc,
 } from 'firebase/firestore';
 import { create, StateCreator } from 'zustand';
 import { persist, PersistOptions } from 'zustand/middleware';
@@ -21,6 +22,7 @@ interface AuthState {
   channelFollower: string[];
   channelFollowing: string[];
   tags: string[];
+  isFirstLogin: boolean;
   setUser: (user: User | null) => void;
   clearUser: () => void;
   fetchUserData: (id: string) => void;
@@ -43,6 +45,7 @@ export const useAuthStore = create<AuthState>(
       channelFollower: [],
       channelFollowing: [],
       tags: [],
+      isFirstLogin: true,
 
       setUser: (user) => set({ user }),
       clearUser: () =>
@@ -64,6 +67,7 @@ export const useAuthStore = create<AuthState>(
             channelFollower: data?.channelFollower || [],
             channelFollowing: data?.channelFollowing || [],
             tags: data?.tags || [],
+            isFirstLogin: data?.isFirstLogin ?? true,
           });
         }
       },
@@ -85,6 +89,14 @@ export const useAuthStore = create<AuthState>(
     }
   )
 );
+
+export const updateFirstLogin = async (userId: string, tags: string[]) => {
+  const userDocRef = doc(db, 'users', userId);
+  await updateDoc(userDocRef, {
+    isFirstLogin: false,
+    tags,
+  });
+};
 
 onAuthStateChanged(auth, async (user) => {
   const { setUser, fetchUserData } = useAuthStore.getState();

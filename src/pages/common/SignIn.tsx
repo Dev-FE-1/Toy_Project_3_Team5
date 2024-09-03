@@ -27,6 +27,7 @@ export const SignIn = () => {
   const navigate = useNavigate();
 
   const setUser = useAuthStore((state) => state.setUser);
+  const isFirstLogin = useAuthStore((state) => state.isFirstLogin);
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('savedEmail');
@@ -56,7 +57,11 @@ export const SignIn = () => {
         password
       );
       setUser(userCredential.user);
-      navigate(ROUTES.ROOT);
+      if (isFirstLogin) {
+        navigate(ROUTES.HASH_TAG);
+      } else {
+        navigate(ROUTES.ROOT);
+      }
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
       setErrorMessage('아이디와 비밀번호를 확인해주세요');
@@ -68,7 +73,11 @@ export const SignIn = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
-      navigate(ROUTES.ROOT);
+      if (isFirstLogin) {
+        navigate(ROUTES.HASH_TAG);
+      } else {
+        navigate(ROUTES.ROOT);
+      }
     } catch (error) {
       console.error('Google 로그인 중 오류 발생:', error);
       setErrorMessage(

@@ -13,10 +13,23 @@ interface TagProps {
   tags: Tag[];
   onRemove: (id: number) => void;
   margin?: string;
+  onTagClick?: (id: number, removable: boolean) => void;
 }
 
-const HashTag: React.FC<TagProps> = ({ tags, onRemove, margin = '3px' }) => {
+const HashTag: React.FC<TagProps> = ({
+  tags,
+  onRemove,
+  margin = '3px',
+  onTagClick,
+}) => {
   const { selectedTags, onTagSelection } = useTagSelection();
+
+  const onSelectedTagClick = (id: number, removable: boolean) => {
+    onTagSelection(id, removable);
+    if (onTagClick) {
+      onTagClick(id, removable);
+    }
+  };
 
   return (
     <div>
@@ -24,7 +37,7 @@ const HashTag: React.FC<TagProps> = ({ tags, onRemove, margin = '3px' }) => {
         <div
           key={tag.id}
           css={tagStyle(selectedTags.includes(tag.id), tag.removable, margin)}
-          onClick={() => onTagSelection(tag.id, tag.removable)}
+          onClick={() => onSelectedTagClick(tag.id, tag.removable)}
         >
           {tag.label}
           {tag.removable && (

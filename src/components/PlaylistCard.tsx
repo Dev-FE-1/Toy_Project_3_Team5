@@ -96,8 +96,8 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         <figure className='img-container'>
           <img
             src={
-              playlistItem.thumbNail
-                ? playlistItem.thumbNail
+              playlistItem.thumbnail
+                ? playlistItem.thumbnail
                 : playlistItem.links[0]
             }
             alt='썸네일 이미지'
@@ -141,8 +141,8 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         <figure className='img-container'>
           <img
             src={
-              playlistItem.thumbNail
-                ? playlistItem.thumbNail
+              playlistItem.thumbnail
+                ? playlistItem.thumbnail
                 : playlistItem.links[0]
             }
             alt='썸네일 이미지'

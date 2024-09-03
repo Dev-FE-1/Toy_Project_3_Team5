@@ -34,7 +34,7 @@ export const addPlaylist = async (
       nextPlaylistId.toString()
     );
 
-    await updateDoc(docRef, { thumbNail: url });
+    await updateDoc(docRef, { thumbnail: url });
   }
 
   return { status: 'success', result: true };

@@ -57,7 +57,7 @@ const INIT_VALUES: {
     isPublic: true,
     playlistId: '임시 PL ID',
     regDate: new Date().toISOString(),
-    thumbNail: '/src/assets/defaultThumbnail.jpg',
+    thumbnail: '/src/assets/logoIcon.png',
     links: [],
   },
 };
@@ -82,10 +82,6 @@ const PlayListAdd = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [preview, setPreview] = useState<PlayListDataProps>(
-    INIT_VALUES.preview
-  );
-
-  const [resultPlaylist, setResultPlaylist] = useState<PlayListDataProps>(
     INIT_VALUES.preview
   );
 
@@ -140,13 +136,12 @@ const PlayListAdd = () => {
         likes: 0,
         description: desc,
         isPublic: enabled,
-        playlistId: '임시 PL ID',
         regDate: new Date().toISOString(),
-        thumbNail:
+        thumbnail:
           thumbnail?.preview ??
           (videoList.length > 0
             ? videoList[0].imgUrl
-            : INIT_VALUES.preview.thumbNail),
+            : INIT_VALUES.preview.thumbnail),
         links: [...videoList.map((video) => video.link)],
       });
     },
@@ -187,13 +182,12 @@ const PlayListAdd = () => {
       setAddedHashtag(addedHashtag.filter((tag) => tag.id !== id));
     },
     createPlaylist: async () => {
-      setResultPlaylist({
+      const playlist: PlayListDataProps = {
         ...preview,
-        thumbNail: '',
         thumbnailFile: thumbnail?.file,
-      });
+      };
 
-      const response = await addPlaylist(resultPlaylist);
+      const response = await addPlaylist(playlist);
 
       if (response.status === 'success') {
         toastTrigger(TEXT.toast.success);

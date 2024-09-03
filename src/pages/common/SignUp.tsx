@@ -127,6 +127,7 @@ export const SignUp = () => {
         tags: [],
       });
       console.log('회원가입 및 Firestore 데이터 저장 성공:', user);
+      window.location.reload();
       setIsSignUpSuccessToastActive(true);
     } catch (error) {
       console.error('회원가입 중 오류 발생:', error);

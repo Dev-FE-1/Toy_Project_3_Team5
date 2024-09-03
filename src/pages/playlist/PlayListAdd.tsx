@@ -14,15 +14,18 @@ import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import { Regex } from '@/constants/validation';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { PlayListDataProps } from '@/types/playlistType';
 import { tagging } from '@/utils/textUtils';
+import { getVideoId } from '@/utils/videoUtils';
 
 const TEXT = {
   title: {
     label: '플레이리스트 제목',
     placeholder: '플레이리스트 제목을 입력해주세요.',
+    required: '제목을 입력해주세요.',
   },
   desc: {
     label: '플레이리스트 설명',
@@ -31,7 +34,9 @@ const TEXT = {
   link: {
     label: '영상 링크 추가',
     placeholder: '영상 링크를 입력해주세요.',
-    validmsg: '지원하지 않는 영상입니다.',
+    validmsg: '지원하지 않는 링크 형식입니다.',
+    validDuplmsg: '중복된 링크입니다.',
+    required: '영상링크를 1개이상 입력해주세요.',
   },
   hashtag: {
     label: '해시태그',
@@ -51,6 +56,7 @@ const INIT_VALUES: {
   preview: {
     title: '임시 제목',
     userId: '임시 유저',
+    ownerChannelName: '',
     tags: ['#임시1'],
     likes: 0,
     description: '임시 설명',
@@ -85,7 +91,7 @@ const PlayListAdd = () => {
     INIT_VALUES.preview
   );
 
-  const { user } = useAuthStore();
+  const { user, channelName } = useAuthStore();
   const { toastTrigger } = useToast();
   const navigate = useNavigate();
 
@@ -98,12 +104,11 @@ const PlayListAdd = () => {
     },
   };
 
-  // 모든 동작? 같은 이름을 지어주고 싶은데
   const onKeydown = {
     link: (e: React.KeyboardEvent<HTMLInputElement>) => {
-      // 입력 valid 체크
-      // const valid = validation.hashtag;
-      // if (e.key === ' ') console.log('a');
+      if (validation.link(link)) {
+        return;
+      }
       if (e.key === 'Enter') onClick.addVideoLink();
     },
     hashtag: (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -116,12 +121,20 @@ const PlayListAdd = () => {
 
   // true: 조건에 걸림, false: 통과
   const validation = {
-    hashtag: {
-      count: () => addedHashtag.length > 5,
-      blank: () => hashtag.trim().length < 1,
-      regex: () => {},
-      cantSpace: (keycode: string) => keycode === 'Space',
+    link: (value: string) => {
+      if (!Regex.youtube.test(value)) return TEXT.link.validmsg;
+      const videoId = getVideoId(value);
+      if (!!!videoId) return TEXT.link.validmsg;
+      if (videoId && check.dupl.link(videoId)) return TEXT.link.validDuplmsg;
+      return '';
     },
+    // duplLink: (videoId: string) => {
+    //   let result = false;
+    //   videoList.map((video) => {
+    //     if (video.videoId === videoId) return (result = true);
+    //   });
+    //   return result;
+    // },
   };
 
   const methods = {
@@ -137,6 +150,7 @@ const PlayListAdd = () => {
         description: desc,
         isPublic: enabled,
         regDate: new Date().toISOString(),
+        ownerChannelName: channelName,
         thumbnail:
           thumbnail?.preview ??
           (videoList.length > 0
@@ -149,6 +163,9 @@ const PlayListAdd = () => {
 
   const onClick = {
     addVideoLink: async () => {
+      if (validation.link(link)) {
+        return;
+      }
       const { status, result } = await getVideoInfo(link);
       if (status === 'fail' || !!!result) return;
 
@@ -193,6 +210,18 @@ const PlayListAdd = () => {
         toastTrigger(TEXT.toast.success);
         navigate(ROUTES.PLAYLIST(user?.uid));
       }
+    },
+  };
+
+  const check = {
+    dupl: {
+      link: (videoId: string): boolean => {
+        let result = false;
+        videoList.map((video) => {
+          if (video.videoId === videoId) return (result = true);
+        });
+        return result;
+      },
     },
   };
 
@@ -263,6 +292,7 @@ const PlayListAdd = () => {
           width='360px'
           onChange={onChange.link}
           onKeyDown={onKeydown.link}
+          validate={validation.link}
         />
         <IconButton IconComponent={PlusSquare} onClick={onClick.addVideoLink} />
       </div>

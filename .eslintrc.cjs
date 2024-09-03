@@ -93,6 +93,7 @@ module.exports = {
         },
       },
     ],
+    'react/jsx-handler-names': 'off',
   },
   settings: {
     react: {

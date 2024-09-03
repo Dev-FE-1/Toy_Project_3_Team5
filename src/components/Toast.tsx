@@ -4,36 +4,32 @@ import { Transition } from '@headlessui/react';
 import { CircleCheck, CircleX } from 'lucide-react';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
+import useToast from '@/hooks/useToast';
 
 type ToastStatusType = 'success' | 'fail';
 
 interface ToastProps {
   duration?: number;
   status?: ToastStatusType;
-  isActive: boolean;
-  toastMsg: string;
-  onClose: () => void;
 }
 
-const Toast = ({
-  duration = 2000,
-  status = 'success',
-  isActive,
-  toastMsg,
-  onClose,
-}: ToastProps) => {
+const Toast = ({ duration = 2000, status = 'success' }: ToastProps) => {
+  const { isToastOn, toastMsg, onClose } = useToast();
+  // const { toastMsg, onClose } = useToast();
+  // const isToastOn = true;
+
   useEffect(() => {
-    if (isActive) {
+    if (isToastOn) {
       const timer = setTimeout(onClose, duration);
       return () => clearTimeout(timer);
     }
-  }, [isActive, onClose, duration]);
+  }, [isToastOn, onClose, duration]);
 
   return (
     <div css={transStyle}>
       <Transition
-        show={isActive}
-        appear={isActive}
+        show={isToastOn}
+        appear={isToastOn}
         as={Fragment}
         enterFrom='transition-enter-from'
         enterTo='transition-enter-to'
@@ -58,14 +54,14 @@ const Toast = ({
 const transStyle = css``;
 
 const toastStyle = css`
-  width: calc(100vw - 16px * 2);
-  max-width: 430px;
+  width: calc(100vw - 40px);
+  max-width: calc(430px - 40px);
   position: fixed;
-  bottom: 96px; // navbar 크기만큼
+  bottom: 60px;
   display: flex;
   align-items: center;
-  /* margin-left: 16px; */
   padding: 16px;
+  margin-left: 20px;
   border-radius: 4px;
   background-color: ${colors.gray04};
   color: ${colors.white};

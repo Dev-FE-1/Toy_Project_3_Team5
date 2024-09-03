@@ -5,6 +5,7 @@ import { fontSize, fontWeight } from '@/constants/font';
 
 interface InputBoxProps {
   label: string;
+  description?: string;
   placeholder: string;
   validate?: (value: string) => string;
   isPassword?: boolean;
@@ -16,10 +17,13 @@ interface InputBoxProps {
   onChange?: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  externalErrorMessage?: string;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const InputBox: React.FC<InputBoxProps> = ({
   label,
+  description,
   placeholder,
   validate,
   isPassword = false,
@@ -29,6 +33,8 @@ const InputBox: React.FC<InputBoxProps> = ({
   height = '36px',
   value: propValue,
   onChange: propOnChange,
+  externalErrorMessage,
+  onKeyDown,
 }) => {
   const [value, setValue] = useState(propValue || '');
   const [isTouched, setIsTouched] = useState(false);
@@ -59,8 +65,11 @@ const InputBox: React.FC<InputBoxProps> = ({
     }
   };
 
+  const errorMessageToShow = externalErrorMessage || errorMessage;
   const isValid = validate
-    ? errorMessage === '' || errorMessage === '사용 가능한 비밀번호입니다.'
+    ? errorMessageToShow === '' ||
+      errorMessageToShow.includes('가능한') ||
+      errorMessageToShow.includes('일치')
     : null;
 
   return (
@@ -69,6 +78,7 @@ const InputBox: React.FC<InputBoxProps> = ({
         <label css={labelStyleBase} style={labelStyle}>
           {label}
         </label>
+        {description && <label css={labelStyleDesc}>{description}</label>}
         {isTextarea ? (
           <textarea
             placeholder={placeholder}
@@ -85,10 +95,11 @@ const InputBox: React.FC<InputBoxProps> = ({
             onChange={onInputChange}
             onBlur={onInputBlur}
             css={inputStyle(isValid, isTouched, width, height, false)}
+            onKeyDown={onKeyDown}
           />
         )}
-        {isTouched && errorMessage && (
-          <span css={messageStyle(isValid)}>{errorMessage}</span>
+        {isTouched && errorMessageToShow && (
+          <span css={messageStyle(isValid)}>{errorMessageToShow}</span>
         )}
       </div>
     </>
@@ -104,6 +115,12 @@ const inputContainerStyle = css`
 const labelStyleBase = css`
   font-size: ${fontSize.sm};
   font-weight: ${fontWeight.regular};
+  margin-bottom: 4px;
+`;
+
+const labelStyleDesc = css`
+  font-size: ${fontSize.sm};
+  color: ${colors.gray04};
   margin-bottom: 4px;
 `;
 

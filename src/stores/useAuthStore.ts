@@ -1,54 +1,113 @@
-import { User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { create } from 'zustand';
-import { auth, db, onUserStateChanged } from '@/firebase/firbaseConfig';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
+import { create, StateCreator } from 'zustand';
+import { persist, PersistOptions } from 'zustand/middleware';
+import { auth, db } from '@/firebase/firbaseConfig';
 
 interface AuthState {
   user: User | null;
+  userId: string;
   profileImage: string;
   channelName: string;
-  playlistCount: number;
-  followerCount: number;
-  followingCount: number;
+  likedPlaylist: number[];
+  savedPlaylist: number[];
+  channelFollower: string[];
+  channelFollowing: string[];
+  tags: string[];
   setUser: (user: User | null) => void;
   clearUser: () => void;
-  fetchUserData: (uid: string) => void;
+  fetchUserData: (id: string) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  profileImage: '',
-  channelName: '',
-  playlistCount: 0,
-  followerCount: 0,
-  followingCount: 0,
+type AuthPersist = (
+  config: StateCreator<AuthState>,
+  options: PersistOptions<AuthState>
+) => StateCreator<AuthState>;
 
-  setUser: (user) => set({ user }),
-  clearUser: () =>
-    set({
+export const useAuthStore = create<AuthState>(
+  (persist as AuthPersist)(
+    (set) => ({
       user: null,
+      userId: '',
       profileImage: '',
-    }),
-  fetchUserData: async (uid) => {
-    const userDocRef = doc(db, 'users', uid);
-    const docSnapshot = await getDoc(userDocRef);
-    if (docSnapshot.exists()) {
-      const data = docSnapshot.data();
-      set({
-        profileImage: data?.profileImg || '',
-        channelName: data?.channelName || '',
-        playlistCount: data?.followingPlaylist?.length || 0,
-        followerCount: data?.channelFollower?.length || 0,
-        followingCount: data?.channelFollowing?.length || 0,
-      });
-    }
-  },
-}));
+      channelName: '',
+      likedPlaylist: [],
+      savedPlaylist: [],
+      channelFollower: [],
+      channelFollowing: [],
+      tags: [],
 
-onUserStateChanged((user) => {
+      setUser: (user) => set({ user }),
+      clearUser: () =>
+        set({
+          user: null,
+          profileImage: '',
+        }),
+      fetchUserData: async (id) => {
+        const userDocRef = doc(db, 'users', id);
+        const docSnapshot = await getDoc(userDocRef);
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+
+          set({
+            profileImage: data?.profileImg || '',
+            channelName: data?.channelName || '',
+            likedPlaylist: data?.likedPlaylist || [],
+            savedPlaylist: data?.savedPlaylist || [],
+            channelFollower: data?.channelFollower || [],
+            channelFollowing: data?.channelFollowing || [],
+            tags: data?.tags || [],
+          });
+        }
+      },
+    }),
+    {
+      name: 'auth-storage',
+      storage: {
+        getItem: (name) => {
+          const item = localStorage.getItem(name);
+          return item ? JSON.parse(item) : null;
+        },
+        setItem: (name, value) => {
+          localStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => {
+          localStorage.removeItem(name);
+        },
+      },
+    }
+  )
+);
+
+onAuthStateChanged(auth, async (user) => {
   const { setUser, fetchUserData } = useAuthStore.getState();
   setUser(user);
   if (user) {
-    fetchUserData(user.uid);
+    const email = user.email || '';
+    const userIdFromEmail = email.split('@')[0];
+
+    const usersCollectionRef = collection(db, 'users');
+    const userQuery = query(usersCollectionRef, where('uid', '==', user.uid));
+    const querySnapshot = await getDocs(userQuery);
+
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      const { id } = userDoc;
+
+      useAuthStore.setState({ userId: userIdFromEmail });
+
+      fetchUserData(id);
+    } else {
+      console.error('User not found in Firestore');
+    }
+  } else {
+    useAuthStore.getState().clearUser();
   }
 });

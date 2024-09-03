@@ -14,7 +14,9 @@ import Button from '@/components/Button';
 import Header from '@/components/Header';
 import InputBox from '@/components/InputBox';
 import Toast from '@/components/Toast';
+import ROUTES from '@/constants/route';
 import { auth, db } from '@/firebase/firbaseConfig';
+import useToast from '@/hooks/useToast';
 
 export const SignUp = () => {
   const [id, setId] = useState<string>('');
@@ -29,9 +31,8 @@ export const SignUp = () => {
   const [isIdChecked, setIsIdChecked] = useState<boolean>(false);
   const [isChannelNameChecked, setIsChannelNameChecked] =
     useState<boolean>(false);
-  const [isToastActive, setIsToastActive] = useState<boolean>(false);
-  const [isSignUpSuccessToastActive, setIsSignUpSuccessToastActive] =
-    useState<boolean>(false);
+
+  const { toastTrigger } = useToast();
 
   const checkChannelNameExists = async (
     channelName: string
@@ -96,7 +97,7 @@ export const SignUp = () => {
     e.preventDefault();
 
     if (!isIdChecked || !isChannelNameChecked) {
-      setIsToastActive(true);
+      toastTrigger('중복 검사를 진행해주세요.');
       return;
     }
 
@@ -127,8 +128,10 @@ export const SignUp = () => {
         tags: [],
       });
       console.log('회원가입 및 Firestore 데이터 저장 성공:', user);
-      window.location.reload();
-      setIsSignUpSuccessToastActive(true);
+      toastTrigger('회원가입 완료!🥳 로그인 화면으로 돌아가 로그인해주세요.');
+      setTimeout(() => {
+        window.location.href = ROUTES.SIGN_IN;
+      }, 2000);
     } catch (error) {
       console.error('회원가입 중 오류 발생:', error);
     }
@@ -247,18 +250,7 @@ export const SignUp = () => {
           />
         </div>
       </form>
-      <Toast
-        isActive={isToastActive}
-        status='fail'
-        toastMsg='중복 검사를 진행해주세요.'
-        onClose={() => setIsToastActive(false)}
-      />
-      <Toast
-        isActive={isSignUpSuccessToastActive}
-        status='success'
-        toastMsg={`회원가입 완료!🥳 로그인 화면으로 돌아가 로그인해주세요.`}
-        onClose={() => setIsSignUpSuccessToastActive(false)}
-      />
+      <Toast />
     </div>
   );
 };

@@ -2,40 +2,26 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 
 import { Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
-
-import useChannelFetch from '@/hooks/useChannelFetch';
-import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylistFetch';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { PlayListDataProps } from '@/types/playlistType';
+import ROUTES from '@/constants/route';
+import { PlayListDataProps } from '@/hooks/usePlaylist';
+import { TEST_DATA, TestProfileProps } from '@/mock/following-test';
 
 const Following = () => {
-  const { userId } = useAuthStore();
-  const [selectedChannel, setSelectedChannel] = useState(userId);
+  const getFollowing = () => TEST_DATA.following;
+  const getPlaylist = () => TEST_DATA.playlist;
+  const navigate = useNavigate();
 
-  const channels = useChannelFetch(selectedChannel); // 채널 데이터 가져오기
-  const playlists: PlayListDataProps[] =
-    useFollowingPlaylistFetch(selectedChannel);
-
-  const onFollowingChannelCLick = (channelId: string) => {
-    if (selectedChannel === channelId) {
-      setSelectedChannel(userId);
-    } else {
-      setSelectedChannel(channelId);
-    }
+  const followingList: TestProfileProps[] = getFollowing();
+  const playlists: PlayListDataProps[] = getPlaylist();
+  const onlistClick = () => {
+    navigate(ROUTES.PROFILE_FOLLOWING('123123'));
   };
-  const followingList = channels.map((channel) => ({
-    id: channel.id,
-    alt: '썸네일',
-    src: channel.profileImg,
-    size: 'md' as const,
-    name: channel.channelName,
-  }));
-
   return (
     <div css={containerStyle}>
       {followingList && followingList.length > 0 ? (
@@ -59,7 +45,7 @@ const Following = () => {
           </div>
           <Button
             label='All'
-            onClick={() => {}}
+            onClick={onlistClick}
             IconComponent={Plus}
             color='primary'
             shape='text'

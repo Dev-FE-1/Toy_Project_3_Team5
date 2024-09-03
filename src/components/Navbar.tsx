@@ -16,7 +16,7 @@ interface NavList {
 const navList: NavList[] = [
   { label: '홈', icon: Home, to: ROUTES.ROOT },
   { label: '인기', icon: Flame, to: ROUTES.POPULAR },
-  { label: '마이플리', icon: Library, to: ROUTES.PLAYLIST() },
+  { label: '내 플리', icon: Library, to: ROUTES.PLAYLIST('1') },
   { label: '팔로잉', icon: Users, to: ROUTES.FOLLOWING },
 ];
 
@@ -27,7 +27,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav css={navbarStyle}>
-      {navList.map((list, idx) => {
+      {navList.map((list) => {
         const isActive =
           list.to === ROUTES.ROOT
             ? location.pathname === list.to
@@ -42,15 +42,13 @@ const Navbar: React.FC = () => {
         };
 
         return (
-          <div css={iconWrapperStyle} key={idx}>
-            <IconButton
-              key={list.label}
-              IconComponent={list.icon}
-              onClick={onClick}
-              label={list.label}
-              color={isActive ? 'primary' : 'gray'}
-            />
-          </div>
+          <IconButton
+            key={list.label}
+            IconComponent={list.icon}
+            onClick={() => navigate(list.to)}
+            label={list.label}
+            color={isActive ? 'primary' : 'gray'}
+          />
         );
       })}
     </nav>
@@ -58,7 +56,7 @@ const Navbar: React.FC = () => {
 };
 
 const navbarStyle = css`
-  width: 430px;
+  width: 426px;
   height: 60px;
   display: flex;
   justify-content: space-around;
@@ -68,13 +66,6 @@ const navbarStyle = css`
   padding: 10px 20px;
   background-color: ${colors.white};
   border-top: 1px solid ${colors.gray02};
-  z-index: 10;
-`;
-
-const iconWrapperStyle = css`
-  display: flex;
-  justify-content: center;
-  width: 60px;
 `;
 
 export default Navbar;

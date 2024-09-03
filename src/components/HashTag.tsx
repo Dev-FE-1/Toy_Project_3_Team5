@@ -12,9 +12,10 @@ export interface Tag {
 interface TagProps {
   tags: Tag[];
   onRemove: (id: number) => void;
+  margin?: string;
 }
 
-const HashTag: React.FC<TagProps> = ({ tags, onRemove }) => {
+const HashTag: React.FC<TagProps> = ({ tags, onRemove, margin = '3px' }) => {
   const { selectedTags, onTagSelection } = useTagSelection();
 
   return (
@@ -22,7 +23,7 @@ const HashTag: React.FC<TagProps> = ({ tags, onRemove }) => {
       {tags.map((tag) => (
         <div
           key={tag.id}
-          css={tagStyle(selectedTags.includes(tag.id), tag.removable)}
+          css={tagStyle(selectedTags.includes(tag.id), tag.removable, margin)}
           onClick={() => onTagSelection(tag.id, tag.removable)}
         >
           {tag.label}
@@ -43,10 +44,14 @@ const HashTag: React.FC<TagProps> = ({ tags, onRemove }) => {
   );
 };
 
-const tagStyle = (isSelected: boolean, removable: boolean) => css`
+const tagStyle = (
+  isSelected: boolean,
+  removable: boolean,
+  margin: string
+) => css`
   display: inline-flex;
   align-items: center;
-  margin-right: 3px;
+  margin: ${margin};
   border: 1px solid ${colors.gray02};
   font-size: ${fontSize.sm};
   font-weight: ${fontWeight.medium};

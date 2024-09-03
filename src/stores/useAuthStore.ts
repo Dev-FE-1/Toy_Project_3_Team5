@@ -13,11 +13,14 @@ import { auth, db } from '@/firebase/firbaseConfig';
 
 interface AuthState {
   user: User | null;
+  userId: string;
   profileImage: string;
   channelName: string;
-  playlistCount: number;
-  followerCount: number;
-  followingCount: number;
+  likedPlaylist: number[];
+  savedPlaylist: number[];
+  channelFollower: string[];
+  channelFollowing: string[];
+  tags: string[];
   setUser: (user: User | null) => void;
   clearUser: () => void;
   fetchUserData: (id: string) => void;
@@ -32,11 +35,14 @@ export const useAuthStore = create<AuthState>(
   (persist as AuthPersist)(
     (set) => ({
       user: null,
+      userId: '',
       profileImage: '',
       channelName: '',
-      playlistCount: 0,
-      followerCount: 0,
-      followingCount: 0,
+      likedPlaylist: [],
+      savedPlaylist: [],
+      channelFollower: [],
+      channelFollowing: [],
+      tags: [],
 
       setUser: (user) => set({ user }),
       clearUser: () =>
@@ -49,12 +55,15 @@ export const useAuthStore = create<AuthState>(
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
+
           set({
             profileImage: data?.profileImg || '',
             channelName: data?.channelName || '',
-            playlistCount: data?.savedPlaylist?.length || 0,
-            followerCount: data?.channelFollower?.length || 0,
-            followingCount: data?.channelFollowing?.length || 0,
+            likedPlaylist: data?.likedPlaylist || [],
+            savedPlaylist: data?.savedPlaylist || [],
+            channelFollower: data?.channelFollower || [],
+            channelFollowing: data?.channelFollowing || [],
+            tags: data?.tags || [],
           });
         }
       },
@@ -81,6 +90,9 @@ onAuthStateChanged(auth, async (user) => {
   const { setUser, fetchUserData } = useAuthStore.getState();
   setUser(user);
   if (user) {
+    const email = user.email || '';
+    const userIdFromEmail = email.split('@')[0];
+
     const usersCollectionRef = collection(db, 'users');
     const userQuery = query(usersCollectionRef, where('uid', '==', user.uid));
     const querySnapshot = await getDocs(userQuery);
@@ -88,6 +100,9 @@ onAuthStateChanged(auth, async (user) => {
     if (!querySnapshot.empty) {
       const userDoc = querySnapshot.docs[0];
       const { id } = userDoc;
+
+      useAuthStore.setState({ userId: userIdFromEmail });
+
       fetchUserData(id);
     } else {
       console.error('User not found in Firestore');

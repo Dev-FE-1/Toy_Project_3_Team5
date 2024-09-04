@@ -35,12 +35,6 @@ const ProfileFollowing = () => {
   return (
     <>
       <div css={rootContainer}>
-        <div css={tabBtnContainer}>
-          <TabButton
-            tabNames={['마이플리', '저장된플리']}
-            tabLinks={[ROUTES.PLAYLIST, ROUTES.PLAYLIST_SAVED]} //페이지를 따로 보내서 라우팅? 아니면 그냥 페이지 안에서 useState로 조건부 렌더링?
-          />
-        </div>
         <div css={numberingContainer}>총 {mockdata.length} 명</div>
         <div css={profileListContainer}>
           {mockdata.map((data, index) => (

@@ -13,14 +13,11 @@ import {
 import { db } from '@/firebase/firbaseConfig';
 import { PlayListDataProps } from '@/types/playlistType';
 
-const fetchSearchPlaylists = async (
+const fetchPlaylists = async (
   keyword: string,
   pageParam: QueryDocumentSnapshot<DocumentData> | null,
-  pageSize: number = 5
-): Promise<{
-  playlistsData: PlayListDataProps[];
-  nextCursor: QueryDocumentSnapshot<DocumentData> | null;
-}> => {
+  pageSize: number
+) => {
   const playlistCollection = collection(db, 'playlist');
   let q = query(
     playlistCollection,
@@ -34,9 +31,8 @@ const fetchSearchPlaylists = async (
     q = query(q, startAfter(pageParam));
   }
 
-  let querySnapshot = await getDocs(q);
-  let allPlaylistsData: PlayListDataProps[] = [];
-  let lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+  const querySnapshot = await getDocs(q);
+  const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
 
   const filteredData = querySnapshot.docs
     .map((doc) => ({
@@ -47,37 +43,35 @@ const fetchSearchPlaylists = async (
       playlist.title.toLowerCase().includes(keyword.toLowerCase())
     );
 
-  allPlaylistsData = [...allPlaylistsData, ...filteredData];
+  return { filteredData, lastVisible };
+};
 
-  while (allPlaylistsData.length < pageSize && querySnapshot.docs.length > 0) {
-    q = query(
-      playlistCollection,
-      where('isPublic', '==', true),
-      orderBy('title'),
-      orderBy('regDate', 'desc'),
-      startAfter(lastVisible),
-      limit(pageSize)
+const fetchSearchPlaylists = async (
+  keyword: string,
+  pageParam: QueryDocumentSnapshot<DocumentData> | null,
+  pageSize: number = 5
+): Promise<{
+  playlistsData: PlayListDataProps[];
+  nextCursor: QueryDocumentSnapshot<DocumentData> | null;
+}> => {
+  const allPlaylistsData: PlayListDataProps[] = [];
+  let lastVisible: QueryDocumentSnapshot<DocumentData> | null = pageParam;
+
+  do {
+    const { filteredData, lastVisible: newLastVisible } = await fetchPlaylists(
+      keyword,
+      lastVisible,
+      pageSize
     );
 
-    querySnapshot = await getDocs(q);
-    lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    allPlaylistsData.push(...filteredData);
+    lastVisible = newLastVisible;
+  } while (allPlaylistsData.length < pageSize && lastVisible);
 
-    const additionalData = querySnapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<PlayListDataProps, 'id'>),
-      }))
-      .filter((playlist) =>
-        playlist.title.toLowerCase().includes(keyword.toLowerCase())
-      );
-
-    allPlaylistsData = [...allPlaylistsData, ...additionalData];
-  }
-
-  const playlistsData = allPlaylistsData.slice(0, pageSize);
-  const nextCursor = querySnapshot.docs.length === 0 ? null : lastVisible;
-
-  return { playlistsData, nextCursor };
+  return {
+    playlistsData: allPlaylistsData.slice(0, pageSize),
+    nextCursor: allPlaylistsData.length < pageSize ? null : lastVisible,
+  };
 };
 
 export const useFetchSearchPlaylists = (

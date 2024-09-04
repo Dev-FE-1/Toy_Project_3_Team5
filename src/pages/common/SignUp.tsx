@@ -10,6 +10,7 @@ import {
   setDoc,
   getDoc,
 } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Header from '@/components/Header';
 import InputBox from '@/components/InputBox';
@@ -31,6 +32,8 @@ export const SignUp = () => {
   const [isIdChecked, setIsIdChecked] = useState<boolean>(false);
   const [isChannelNameChecked, setIsChannelNameChecked] =
     useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const { toastTrigger } = useToast();
 
@@ -91,7 +94,7 @@ export const SignUp = () => {
     e.preventDefault();
 
     if (!isIdChecked || !isChannelNameChecked) {
-      toastTrigger('중복 검사를 진행해주세요.');
+      toastTrigger('중복 검사를 진행해주세요.', 'fail');
       return;
     }
 
@@ -120,11 +123,10 @@ export const SignUp = () => {
         likedPlaylist: [],
         profileImg: '',
         tags: [],
+        isFirstLogin: false,
       });
-      toastTrigger('회원가입 완료!🥳 로그인 화면으로 돌아가 로그인해주세요.');
-      setTimeout(() => {
-        window.location.href = ROUTES.SIGN_IN;
-      }, 2000);
+      navigate(ROUTES.SIGN_IN);
+      toastTrigger('회원가입이 완료되었습니다! 🥳', 'success');
     } catch (error) {}
   };
 

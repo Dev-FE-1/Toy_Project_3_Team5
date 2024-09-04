@@ -35,7 +35,7 @@ const TEXT = {
   link: {
     label: '영상 링크 추가',
     placeholder: '영상 링크를 입력해주세요.',
-    validmsg: '지원하지 않는 링크 형식입니다.',
+    validmsg: '지원하지 않는 영상입니다.',
     validDuplmsg: '중복된 링크입니다.',
     required: '영상링크를 1개이상 입력해주세요.',
   },
@@ -102,7 +102,7 @@ const PlayListAdd = () => {
     INIT_VALUES.preview
   );
 
-  const { user, channelName } = useAuthStore();
+  const { userId, channelName } = useAuthStore();
   const { toastTrigger } = useToast();
   const navigate = useNavigate();
 
@@ -157,7 +157,7 @@ const PlayListAdd = () => {
     createPreview: () => {
       setPreview({
         title,
-        userId: user?.uid ?? '',
+        userId: userId ?? '',
         tags: addedHashtag.map((tag) => tag.label),
         likes: 0,
         description: desc,
@@ -180,7 +180,11 @@ const PlayListAdd = () => {
         return;
       }
       const { status, result } = await getVideoInfo(link);
-      if (status === 'fail' || !!!result) return;
+      console.log(status, result);
+      if (status === 'fail' || !!!result) {
+        toastTrigger(TEXT.link.validmsg);
+        return;
+      }
 
       setVideoList([...videoList, result]);
       setLink('');
@@ -228,7 +232,7 @@ const PlayListAdd = () => {
 
       if (response.status === 'success') {
         toastTrigger(TEXT.toast.success);
-        navigate(ROUTES.PLAYLIST(user?.uid));
+        navigate(ROUTES.PLAYLIST(userId));
       }
     },
   };

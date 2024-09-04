@@ -55,7 +55,6 @@ export const SignUp = () => {
   };
 
   const checkIdExists = async (id: string): Promise<boolean> => {
-    const q = query(collection(db, 'users'), where('id', '==', id));
     try {
       const docRef = doc(db, 'users', id);
       const docSnap = await getDoc(docRef);
@@ -89,6 +88,14 @@ export const SignUp = () => {
         setIsChannelNameChecked(true);
       }
     } catch (error) {}
+  };
+
+  const onChannelNameChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setChannelName(e.target.value);
+    setIsChannelNameChecked(false);
+    setChannelNameCheckMessage('다시 중복검사를 진행해주세요.');
   };
 
   const onSignUp = async (e: React.FormEvent) => {
@@ -218,9 +225,7 @@ export const SignUp = () => {
             placeholder='채널 이름을 입력해주세요'
             value={channelName}
             validate={validateChannelName}
-            onChange={(e) => {
-              setChannelName(e.target.value);
-            }}
+            onChange={onChannelNameChange}
             width='315px'
             externalErrorMessage={channelNameCheckMessage}
           />

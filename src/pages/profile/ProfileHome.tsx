@@ -34,18 +34,10 @@ export const ProfileHome = () => {
     userId,
     profileImage,
     channelName,
-    likedPlaylist,
-    savedPlaylist,
     channelFollower,
     channelFollowing,
     clearUser,
   } = useAuthStore();
-
-  const infoData = [
-    { count: myPlaylistCount, label: '플레이리스트' },
-    { count: channelFollower.length, label: '팔로워' },
-    { count: channelFollowing.length, label: '팔로잉' },
-  ];
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -89,12 +81,24 @@ export const ProfileHome = () => {
           프로필 수정
         </button>
         <div css={infoContainerStyle}>
-          {infoData.map(({ count, label }) => (
-            <div key={label} css={infoStyle}>
-              <div>{count}</div>
-              <div>{label}</div>
-            </div>
-          ))}
+          <div
+            css={infoStyle}
+            onClick={() => navigate(ROUTES.PLAYLIST(userId))}
+          >
+            <div>{myPlaylistCount}</div>
+            <div>플레이리스트</div>
+          </div>
+          <div
+            css={infoStyle}
+            onClick={() => navigate(ROUTES.PROFILE_FOLLOWER(userId))}
+          >
+            <div>{channelFollower.length}</div>
+            <div>팔로워</div>
+          </div>
+          <div css={infoStyle} onClick={() => navigate(ROUTES.FOLLOWING)}>
+            <div>{channelFollowing.length}</div>
+            <div>팔로잉</div>
+          </div>
         </div>
       </div>
       <div css={commentContainerStyle}>

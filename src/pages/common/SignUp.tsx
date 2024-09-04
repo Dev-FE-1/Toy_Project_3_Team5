@@ -15,6 +15,7 @@ import Button from '@/components/Button';
 import Header from '@/components/Header';
 import InputBox from '@/components/InputBox';
 import Toast from '@/components/Toast';
+import colors from '@/constants/colors';
 import ROUTES from '@/constants/route';
 import { auth, db } from '@/firebase/firbaseConfig';
 import useToast from '@/hooks/useToast';
@@ -252,6 +253,27 @@ const containerStyle = css`
   width: 100%;
   max-width: 430px;
   margin: 0 auto;
+
+  &::before {
+    left: 50%;
+    transform: translateX(-215px);
+  }
+
+  &::after {
+    right: 50%;
+    transform: translateX(215px);
+  }
+
+  &::before,
+  &::after {
+    width: 1px;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    background-color: ${colors.gray02};
+    content: '';
+    z-index: 11;
+  }
 `;
 
 const signUpContainerStyle = css`

@@ -33,18 +33,21 @@ const comments = [
 export const ProfileHome = () => {
   const navigate = useNavigate();
   const {
+    userId,
     profileImage,
     channelName,
-    playlistCount,
-    followerCount,
-    followingCount,
+    likedPlaylist,
+    savedPlaylist,
+    channelFollower,
+    channelFollowing,
+    tags,
     clearUser,
   } = useAuthStore();
 
   const infoData = [
-    { count: playlistCount, label: '플레이리스트' },
-    { count: followerCount, label: '팔로워' },
-    { count: followingCount, label: '팔로잉' },
+    { count: savedPlaylist.length, label: '플레이리스트' },
+    { count: channelFollower.length, label: '팔로워' },
+    { count: channelFollowing.length, label: '팔로잉' },
   ];
 
   const logout = async () => {
@@ -59,7 +62,12 @@ export const ProfileHome = () => {
       <div css={profileContainerStyle}>
         <Profile src={profileImage} alt='프로필 이미지' size='xl' />
         <span css={profileNameStyle}>{channelName}</span>
-        <button css={profileBtnStyle}>프로필 수정</button>
+        <button
+          css={profileBtnStyle}
+          onClick={() => navigate(ROUTES.PROFILE_MODIFY(userId))}
+        >
+          프로필 수정
+        </button>
         <div css={infoContainerStyle}>
           {infoData.map(({ count, label }) => (
             <div key={label} css={infoStyle}>

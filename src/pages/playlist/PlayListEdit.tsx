@@ -33,26 +33,6 @@ import { getVideoId } from '@/utils/videoUtils';
  *  4.3. toast, useNavigate
  */
 
-// const fetchTestData = {
-//   likes: 0,
-//   regDate: '2024-09-04T03:02:17.304Z',
-//   userId: 'kimisadev27',
-//   tags: ['#윤하', '#데뷔20주년', '#태양물고기'],
-//   isPublic: true,
-//   title: '윤하노래 모음',
-//   description: '유튜브에 윤하 검색해서 나오는 영상 5개 플리',
-//   ownerChannelName: 'dj킴믹스',
-//   thumbnail:
-//     'https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/playlist%2F55%2Fthumbnail.png?alt=media&token=8d1388c8-97e5-4403-8c7c-85985631ac45',
-//   links: [
-//     'https://www.youtube.com/watch?v=ECD3nPW0WL8&ab_channel=%ED%8D%BC%EC%8A%A4%EB%84%90Personal',
-//     'https://www.youtube.com/watch?v=ehX7MAhc5iA&pp=ygUG7Jyk7ZWY',
-//     'https://www.youtube.com/watch?v=j1uXcHwLhHM&list=RDEMbm5uPcQwbWpV_Z02LESnXQ&start_radio=1',
-//     'https://www.youtube.com/watch?v=kZEucEyXSQE&t=5s&pp=ygUG7Jyk7ZWY',
-//     'https://www.youtube.com/watch?v=rVuq_24eEMs&pp=ygUG7Jyk7ZWY',
-//   ],
-// };
-
 const INIT_VALUES: {
   hashtag: string;
   preview: PlayListDataProps;
@@ -83,12 +63,8 @@ const PlayListEdit = () => {
   const { toastTrigger } = useToast();
   const { userId, channelName } = useAuthStore();
 
-  const { playlistId } = useParams();
-  const [playlistInfo, setPlaylistInfo] = useState<PlayListDataProps>(
-    INIT_VALUES.preview
-  );
-  // const playlistInfo = getPlaylistInfo(Number(playlistId));
-  // const playlistInfo = fetchTestData;
+  const { playlistId } = useParams<string>();
+  const [playlistInfo, setPlaylistInfo] = useState<PlayListDataProps>();
 
   const [enabled, setEnabled] = useState<boolean>(true);
   const [title, setTitle] = useState<string>('');
@@ -100,6 +76,7 @@ const PlayListEdit = () => {
   const [hashtag, setHashtag] = useState<string>('');
   const [addedHashtag, setAddedHashtag] = useState<Tag[]>([]);
 
+  const [prevThumbnail, setPrevThumbnail] = useState<string | null>(null);
   const [thumbnail, setThumbnail] = useState<ThumbnailProps | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -112,13 +89,14 @@ const PlayListEdit = () => {
       setEnabled(values.isPublic);
       setTitle(values.title);
       setDesc(values.description ?? '');
-      // strict mode 때문에 2번씩 불러와짐
+
       values.links.map(async (link) => {
         const { status, result } = await getVideoInfo(link);
         if (status === 'success' && result) {
           videoList.push(result);
         }
       });
+
       values.tags.map(async (tag) => {
         addedHashtag.push({
           id:
@@ -129,6 +107,8 @@ const PlayListEdit = () => {
           removable: true,
         });
       });
+
+      setPrevThumbnail(values.thumbnail);
     },
     hashtag: () => {
       setHashtag(INIT_VALUES.hashtag);
@@ -189,6 +169,7 @@ const PlayListEdit = () => {
         ownerChannelName: channelName,
         thumbnail:
           thumbnail?.preview ??
+          prevThumbnail ??
           (videoList.length > 0
             ? videoList[0].imgUrl
             : INIT_VALUES.preview.thumbnail),
@@ -215,6 +196,10 @@ const PlayListEdit = () => {
       setVideoList(videoList.filter((video) => video.videoId !== videoId));
     },
     removeThumbnail: () => {
+      if (prevThumbnail) {
+        setPrevThumbnail(null);
+        return;
+      }
       setThumbnail(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     },
@@ -250,10 +235,10 @@ const PlayListEdit = () => {
         thumbnailFile: thumbnail?.file,
       };
 
-      const response = await updatePlaylist(playlist);
+      const response = await updatePlaylist(playlist, Number(playlistId));
 
       if (response.status === 'success') {
-        toastTrigger(TEXT.toast.success);
+        toastTrigger(TEXT.toast.modify);
         navigate(ROUTES.PLAYLIST(userId));
       }
     },
@@ -335,7 +320,7 @@ const PlayListEdit = () => {
 
   useEffect(() => {
     methods.createPreview();
-  }, [enabled, title, addedHashtag, videoList, thumbnail]);
+  }, [enabled, title, addedHashtag, videoList, thumbnail, prevThumbnail]);
 
   return (
     <div css={containerStyle}>
@@ -431,7 +416,7 @@ const PlayListEdit = () => {
           ref={fileInputRef}
           accept='image/png'
         />
-        {thumbnail && (
+        {(prevThumbnail || thumbnail) && (
           <Button
             label='이미지 삭제'
             IconComponent={X}
@@ -450,24 +435,6 @@ const PlayListEdit = () => {
         <PlaylistCard playlistItem={preview} size='small' />
       </div>
 
-      {/* {enabled ? (
-        <Button
-          label={TEXT.createButton.label}
-          onClick={onClick.createPlaylist}
-          color='primary'
-          size='md'
-          fullWidth
-        />
-      ) : (
-        <Button
-          label={TEXT.createButton.loading}
-          onClick={onClick.createPlaylist}
-          color='lightGray'
-          size='md'
-          fullWidth
-          disabled
-        />
-      )} */}
       <Button
         label={TEXT.createButton.label}
         onClick={onClick.modifyPlaylist}
@@ -484,6 +451,7 @@ const containerStyle = css`
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  padding-bottom: 60px;
 
   & > div {
     padding: 5px 0;

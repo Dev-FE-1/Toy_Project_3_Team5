@@ -20,25 +20,27 @@ export const loginInfo = await signInWithEmailAndPassword(
 );
 const loginEmail: string | null = loginInfo.user.email;
 const emailPrefix = loginEmail ? loginEmail.split('@')[0] : '';
-console.log('로그인정보', loginInfo);
 console.log('로그인id', emailPrefix); //유저정보 콘솔로그
 //여기까지 없애기
 
 const Following = () => {
+  console.log('emailPrefix', emailPrefix);
   const [selectedChannel, setSelectedChannel] = useState(emailPrefix);
 
-  const { channels } = useChannelFetch(selectedChannel); // 채널 데이터 가져오기
+  const channels = useChannelFetch(selectedChannel); // 채널 데이터 가져오기
   const playlists: PlayListDataProps[] =
     useFollowingPlaylistFetch(selectedChannel);
+  console.log('가져오는 데이터', playlists);
 
   const onFollowingChannelCLick = (channelId: string) => {
-    if (channelId === selectedChannel) {
-      setSelectedChannel(loginInfo.user.uid);
+    // console.log('현재 아이디값', selectedChannel);
+    // console.log('누른버튼의값', channelId);
+    if (selectedChannel === channelId) {
+      setSelectedChannel(emailPrefix);
     } else {
       setSelectedChannel(channelId);
     }
   };
-
   const followingList = channels.map((channel) => ({
     id: channel.id,
     alt: '썸네일',

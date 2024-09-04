@@ -27,7 +27,6 @@ const useChannelFetch = (userId: string) => {
       const { channelFollowing } = userDocSnap.data() as {
         channelFollowing: string[];
       };
-      console.log('channelFollowing', channelFollowing);
 
       if (channelFollowing && channelFollowing.length > 0) {
         // users 컬렉션에서 uid가 channelFollowing 배열에 있는 경우를 찾는 쿼리
@@ -41,7 +40,7 @@ const useChannelFetch = (userId: string) => {
           profileImg: doc.data().profileImg || '',
           channelName: doc.data().channelName || '',
         }));
-        console.log('fetchedChannels', fetchedChannels);
+
         setChannels(fetchedChannels);
       }
     } else {
@@ -56,7 +55,7 @@ const useChannelFetch = (userId: string) => {
     }
   }, [userId, fetchChannels]);
 
-  return { channels };
+  return channels;
 };
 
 export default useChannelFetch;

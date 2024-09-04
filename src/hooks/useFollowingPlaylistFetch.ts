@@ -7,43 +7,53 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-import { PlayListDataProps } from './usePlaylist';
 import { db } from '@/firebase/firbaseConfig';
 import { loginInfo } from '@/pages/common/Following';
+import { PlayListDataProps } from '@/types/playlistType';
 
 const useFollowingPlaylistFetch = (userId: string) => {
   const [playlists, setPlaylists] = useState<PlayListDataProps[]>([]);
 
   const fetchPlaylists = useCallback(async () => {
-    if (userId === loginInfo.user.uid) {
+    const loginEmail: string | null = loginInfo.user.email;
+    const emailPrefix = loginEmail ? loginEmail.split('@')[0] : '';
+    if (userId === emailPrefix) {
       //  특정 사용자 문서에서 channelFollowing 배열 가져오기
       const userDocRef = doc(db, 'users', userId);
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
         const { channelFollowing } = userDocSnap.data();
+        console.log('channelFollowing', channelFollowing);
 
-        if (channelFollowing && channelFollowing.length > 0) {
+        const usersQuery = query(
+          collection(db, 'users'),
+          where('uid', 'in', channelFollowing)
+        );
+
+        const usersSnapshot = await getDocs(usersQuery);
+        const channelFollowingDocs = usersSnapshot.docs.map((doc) => doc.id);
+
+        // 이 부분을 사용하여 필요한 로직을 작성합니다.
+        console.log('channelFollowingDocs', channelFollowingDocs);
+
+        if (channelFollowingDocs && channelFollowingDocs.length > 0) {
           // channelFollowing 배열에 포함된 userId들을 기준으로 playlist 문서 가져오기
           const playlistsQuery = query(
             collection(db, 'playlist'),
-            where('userId', 'in', channelFollowing)
+            where('userId', 'in', channelFollowingDocs)
           );
 
           const querySnapshot = await getDocs(playlistsQuery);
 
           const fetchedPlaylists = querySnapshot.docs.map((doc) => {
-            const data = doc.data();
+            const data = doc.data() as PlayListDataProps;
             return {
-              title: data.title || '',
-              userName: data.userId || '',
-              tags: data.tags || [],
-              numberOfComments: 10,
-              numberOfLikes: data.likes || 0,
-              publicity: data.isPublic ?? false,
-              links: data.links || [],
+              ...data,
+              playlistId: doc.id,
             };
           });
+          console.log('fetchedPlaylists', fetchedPlaylists);
 
           setPlaylists(fetchedPlaylists);
         }
@@ -58,16 +68,10 @@ const useFollowingPlaylistFetch = (userId: string) => {
       const querySnapshot = await getDocs(playlistsQuery);
 
       const fetchedPlaylists = querySnapshot.docs.map((doc) => {
-        const data = doc.data();
+        const data = doc.data() as PlayListDataProps;
         return {
-          id: doc.id,
-          title: data.title || '',
-          userName: data.userId || '',
-          tags: data.tags || [],
-          numberOfComments: 10,
-          numberOfLikes: data.likes || 0,
-          publicity: data.isPublic ?? false,
-          links: data.links || [],
+          ...data,
+          playlistId: doc.id,
         };
       });
 

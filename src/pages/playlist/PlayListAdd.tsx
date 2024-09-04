@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { PlusSquare, SquarePlus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { addPlaylist } from '@/api/playlist';
+import { addPlaylist } from '@/api/playlistInfo';
 import { getVideoInfo } from '@/api/video';
 import Button from '@/components/Button';
 import HashTag, { Tag } from '@/components/HashTag';

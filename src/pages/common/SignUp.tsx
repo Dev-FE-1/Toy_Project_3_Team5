@@ -127,7 +127,6 @@ export const SignUp = () => {
         profileImg: '',
         tags: [],
       });
-      console.log('회원가입 및 Firestore 데이터 저장 성공:', user);
       toastTrigger('회원가입 완료!🥳 로그인 화면으로 돌아가 로그인해주세요.');
       setTimeout(() => {
         window.location.href = ROUTES.SIGN_IN;
@@ -148,7 +147,7 @@ export const SignUp = () => {
     const regex =
       /^(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{5,}$/;
     if (!regex.test(value)) {
-      return '비밀번호는 5자리 이상, 특수문자(!,@,-,$,*)포함이어야 합니다';
+      return '비밀번호는 6자리 이상, 특수문자(!,@,-,$,*)포함이어야 합니다';
     }
     return '사용 가능한 비밀번호입니다.';
   };
@@ -169,8 +168,8 @@ export const SignUp = () => {
 
   const isSignUpDisabled =
     id.length < 5 ||
-    password.length < 5 ||
-    passwordConfirm.length < 5 ||
+    password.length < 6 ||
+    passwordConfirm.length < 6 ||
     channelName.length < 2;
 
   return (

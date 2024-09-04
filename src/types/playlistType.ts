@@ -1,7 +1,9 @@
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+
 export interface PlayListDataProps {
   playlistId?: string;
   title: string;
-  description: string;
+  description?: string;
   isPublic: boolean;
   likes: number;
   links: string[];
@@ -11,5 +13,10 @@ export interface PlayListDataProps {
   thumbnailFile?: File;
   userId: string;
   ownerChannelName: string;
-  commentCount: number;
+  commentCount?: number;
+}
+
+export interface PlaylistsResultProps {
+  playlist: PlayListDataProps[];
+  nextCursor: QueryDocumentSnapshot<DocumentData> | null;
 }

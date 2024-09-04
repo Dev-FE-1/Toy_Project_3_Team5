@@ -1,25 +1,48 @@
+import { useMemo, useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useFetchSavedPlaylist } from '@/api/playlists';
 import Button from '@/components/Button';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import PopupFilter from '@/components/PopupFilter';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { usePlaylist, PageType } from '@/queries/usePlaylist';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+
+const PAGE_SIZE = 5;
 
 export const PlayListSaved = () => {
   const navigate = useNavigate();
-  const {
-    playlists,
-    isLoading,
-    hasNextPage,
-    isFetchingNextPage,
-    num,
-    setNum,
-    optionGroups,
-  } = usePlaylist('savedPlaylist' as PageType);
+  const [num, setNum] = useState<number[]>([0, 0]);
+
+  const optionGroups = [
+    { label: '정렬', options: ['최신순', '좋아요순', '댓글순'] },
+  ];
+
+  const { data, fetchNextPage, hasNextPage, isFetching } =
+    useFetchSavedPlaylist(PAGE_SIZE);
+
+  const playlist = useMemo(
+    () => (data ? data.pages.flatMap((page) => page.playlist) : []),
+    [data]
+  );
+
+  const infiniteScrollRef = useInfiniteScroll(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
+      if (hasNextPage && !isFetching) {
+        fetchNextPage();
+      }
+    },
+    {
+      root: document.querySelector('.scroll-container'),
+      rootMargin: '0px 0px -20px 0px',
+      threshold: 0.5,
+    }
+  );
 
   const onAddBtnClick = (): void => {
     navigate(ROUTES.PLAYLIST_ADD());
@@ -29,30 +52,24 @@ export const PlayListSaved = () => {
     navigate(ROUTES.POPULAR);
   };
 
-  if (isLoading) {
-    return <div>로딩 중...</div>;
-  }
-
   return (
     <>
-      <section css={homeContainerStyles(playlists.length > 0)}>
+      <section css={homeContainerStyles}>
         <div className='filter-area'>
-          {playlists.length > 0 && (
-            <PopupFilter
-              optionGroups={optionGroups}
-              selectedIndexes={num}
-              setSelectedIndexes={setNum}
-            />
-          )}
+          <PopupFilter
+            optionGroups={optionGroups}
+            selectedIndexes={num}
+            setSelectedIndexes={setNum}
+          />
           <Button
-            label='플레이리스트 추가'
+            label='플레이리스트 생성'
             IconComponent={Plus}
             shape='text'
             onClick={onAddBtnClick}
           />
         </div>
-        {playlists.length > 0 && <p>총 {playlists.length}개의 플리</p>}
-        {playlists.length === 0 ? (
+        {playlist.length > 0 && <p>총 {playlist.length}개의 플리</p>}
+        {isFetching === false && playlist.length === 0 ? (
           <div css={emptyStateStyles}>
             <img src='/src/assets/folderIcon.png' alt='아이콘 이미지' />
             <div className='textContainer'>
@@ -62,9 +79,9 @@ export const PlayListSaved = () => {
             <Button label='인기 플리 구경하기' onClick={onPopularBtnClick} />
           </div>
         ) : (
-          <ul css={cardContainerStyles}>
-            {playlists.map((playlistItem, index) => (
-              <li key={index}>
+          <ul className='scroll-container' css={cardContainerStyles}>
+            {playlist.map((playlistItem, index) => (
+              <li className='list' key={index}>
                 <PlaylistCard
                   size='small'
                   playlistItem={playlistItem}
@@ -72,11 +89,15 @@ export const PlayListSaved = () => {
                 />
               </li>
             ))}
+            {isFetching && playlist.length >= PAGE_SIZE && <LoadingSpinner />}
+            <div
+              ref={infiniteScrollRef}
+              style={{
+                minHeight: '72px',
+                width: '100%',
+              }}
+            ></div>
           </ul>
-        )}
-        {isFetchingNextPage && <div>더 불러오는 중...</div>}
-        {!hasNextPage && playlists.length > 0 && (
-          <div>모든 플레이리스트를 불러왔습니다.</div>
         )}
         <Outlet />
       </section>
@@ -84,16 +105,20 @@ export const PlayListSaved = () => {
   );
 };
 
-const homeContainerStyles = (hasPlaylists: boolean) => css`
+const profileHeight = '140px';
+const tabHeight = '41px';
+
+const homeContainerStyles = css`
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 12px 20px;
+  height: calc(100% - ${profileHeight} - ${tabHeight});
 
   .filter-area {
     display: flex;
     align-items: center;
-    justify-content: ${hasPlaylists ? 'space-between' : 'flex-end'};
+    justify-content: space-between;
   }
 
   p {
@@ -105,7 +130,16 @@ const homeContainerStyles = (hasPlaylists: boolean) => css`
 const cardContainerStyles = css`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  overflow-y: auto;
+  padding-bottom: 40px;
+  align-items: center;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  .list {
+    width: 100%;
+  }
 `;
 
 const emptyStateStyles = css`

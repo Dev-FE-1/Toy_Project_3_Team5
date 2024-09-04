@@ -46,7 +46,6 @@ export const SignUp = () => {
       const querySnapshot = await getDocs(q);
       return !querySnapshot.empty;
     } catch (error) {
-      console.error('채널 이름 중복 체크 오류:', error);
       throw new Error('중복 체크에 실패했습니다.');
     }
   };
@@ -58,7 +57,6 @@ export const SignUp = () => {
       const docSnap = await getDoc(docRef);
       return docSnap.exists();
     } catch (error) {
-      console.error('아이디 중복 체크 오류:', error);
       throw new Error('중복 체크에 실패했습니다.');
     }
   };
@@ -73,9 +71,7 @@ export const SignUp = () => {
         setIdCheckMessage('사용 가능한 아이디입니다.');
         setIsIdChecked(true);
       }
-    } catch (error) {
-      console.log('아이디 중복 검사 오류:', error);
-    }
+    } catch (error) {}
   };
 
   const onChannelNameCheck = async () => {
@@ -88,9 +84,7 @@ export const SignUp = () => {
         setChannelNameCheckMessage('사용 가능한 채널 이름입니다.');
         setIsChannelNameChecked(true);
       }
-    } catch (error) {
-      console.error('채널 이름 중복 검사 오류:', error);
-    }
+    } catch (error) {}
   };
 
   const onSignUp = async (e: React.FormEvent) => {
@@ -131,9 +125,7 @@ export const SignUp = () => {
       setTimeout(() => {
         window.location.href = ROUTES.SIGN_IN;
       }, 2000);
-    } catch (error) {
-      console.error('회원가입 중 오류 발생:', error);
-    }
+    } catch (error) {}
   };
 
   const validateId = (value: string) => {

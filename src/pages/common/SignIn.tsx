@@ -10,6 +10,7 @@ import google from '@/assets/google_icon.svg';
 import Button from '@/components/Button';
 import InputBox from '@/components/InputBox';
 import Logo from '@/components/Logo';
+import Toast from '@/components/Toast';
 import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
@@ -158,6 +159,7 @@ export const SignIn = () => {
           회원가입하기
         </span>
       </div>
+      <Toast />
     </div>
   );
 };

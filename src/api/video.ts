@@ -8,6 +8,8 @@ export const getVideoInfo = async (
   const { data } = await axios.get(`https://noembed.com/embed?url=${link}`);
   if (!!!data) return { status: 'fail' };
 
+  if (!!data.error) return { status: 'fail' };
+
   let videoId = '';
   if (data.provider_name === 'YouTube')
     videoId = data.thumbnail_url.split('/')[4];

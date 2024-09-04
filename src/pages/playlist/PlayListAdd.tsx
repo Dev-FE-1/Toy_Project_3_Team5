@@ -14,15 +14,19 @@ import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import { Regex } from '@/constants/validation';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { PlayListDataProps } from '@/types/playlistType';
 import { tagging } from '@/utils/textUtils';
+import { getVideoId } from '@/utils/videoUtils';
 
 const TEXT = {
+  toggle: { active: '공개', inactive: '비공개' },
   title: {
     label: '플레이리스트 제목',
     placeholder: '플레이리스트 제목을 입력해주세요.',
+    required: '제목을 입력해주세요.',
   },
   desc: {
     label: '플레이리스트 설명',
@@ -32,14 +36,26 @@ const TEXT = {
     label: '영상 링크 추가',
     placeholder: '영상 링크를 입력해주세요.',
     validmsg: '지원하지 않는 영상입니다.',
+    validDuplmsg: '중복된 링크입니다.',
+    required: '영상링크를 1개이상 입력해주세요.',
   },
   hashtag: {
     label: '해시태그',
     desc: '최대 5개까지 입력 가능합니다.',
     placeholder: '#',
+    required: '해시태그를 입력해주세요',
+    limit: '해시태그는 5개까지 등록할 수 있습니다.',
+    validDuplmsg: '중복된 해시태그입니다.',
+  },
+  thumbnail: {
+    label: '썸네일',
+    desc: '플레이리스트 메인 썸네일을 선택해주세요.',
+  },
+  preview: {
+    large: '미리보기 (large)',
+    small: '미리보기 (small)',
   },
   createButton: { label: '플레이리스트 생성하기', loading: '생성 중...' },
-  toggle: { active: '공개', inactive: '비공개' },
   toast: { success: '플레이리스트 생성이 완료되었습니다.' },
 };
 
@@ -51,6 +67,7 @@ const INIT_VALUES: {
   preview: {
     title: '임시 제목',
     userId: '임시 유저',
+    ownerChannelName: '',
     tags: ['#임시1'],
     likes: 0,
     description: '임시 설명',
@@ -85,7 +102,7 @@ const PlayListAdd = () => {
     INIT_VALUES.preview
   );
 
-  const { user } = useAuthStore();
+  const { userId, channelName } = useAuthStore();
   const { toastTrigger } = useToast();
   const navigate = useNavigate();
 
@@ -98,29 +115,38 @@ const PlayListAdd = () => {
     },
   };
 
-  // 모든 동작? 같은 이름을 지어주고 싶은데
   const onKeydown = {
     link: (e: React.KeyboardEvent<HTMLInputElement>) => {
-      // 입력 valid 체크
-      // const valid = validation.hashtag;
-      // if (e.key === ' ') console.log('a');
       if (e.key === 'Enter') onClick.addVideoLink();
     },
     hashtag: (e: React.KeyboardEvent<HTMLInputElement>) => {
-      // 입력 valid 체크
-      // const valid = validation.hashtag;
-      // if (e.key === ' ') console.log('a');
       if (e.key === 'Enter') onClick.addHashtag();
     },
   };
 
-  // true: 조건에 걸림, false: 통과
   const validation = {
-    hashtag: {
-      count: () => addedHashtag.length > 5,
-      blank: () => hashtag.trim().length < 1,
-      regex: () => {},
-      cantSpace: (keycode: string) => keycode === 'Space',
+    link: (value: string) => {
+      if (!Regex.youtube.test(value)) return TEXT.link.validmsg;
+      const videoId = getVideoId(value);
+      if (!!!videoId) return TEXT.link.validmsg;
+      if (videoId && check.dupl.link(videoId)) return TEXT.link.validDuplmsg;
+      return '';
+    },
+    hashtag: (value: string) => {
+      if (value.trim().length < 1 || value.trim() === '#') {
+        toastTrigger(TEXT.hashtag.required, 'fail');
+        return false;
+      }
+      if (addedHashtag.length >= 5) {
+        toastTrigger(TEXT.hashtag.limit, 'fail');
+        return false;
+      }
+      const taggedValue = tagging(value);
+      if (check.dupl.hashtag(taggedValue)) {
+        toastTrigger(TEXT.hashtag.validDuplmsg, 'fail');
+        return false;
+      }
+      return true;
     },
   };
 
@@ -131,12 +157,13 @@ const PlayListAdd = () => {
     createPreview: () => {
       setPreview({
         title,
-        userId: user?.uid ?? '',
+        userId: userId ?? '',
         tags: addedHashtag.map((tag) => tag.label),
         likes: 0,
         description: desc,
         isPublic: enabled,
         regDate: new Date().toISOString(),
+        ownerChannelName: channelName,
         thumbnail:
           thumbnail?.preview ??
           (videoList.length > 0
@@ -149,8 +176,14 @@ const PlayListAdd = () => {
 
   const onClick = {
     addVideoLink: async () => {
+      if (validation.link(link)) {
+        return;
+      }
       const { status, result } = await getVideoInfo(link);
-      if (status === 'fail' || !!!result) return;
+      if (status === 'fail' || !!!result) {
+        toastTrigger(TEXT.link.validmsg, 'fail');
+        return;
+      }
 
       setVideoList([...videoList, result]);
       setLink('');
@@ -163,6 +196,7 @@ const PlayListAdd = () => {
       if (fileInputRef.current) fileInputRef.current.value = '';
     },
     addHashtag: () => {
+      if (!!!validation.hashtag(hashtag)) return;
       const taggedValue = tagging(hashtag);
 
       setAddedHashtag([
@@ -182,6 +216,12 @@ const PlayListAdd = () => {
       setAddedHashtag(addedHashtag.filter((tag) => tag.id !== id));
     },
     createPlaylist: async () => {
+      const checkResult = check.required();
+      if (!!!checkResult.status) {
+        toastTrigger(checkResult.msg, 'fail');
+        return;
+      }
+
       const playlist: PlayListDataProps = {
         ...preview,
         thumbnailFile: thumbnail?.file,
@@ -191,8 +231,44 @@ const PlayListAdd = () => {
 
       if (response.status === 'success') {
         toastTrigger(TEXT.toast.success);
-        navigate(ROUTES.PLAYLIST(user?.uid));
+        navigate(ROUTES.PLAYLIST(userId));
       }
+    },
+  };
+
+  const check = {
+    required: (): {
+      status: boolean;
+      msg: string;
+    } => {
+      if (title.trim().length < 1)
+        return { status: false, msg: TEXT.title.required };
+      if (videoList.length < 1)
+        return { status: false, msg: TEXT.link.required };
+      if (addedHashtag.length < 1)
+        return {
+          status: false,
+          msg: TEXT.hashtag.required,
+        };
+
+      return { status: true, msg: '' };
+    },
+    dupl: {
+      hashtag: (inputTag: string): boolean => {
+        let result = false;
+
+        addedHashtag.map((hashtag) => {
+          if (hashtag.label === inputTag) return (result = true);
+        });
+        return result;
+      },
+      link: (videoId: string): boolean => {
+        let result = false;
+        videoList.map((video) => {
+          if (video.videoId === videoId) return (result = true);
+        });
+        return result;
+      },
     },
   };
 
@@ -263,6 +339,7 @@ const PlayListAdd = () => {
           width='360px'
           onChange={onChange.link}
           onKeyDown={onKeydown.link}
+          validate={validation.link}
         />
         <IconButton IconComponent={PlusSquare} onClick={onClick.addVideoLink} />
       </div>
@@ -297,11 +374,11 @@ const PlayListAdd = () => {
         <HashTag onRemove={onClick.removeHashtag} tags={addedHashtag} />
       </div>
       <div css={thumbnailStyle}>
-        <label style={labelStyle}>썸네일</label>
+        <label style={labelStyle}>{TEXT.thumbnail.label}</label>
         <label
           style={{ fontSize: `${fontSize.sm}`, color: `${colors.gray04}` }}
         >
-          플레이리스트 메인 썸네일을 선택해주세요.
+          {TEXT.thumbnail.desc}
         </label>
 
         <Button
@@ -334,9 +411,9 @@ const PlayListAdd = () => {
         )}
       </div>
       <div css={previewStyle}>
-        <label style={labelStyle}>미리보기(large)</label>
+        <label style={labelStyle}>{TEXT.preview.large}</label>
         <PlaylistCard playlistItem={preview} size='large' />
-        <label style={labelStyle}>미리보기(small)</label>
+        <label style={labelStyle}>{TEXT.preview.small}</label>
         <PlaylistCard playlistItem={preview} size='small' />
       </div>
 

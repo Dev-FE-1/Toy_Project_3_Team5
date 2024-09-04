@@ -109,7 +109,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
           {omittedText(playlistItem.title, MAXLENGTH)}
         </h2>
         <p className='username'>
-          {'소유자명'} · 트랙 {playlistItem.links.length}개
+          {playlistItem.ownerChannelName} · 트랙 {playlistItem.links.length}개
         </p>
         <ul className='tags'>
           {playlistItem.tags.map((tag, index) => (
@@ -128,7 +128,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
           </div>
           <div className='icon'>
             <MessageSquareMore />
-            {'0'}
+            {playlistItem.commentCount}
           </div>
         </div>
       </section>
@@ -153,7 +153,8 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
             {omittedText(playlistItem.title, MAXLENGTH)}
           </h2>
           <p className='username'>
-            {'소유자명'} · 트랙 {playlistItem.links.length}개
+            {playlistItem.ownerChannelName} · 트랙 {playlistItem.links.length}개
+            · 댓글 {playlistItem.commentCount}개
           </p>
           <ul className='tags'>
             {playlistItem.tags.map((tag, index) => (

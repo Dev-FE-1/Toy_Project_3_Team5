@@ -1,7 +1,7 @@
 export interface PlayListDataProps {
   playlistId?: string;
   title: string;
-  description: string;
+  description?: string;
   isPublic: boolean;
   likes: number;
   links: string[];
@@ -10,4 +10,6 @@ export interface PlayListDataProps {
   thumbnail: string;
   thumbnailFile?: File;
   userId: string;
+  ownerChannelName: string;
+  commentCount?: number;
 }

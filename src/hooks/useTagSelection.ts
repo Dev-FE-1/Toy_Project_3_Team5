@@ -6,9 +6,17 @@ const useTagSelection = (initialSelectedTags: number[] = []) => {
 
   const onTagSelection = (id: number, removable: boolean) => {
     if (removable) return;
-    setSelectedTags((prev) =>
-      prev.includes(id) ? prev.filter((tagId) => tagId !== id) : [...prev, id]
-    );
+
+    setSelectedTags((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((tagId) => tagId !== id);
+      } else {
+        if (prev.length >= 10) {
+          return prev;
+        }
+        return [...prev, id];
+      }
+    });
   };
 
   return {

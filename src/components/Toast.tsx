@@ -6,17 +6,14 @@ import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import useToast from '@/hooks/useToast';
 
-type ToastStatusType = 'success' | 'fail';
+export type ToastStatusType = 'success' | 'fail';
 
 interface ToastProps {
   duration?: number;
-  status?: ToastStatusType;
 }
 
-const Toast = ({ duration = 2000, status = 'success' }: ToastProps) => {
-  const { isToastOn, toastMsg, onClose } = useToast();
-  // const { toastMsg, onClose } = useToast();
-  // const isToastOn = true;
+const Toast = ({ duration = 2000 }: ToastProps) => {
+  const { isToastOn, toastMsg, onClose, status } = useToast();
 
   useEffect(() => {
     if (isToastOn) {

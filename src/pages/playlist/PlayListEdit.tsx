@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { PlusSquare, SquarePlus, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { addPlaylist } from '@/api/playlistInfo';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getPlaylistInfo, updatePlaylist } from '@/api/playlistInfo';
 import { getVideoInfo } from '@/api/video';
 import Button from '@/components/Button';
 import HashTag, { Tag } from '@/components/HashTag';
@@ -42,7 +42,14 @@ const INIT_VALUES: {
   },
 };
 
-const PlayListAdd = () => {
+const PlayListEdit = () => {
+  const navigate = useNavigate();
+  const { toastTrigger } = useToast();
+  const { userId, channelName } = useAuthStore();
+
+  const { playlistId } = useParams<string>();
+  const [playlistInfo, setPlaylistInfo] = useState<PlayListDataProps>();
+
   const [enabled, setEnabled] = useState<boolean>(true);
   const [title, setTitle] = useState<string>('');
   const [desc, setDesc] = useState<string>('');
@@ -53,6 +60,7 @@ const PlayListAdd = () => {
   const [hashtag, setHashtag] = useState<string>('');
   const [addedHashtag, setAddedHashtag] = useState<Tag[]>([]);
 
+  const [prevThumbnail, setPrevThumbnail] = useState<string | null>(null);
   const [thumbnail, setThumbnail] = useState<ThumbnailProps | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,11 +68,32 @@ const PlayListAdd = () => {
     INIT_VALUES.preview
   );
 
-  const { userId, channelName } = useAuthStore();
-  const { toastTrigger } = useToast();
-  const navigate = useNavigate();
-
   const init = {
+    all: async (values: PlayListDataProps) => {
+      setEnabled(values.isPublic);
+      setTitle(values.title);
+      setDesc(values.description ?? '');
+
+      values.links.map(async (link) => {
+        const { status, result } = await getVideoInfo(link);
+        if (status === 'success' && result) {
+          videoList.push(result);
+        }
+      });
+
+      values.tags.map(async (tag) => {
+        addedHashtag.push({
+          id:
+            addedHashtag.length < 1
+              ? addedHashtag.length
+              : addedHashtag[addedHashtag.length - 1].id + 1,
+          label: tag,
+          removable: true,
+        });
+      });
+
+      setPrevThumbnail(values.thumbnail);
+    },
     hashtag: () => {
       setHashtag(INIT_VALUES.hashtag);
     },
@@ -124,6 +153,7 @@ const PlayListAdd = () => {
         ownerChannelName: channelName,
         thumbnail:
           thumbnail?.preview ??
+          prevThumbnail ??
           (videoList.length > 0
             ? videoList[0].imgUrl
             : INIT_VALUES.preview.thumbnail),
@@ -150,6 +180,10 @@ const PlayListAdd = () => {
       setVideoList(videoList.filter((video) => video.videoId !== videoId));
     },
     removeThumbnail: () => {
+      if (prevThumbnail) {
+        setPrevThumbnail(null);
+        return;
+      }
       setThumbnail(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     },
@@ -173,7 +207,7 @@ const PlayListAdd = () => {
     removeHashtag: (id: number) => {
       setAddedHashtag(addedHashtag.filter((tag) => tag.id !== id));
     },
-    createPlaylist: async () => {
+    modifyPlaylist: async () => {
       const checkResult = check.required();
       if (!!!checkResult.status) {
         toastTrigger(checkResult.msg, 'fail');
@@ -185,10 +219,10 @@ const PlayListAdd = () => {
         thumbnailFile: thumbnail?.file,
       };
 
-      const response = await addPlaylist(playlist);
+      const response = await updatePlaylist(playlist, Number(playlistId));
 
       if (response.status === 'success') {
-        toastTrigger(TEXT.toast.create);
+        toastTrigger(TEXT.toast.modify);
         navigate(ROUTES.PLAYLIST(userId));
       }
     },
@@ -258,8 +292,19 @@ const PlayListAdd = () => {
   };
 
   useEffect(() => {
+    (async () => {
+      const data = await getPlaylistInfo(Number(playlistId));
+      if (data.result) setPlaylistInfo(data.result);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (playlistInfo) init.all(playlistInfo);
+  }, [playlistInfo]);
+
+  useEffect(() => {
     methods.createPreview();
-  }, [enabled, title, addedHashtag, videoList, thumbnail]);
+  }, [enabled, title, addedHashtag, videoList, thumbnail, prevThumbnail]);
 
   return (
     <div css={containerStyle}>
@@ -278,7 +323,6 @@ const PlayListAdd = () => {
         value={title}
         onChange={onChange.title}
       />
-
       <InputBox
         label={TEXT.desc.label}
         placeholder={TEXT.desc.placeholder}
@@ -356,7 +400,7 @@ const PlayListAdd = () => {
           ref={fileInputRef}
           accept='image/png'
         />
-        {thumbnail && (
+        {(prevThumbnail || thumbnail) && (
           <Button
             label='이미지 삭제'
             IconComponent={X}
@@ -375,27 +419,9 @@ const PlayListAdd = () => {
         <PlaylistCard playlistItem={preview} size='small' />
       </div>
 
-      {/* {enabled ? (
-        <Button
-          label={TEXT.createButton.label}
-          onClick={onClick.createPlaylist}
-          color='primary'
-          size='md'
-          fullWidth
-        />
-      ) : (
-        <Button
-          label={TEXT.createButton.loading}
-          onClick={onClick.createPlaylist}
-          color='lightGray'
-          size='md'
-          fullWidth
-          disabled
-        />
-      )} */}
       <Button
         label={TEXT.createButton.label}
-        onClick={onClick.createPlaylist}
+        onClick={onClick.modifyPlaylist}
         color='primary'
         size='md'
         fullWidth
@@ -409,6 +435,7 @@ const containerStyle = css`
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  padding-bottom: 60px;
 
   & > div {
     padding: 5px 0;
@@ -472,4 +499,4 @@ const previewStyle = css`
   }
 `;
 
-export default PlayListAdd;
+export default PlayListEdit;

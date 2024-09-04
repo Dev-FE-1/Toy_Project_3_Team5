@@ -13,10 +13,10 @@ import { SignIn } from '@/pages/common/SignIn';
 import { SignUp } from '@/pages/common/SignUp';
 import { PlayList } from '@/pages/playlist/PlayList';
 import PlayListAdd from '@/pages/playlist/PlayListAdd';
+import PlayListEdit from '@/pages/playlist/PlayListEdit';
 import { PlayListHome } from '@/pages/playlist/PlayListHome';
 import { PlayListLikes } from '@/pages/playlist/PlayListLikes';
 import { PlayListSaved } from '@/pages/playlist/PlayListSaved';
-import { PlayListUpdate } from '@/pages/playlist/PlayListUpdate';
 import { Profile } from '@/pages/profile/Profile';
 import { ProfileFollower } from '@/pages/profile/ProfileFollower';
 import { ProfileFollowing } from '@/pages/profile/ProfileFollowing';
@@ -67,7 +67,7 @@ export const router = createBrowserRouter([
         path: ROUTES.PLAYLIST_MODIFY(),
         element: (
           <ProtectedRoute>
-            <PlayListUpdate />
+            <PlayListEdit />
           </ProtectedRoute>
         ),
       },

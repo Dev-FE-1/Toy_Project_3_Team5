@@ -14,6 +14,19 @@ import { COLLECTION, db, storage, STORAGE } from '@/firebase/firbaseConfig';
 import { ApiResponse } from '@/types/api';
 import { PlayListDataProps } from '@/types/playlistType';
 
+export const getPlaylistInfo = async (
+  playlistId: number
+): Promise<ApiResponse<PlayListDataProps>> => {
+  try {
+    const docRef = doc(db, COLLECTION.playlist, `${playlistId}`);
+    const docSnap = await getDoc(docRef);
+    return { status: 'success', result: docSnap.data() as PlayListDataProps };
+  } catch (err) {
+    console.error(err);
+    return { status: 'fail' };
+  }
+};
+
 export const addPlaylist = async (
   data: PlayListDataProps
 ): Promise<ApiResponse<boolean>> => {
@@ -40,16 +53,24 @@ export const addPlaylist = async (
   return { status: 'success', result: true };
 };
 
-export const getPlaylistInfo = async (
+export const updatePlaylist = async (
+  data: PlayListDataProps,
   playlistId: number
-): Promise<PlayListDataProps> => {
+): Promise<ApiResponse<boolean>> => {
   const docRef = doc(db, COLLECTION.playlist, `${playlistId}`);
   const docSnap = await getDoc(docRef);
 
-  return docSnap.data() as PlayListDataProps;
-};
+  const addData: PlayListDataProps = { ...data };
+  delete addData.thumbnailFile;
 
-export const updatePlaylist = async () => {};
+  if (!!!docSnap.exists()) return { status: 'fail' };
+  if (data.thumbnailFile) {
+    const url = await uploadThumbnail(data.thumbnailFile, `${playlistId}`);
+    addData.thumbnail = url;
+  }
+  await updateDoc(docRef, { ...addData });
+  return { status: 'success', result: true };
+};
 
 export const deletePlaylist = async () => {};
 

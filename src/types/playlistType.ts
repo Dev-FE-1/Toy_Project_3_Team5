@@ -13,3 +13,8 @@ export interface PlayListDataProps {
   ownerChannelName: string;
   commentCount?: number;
 }
+
+export interface ThumbnailProps {
+  file: File;
+  preview: string;
+}

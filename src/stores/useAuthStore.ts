@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { create, StateCreator } from 'zustand';
 import { persist, PersistOptions } from 'zustand/middleware';
+import defaultProfile from '@/assets/profile_default.png';
 import { auth, db } from '@/firebase/firbaseConfig';
 
 interface AuthState {
@@ -60,7 +61,7 @@ export const useAuthStore = create<AuthState>(
           const data = docSnapshot.data();
 
           set({
-            profileImage: data?.profileImg || '',
+            profileImage: data?.profileImg || defaultProfile,
             channelName: data?.channelName || '',
             likedPlaylist: data?.likedPlaylist || [],
             savedPlaylist: data?.savedPlaylist || [],

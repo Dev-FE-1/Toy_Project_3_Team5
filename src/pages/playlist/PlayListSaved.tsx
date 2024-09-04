@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useFetchSavedPlaylist } from '@/api/playlists';
+import { useFetchSavedPlaylist } from '@/api/myplaylist';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';

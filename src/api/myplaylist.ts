@@ -14,9 +14,14 @@ import {
 } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import { db } from '@/firebase/firbaseConfig';
-import { PlayListDataProps, PlaylistsResultProps } from '@/types/playlistType';
+import { PlayListDataProps } from '@/types/playlistType';
 
 type PlaylistPageType = 'user' | 'liked' | 'saved';
+
+interface PlaylistsResultProps {
+  playlist: PlayListDataProps[];
+  nextCursor: QueryDocumentSnapshot<DocumentData> | null;
+}
 
 const playlistKeys = {
   all: ['playlist'] as const,

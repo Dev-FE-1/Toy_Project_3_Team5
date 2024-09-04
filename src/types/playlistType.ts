@@ -1,5 +1,3 @@
-import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
-
 export interface PlayListDataProps {
   playlistId?: string;
   title: string;
@@ -14,9 +12,4 @@ export interface PlayListDataProps {
   userId: string;
   ownerChannelName: string;
   commentCount?: number;
-}
-
-export interface PlaylistsResultProps {
-  playlist: PlayListDataProps[];
-  nextCursor: QueryDocumentSnapshot<DocumentData> | null;
 }

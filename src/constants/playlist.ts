@@ -33,5 +33,8 @@ export const TEXT = {
     small: '미리보기 (small)',
   },
   createButton: { label: '플레이리스트 생성하기', loading: '생성 중...' },
-  toast: { success: '플레이리스트 생성이 완료되었습니다.' },
+  toast: {
+    create: '플레이리스트 생성이 완료되었습니다.',
+    modify: '플레이리스트 수정이 완료되었습니다.',
+  },
 };

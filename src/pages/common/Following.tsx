@@ -1,42 +1,29 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+
 import { Plus } from 'lucide-react';
 import Button from '@/components/Button';
 import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
-import { db, auth } from '@/firebase/firbaseConfig';
+
 import useChannelFetch from '@/hooks/useChannelFetch';
 import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylistFetch';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { PlayListDataProps } from '@/types/playlistType';
 
-//로그인 로직 완성되면 없애기
-export const loginInfo = await signInWithEmailAndPassword(
-  auth,
-  'test1234@gmail.com',
-  'test1234'
-);
-const loginEmail: string | null = loginInfo.user.email;
-const emailPrefix = loginEmail ? loginEmail.split('@')[0] : '';
-console.log('로그인id', emailPrefix); //유저정보 콘솔로그
-//여기까지 없애기
-
 const Following = () => {
-  console.log('emailPrefix', emailPrefix);
-  const [selectedChannel, setSelectedChannel] = useState(emailPrefix);
+  const { userId } = useAuthStore();
+  const [selectedChannel, setSelectedChannel] = useState(userId);
 
   const channels = useChannelFetch(selectedChannel); // 채널 데이터 가져오기
   const playlists: PlayListDataProps[] =
     useFollowingPlaylistFetch(selectedChannel);
-  console.log('가져오는 데이터', playlists);
 
   const onFollowingChannelCLick = (channelId: string) => {
-    // console.log('현재 아이디값', selectedChannel);
-    // console.log('누른버튼의값', channelId);
     if (selectedChannel === channelId) {
-      setSelectedChannel(emailPrefix);
+      setSelectedChannel(userId);
     } else {
       setSelectedChannel(channelId);
     }

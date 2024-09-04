@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { PlayListDataProps } from './usePlaylist';
 import { db } from '@/firebase/firbaseConfig';
-import { loginInfo } from '@/hooks/useTagFetch';
+import { loginInfo } from '@/pages/common/Following';
 
 const useFollowingPlaylistFetch = (userId: string) => {
   const [playlists, setPlaylists] = useState<PlayListDataProps[]>([]);

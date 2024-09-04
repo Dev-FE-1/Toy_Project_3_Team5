@@ -166,11 +166,34 @@ export const SignIn = () => {
 
 const containerStyle = css`
   width: 100%;
-  height: 100vh;
+  max-width: 430px;
+  height: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  &::before {
+    left: 50%;
+    transform: translateX(-215px);
+  }
+
+  &::after {
+    right: 50%;
+    transform: translateX(215px);
+  }
+
+  &::before,
+  &::after {
+    width: 1px;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    background-color: ${colors.gray02};
+    content: '';
+    z-index: 11;
+  }
 `;
 
 const toggleStyle = css`

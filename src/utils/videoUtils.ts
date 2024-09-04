@@ -1,5 +1,7 @@
 import { Regex } from '@/constants/validation';
 
+// 거의 미사용코드임 삭제필요
+
 const example = [
   'https://www.youtube.com/watch?v=n6B5gQXlB-0&ab_channel=HYBELABELS',
   'https://youtu.be/n6B5gQXlB-0?si=k1ddkQxbXNPD7_ph',
@@ -31,8 +33,9 @@ export const getVideoId = (link: string, type: LinkType = 'youtube') => {
   return videoId;
 };
 
-const makeEmbedUrl = (videoId: string, type: LinkType) => {
+export const makeEmbedUrl = (videoId: string, type: LinkType) => {
   if (type === 'youtube') return `https://www.youtube.com/embed/${videoId}`;
+  return `https://www.youtube.com/embed/${videoId}`;
 };
 
 const getThumbnail = (videoId: string, type: LinkType) => {

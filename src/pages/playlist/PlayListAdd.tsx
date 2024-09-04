@@ -134,16 +134,16 @@ const PlayListAdd = () => {
     },
     hashtag: (value: string) => {
       if (value.trim().length < 1 || value.trim() === '#') {
-        toastTrigger(TEXT.hashtag.required);
+        toastTrigger(TEXT.hashtag.required, 'fail');
         return false;
       }
       if (addedHashtag.length >= 5) {
-        toastTrigger(TEXT.hashtag.limit);
+        toastTrigger(TEXT.hashtag.limit, 'fail');
         return false;
       }
       const taggedValue = tagging(value);
       if (check.dupl.hashtag(taggedValue)) {
-        toastTrigger(TEXT.hashtag.validDuplmsg);
+        toastTrigger(TEXT.hashtag.validDuplmsg, 'fail');
         return false;
       }
       return true;
@@ -180,9 +180,8 @@ const PlayListAdd = () => {
         return;
       }
       const { status, result } = await getVideoInfo(link);
-      console.log(status, result);
       if (status === 'fail' || !!!result) {
-        toastTrigger(TEXT.link.validmsg);
+        toastTrigger(TEXT.link.validmsg, 'fail');
         return;
       }
 
@@ -219,7 +218,7 @@ const PlayListAdd = () => {
     createPlaylist: async () => {
       const checkResult = check.required();
       if (!!!checkResult.status) {
-        toastTrigger(checkResult.msg);
+        toastTrigger(checkResult.msg, 'fail');
         return;
       }
 

@@ -1,7 +1,13 @@
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { signOut } from 'firebase/auth';
 import { Trash2, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {
+  getUserComments,
+  getPlaylistTitle,
+  getMyPlaylistCount,
+} from '@/api/mypage';
 import Button from '@/components/Button';
 import CheckBox from '@/components/CheckBox';
 import IconButton from '@/components/IconButton';
@@ -12,26 +18,18 @@ import ROUTES from '@/constants/route';
 import { auth } from '@/firebase/firbaseConfig';
 import { useAuthStore } from '@/stores/useAuthStore';
 
-const comments = [
-  {
-    id: 1,
-    ply: '플레이리스트: 비오는 날 듣기좋은 PopSong List',
-    text: '너무재밌어요! 너무재밌어요! 너무재밌어요!너무재밌어요! 너무재밌어요! 너무재밌어요! ',
-  },
-  {
-    id: 2,
-    ply: '플레이리스트: 비오는 날 듣기좋은 PopSong List',
-    text: '너무 재밌어요! 다음 플레이리스트는 언제 올라오나요?',
-  },
-  {
-    id: 3,
-    ply: '먹방',
-    text: '안녕하세요',
-  },
-];
+interface Comment {
+  content: string;
+  playlistId: number;
+  playlistTitle: string;
+}
 
 export const ProfileHome = () => {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [myPlaylistCount, setMyPlaylistCount] = useState<number>(0);
+
   const navigate = useNavigate();
+
   const {
     userId,
     profileImage,
@@ -40,15 +38,37 @@ export const ProfileHome = () => {
     savedPlaylist,
     channelFollower,
     channelFollowing,
-    tags,
     clearUser,
   } = useAuthStore();
 
   const infoData = [
-    { count: savedPlaylist.length, label: '플레이리스트' },
+    { count: myPlaylistCount, label: '플레이리스트' },
     { count: channelFollower.length, label: '팔로워' },
     { count: channelFollowing.length, label: '팔로잉' },
   ];
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const userComments = await getUserComments(userId);
+
+        const commentWithTitle = await Promise.all(
+          userComments.map(async (comment) => {
+            const playlistTitle = await getPlaylistTitle(comment.playlistId);
+            return {
+              ...comment,
+              playlistTitle,
+            };
+          })
+        );
+        const playlistCount = await getMyPlaylistCount(userId);
+        setMyPlaylistCount(playlistCount);
+        setComments(commentWithTitle);
+      } catch (error) {}
+    };
+
+    fetchComments();
+  }, []);
 
   const logout = async () => {
     await signOut(auth).then(() => {
@@ -78,7 +98,7 @@ export const ProfileHome = () => {
         </div>
       </div>
       <div css={commentContainerStyle}>
-        <div css={commentHeaderStyle}>내가 쓴 댓글 30</div>
+        <div css={commentHeaderStyle}>내가 쓴 댓글 {comments.length}</div>
         <div css={deleteContainerStyle}>
           <button css={allSelectBtnStyle}>전체 선택</button>
           <IconButton
@@ -89,13 +109,13 @@ export const ProfileHome = () => {
           />
         </div>
         <ul css={commentSelectStyle}>
-          {comments.map(({ id, ply, text }) => (
-            <li key={id} css={commentStyle}>
+          {comments.map(({ playlistTitle, content }, index) => (
+            <li key={index} css={commentStyle}>
               <CheckBox />
               <Profile src={profileImage} alt='프로필 이미지' size='sm' />
               <div css={commentDesStyle}>
-                <span>{ply}</span>
-                <div>{text}</div>
+                <span>{playlistTitle}</span>
+                <div>{content}</div>
               </div>
             </li>
           ))}
@@ -152,6 +172,7 @@ const profileBtnStyle = css`
   border: 1px solid ${colors.gray03};
   padding: 4px 12px;
   margin: 6px 0 20px 0;
+  cursor: pointer;
 `;
 
 const infoContainerStyle = css`
@@ -175,6 +196,7 @@ const infoStyle = css`
 `;
 
 const commentContainerStyle = css`
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 0 20px;

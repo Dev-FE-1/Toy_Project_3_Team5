@@ -1,3 +1,10 @@
-import React from 'react';
+const Detail = () => {
+  const a = '';
+  return (
+    <div>
+      <h1>디테일페이지</h1>
+    </div>
+  );
+};
 
-export const Detail = () => <div>Detail 영상 상세보기 페이지</div>;
+export default Detail;

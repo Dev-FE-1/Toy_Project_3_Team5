@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import IconButton from '@/components/IconButton';
 import colors from '@/constants/colors';
 import ROUTES from '@/constants/route';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface NavList {
   label: string;
@@ -15,13 +16,14 @@ interface NavList {
 const navList: NavList[] = [
   { label: '홈', icon: Home, to: ROUTES.ROOT },
   { label: '인기', icon: Flame, to: ROUTES.POPULAR },
-  { label: '마이플리', icon: Library, to: ROUTES.PLAYLIST('1') },
+  { label: '마이플리', icon: Library, to: ROUTES.PLAYLIST() },
   { label: '팔로잉', icon: Users, to: ROUTES.FOLLOWING },
 ];
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { userId } = useAuthStore();
 
   return (
     <nav css={navbarStyle}>
@@ -31,12 +33,20 @@ const Navbar: React.FC = () => {
             ? location.pathname === list.to
             : location.pathname.startsWith(list.to);
 
+        const onClick = () => {
+          if (list.label === '마이플리' && userId) {
+            navigate(ROUTES.PLAYLIST(userId));
+          } else {
+            navigate(list.to);
+          }
+        };
+
         return (
           <div css={iconWrapperStyle} key={idx}>
             <IconButton
               key={list.label}
               IconComponent={list.icon}
-              onClick={() => navigate(list.to)}
+              onClick={onClick}
               label={list.label}
               color={isActive ? 'primary' : 'gray'}
             />

@@ -18,20 +18,9 @@ import ROUTES from '@/constants/route';
 import { Regex } from '@/constants/validation';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { PlayListDataProps } from '@/types/playlistType';
+import { PlayListDataProps, ThumbnailProps } from '@/types/playlistType';
 import { tagging } from '@/utils/textUtils';
 import { getVideoId } from '@/utils/videoUtils';
-
-/**
- * 1. 페이지 진입시 데이터 불러오기 (loading)
- * 2. 불러온 데이터로 ui에 데이터 입력
- * 3. 데이터 수정
- *  3.1.
- * 4. 수정 api 호출
- *  4.1. check required
- *  4.2. call api
- *  4.3. toast, useNavigate
- */
 
 const INIT_VALUES: {
   hashtag: string;
@@ -52,11 +41,6 @@ const INIT_VALUES: {
     links: [],
   },
 };
-
-interface ThumbnailProps {
-  file: File;
-  preview: string;
-}
 
 const PlayListEdit = () => {
   const navigate = useNavigate();

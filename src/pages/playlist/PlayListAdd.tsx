@@ -18,7 +18,7 @@ import ROUTES from '@/constants/route';
 import { Regex } from '@/constants/validation';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { PlayListDataProps } from '@/types/playlistType';
+import { PlayListDataProps, ThumbnailProps } from '@/types/playlistType';
 import { tagging } from '@/utils/textUtils';
 import { getVideoId } from '@/utils/videoUtils';
 
@@ -41,11 +41,6 @@ const INIT_VALUES: {
     links: [],
   },
 };
-
-interface ThumbnailProps {
-  file: File;
-  preview: string;
-}
 
 const PlayListAdd = () => {
   const [enabled, setEnabled] = useState<boolean>(true);

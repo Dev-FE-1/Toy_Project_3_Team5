@@ -7,7 +7,7 @@ import {
   getUserComments,
   getPlaylistTitle,
   getMyPlaylistCount,
-} from '@/api/mypage';
+} from '@/api/mypageInfo';
 import Button from '@/components/Button';
 import CheckBox from '@/components/CheckBox';
 import IconButton from '@/components/IconButton';

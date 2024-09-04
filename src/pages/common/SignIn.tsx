@@ -101,63 +101,66 @@ export const SignIn = () => {
 
   return (
     <div css={containerStyle}>
-      <div style={{ marginBottom: '20px' }}>
-        <Logo logoWidth={180} clickable={false} />
-      </div>
-      <form onSubmit={onEmailLogin}>
-        <InputBox
-          label='아이디'
-          placeholder='아이디'
-          value={id}
-          validate={validateId}
-          onChange={(e) => {
-            setId(e.target.value);
-            if (isEmailRemembered) {
-              localStorage.setItem('savedEmail', e.target.value);
-            }
-          }}
-        />
-        <InputBox
-          label='비밀번호'
-          placeholder='비밀번호'
-          value={password}
-          validate={validatePassword}
-          onChange={(e) => setPassword(e.target.value)}
-          isPassword
-        />
-        {errorMessage && <div css={errorMessageStyle}>{errorMessage}</div>}
-        <div css={toggleStyle}>
-          <Toggle
-            enabled={isEmailRemembered}
-            setEnabled={onToggleChange}
-            label={{ active: '로그인 정보 기억하기', inactive: '' }}
-          />
+      <div css={formStyle}>
+        <div style={{ marginBottom: '20px' }}>
+          <Logo logoWidth={180} clickable={false} />
         </div>
-        <Button
-          label='로그인'
-          size='lg'
-          fullWidth={true}
-          type='submit'
-          onClick={() => {}}
-          disabled={isLoginDisabled}
-        />
-        <div css={loginBtnStyle}>
-          <div css={lineStyle}></div>
+        <form onSubmit={onEmailLogin}>
+          <InputBox
+            label='아이디'
+            placeholder='아이디'
+            value={id}
+            validate={validateId}
+            onChange={(e) => {
+              setId(e.target.value);
+              if (isEmailRemembered) {
+                localStorage.setItem('savedEmail', e.target.value);
+              }
+            }}
+          />
+          <InputBox
+            label='비밀번호'
+            placeholder='비밀번호'
+            value={password}
+            validate={validatePassword}
+            onChange={(e) => setPassword(e.target.value)}
+            isPassword
+          />
+          {errorMessage && <div css={errorMessageStyle}>{errorMessage}</div>}
+          <div css={toggleStyle}>
+            <Toggle
+              enabled={isEmailRemembered}
+              setEnabled={onToggleChange}
+              label={{ active: '로그인 정보 기억하기', inactive: '' }}
+            />
+            <div style={{ position: 'absolute', marginRight: '20px' }}></div>
+          </div>
           <Button
-            label='또는 구글로 로그인'
-            onClick={onGoogleLogin}
+            label='로그인'
             size='lg'
-            color='black'
-            IconComponent={google}
             fullWidth={true}
+            type='submit'
+            onClick={() => {}}
+            disabled={isLoginDisabled}
           />
+          <div css={loginBtnStyle}>
+            <div css={lineStyle}></div>
+            <Button
+              label='또는 구글로 로그인'
+              onClick={onGoogleLogin}
+              size='lg'
+              color='black'
+              IconComponent={google}
+              fullWidth={true}
+            />
+          </div>
+        </form>
+        <div css={signUpMessageStyle}>
+          계정이 없으신가요?{' '}
+          <span onClick={onSignUpMessage} css={signUpStyle}>
+            회원가입하기
+          </span>
         </div>
-      </form>
-      <div css={signUpMessageStyle}>
-        계정이 없으신가요?{' '}
-        <span onClick={onSignUpMessage} css={signUpStyle}>
-          회원가입하기
-        </span>
       </div>
       <Toast />
     </div>
@@ -169,10 +172,10 @@ const containerStyle = css`
   max-width: 430px;
   height: 100%;
   margin: 0 auto;
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: center; */
 
   &::before {
     left: 50%;
@@ -194,6 +197,15 @@ const containerStyle = css`
     content: '';
     z-index: 11;
   }
+`;
+
+const formStyle = css`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
 const toggleStyle = css`

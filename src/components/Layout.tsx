@@ -28,12 +28,12 @@ const pageContainerStyles = css`
   position: relative;
   width: 100%;
   max-width: 430px;
-
+  height: 100%;
   margin: 0 auto;
 
   main {
     padding-top: ${headerNavbarHeight};
-    padding-bottom: ${headerNavbarHeight};
+    height: calc(100% - ${headerNavbarHeight});
   }
 
   &::before {

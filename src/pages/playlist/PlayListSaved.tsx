@@ -11,12 +11,13 @@ import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+import { sortPlaylistsByOption } from '@/utils/filterUtils';
 
 const PAGE_SIZE = 5;
 
 export const PlayListSaved = () => {
   const navigate = useNavigate();
-  const [num, setNum] = useState<number[]>([0, 0]);
+  const [filterOptions, setFilterOptions] = useState<number[]>([0]);
 
   const optionGroups = [
     { label: '정렬', options: ['최신순', '좋아요순', '댓글순'] },
@@ -44,6 +45,11 @@ export const PlayListSaved = () => {
     }
   );
 
+  const sortedPlaylist = useMemo(
+    () => sortPlaylistsByOption(playlist, filterOptions[0]),
+    [playlist, filterOptions]
+  );
+
   const onAddBtnClick = (): void => {
     navigate(ROUTES.PLAYLIST_ADD());
   };
@@ -58,8 +64,8 @@ export const PlayListSaved = () => {
         <div className='filter-area'>
           <PopupFilter
             optionGroups={optionGroups}
-            selectedIndexes={num}
-            setSelectedIndexes={setNum}
+            selectedIndexes={filterOptions}
+            setSelectedIndexes={setFilterOptions}
           />
           <Button
             label='플레이리스트 생성'
@@ -68,8 +74,10 @@ export const PlayListSaved = () => {
             onClick={onAddBtnClick}
           />
         </div>
-        {playlist.length > 0 && <p>총 {playlist.length}개의 플리</p>}
-        {isFetching === false && playlist.length === 0 ? (
+        {sortedPlaylist.length > 0 && (
+          <p>총 {sortedPlaylist.length}개의 플리</p>
+        )}
+        {isFetching === false && sortedPlaylist.length === 0 ? (
           <div css={emptyStateStyles}>
             <img src='/src/assets/folderIcon.png' alt='아이콘 이미지' />
             <div className='textContainer'>
@@ -80,7 +88,7 @@ export const PlayListSaved = () => {
           </div>
         ) : (
           <ul className='scroll-container' css={cardContainerStyles}>
-            {playlist.map((playlistItem, index) => (
+            {sortedPlaylist.map((playlistItem, index) => (
               <li className='list' key={index}>
                 <PlaylistCard
                   size='small'
@@ -89,7 +97,9 @@ export const PlayListSaved = () => {
                 />
               </li>
             ))}
-            {isFetching && playlist.length >= PAGE_SIZE && <LoadingSpinner />}
+            {isFetching && sortedPlaylist.length >= PAGE_SIZE && (
+              <LoadingSpinner />
+            )}
             <div
               ref={infiniteScrollRef}
               style={{

@@ -8,7 +8,7 @@ import HashTag from '@/pages/common/HashTag';
 import Home from '@/pages/common/Home';
 import { NotFound } from '@/pages/common/NotFound';
 import { Popular } from '@/pages/common/Popular';
-import { Search } from '@/pages/common/Search';
+import Search from '@/pages/common/Search';
 import { SignIn } from '@/pages/common/SignIn';
 import { SignUp } from '@/pages/common/SignUp';
 import { PlayList } from '@/pages/playlist/PlayList';

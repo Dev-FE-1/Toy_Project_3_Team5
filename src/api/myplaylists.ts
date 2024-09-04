@@ -111,7 +111,7 @@ const fetchPlaylists = async (
       q = query(
         playlistRef,
         where('__name__', 'in', playlistIdStrings.map(String)),
-        orderBy('__name__'),
+        orderBy('regDate', 'desc'),
         limit(pageSize)
       );
       break;

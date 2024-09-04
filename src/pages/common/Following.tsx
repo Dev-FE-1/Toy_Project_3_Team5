@@ -1,34 +1,58 @@
+import { useState } from 'react';
 import { css } from '@emotion/react';
+
 import { Plus } from 'lucide-react';
 import Button from '@/components/Button';
 import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
-import { PlayListDataProps } from '@/hooks/usePlaylist';
-import { TEST_DATA, TestProfileProps } from '@/mock/following-test';
+
+import useChannelFetch from '@/hooks/useChannelFetch';
+import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylistFetch';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { PlayListDataProps } from '@/types/playlistType';
 
 const Following = () => {
-  const getFollowing = () => TEST_DATA.following;
-  const getPlaylist = () => TEST_DATA.playlist;
+  const { userId } = useAuthStore();
+  const [selectedChannel, setSelectedChannel] = useState(userId);
 
-  const followingList: TestProfileProps[] = getFollowing();
-  const playlists: PlayListDataProps[] = getPlaylist();
+  const channels = useChannelFetch(selectedChannel); // 채널 데이터 가져오기
+  const playlists: PlayListDataProps[] =
+    useFollowingPlaylistFetch(selectedChannel);
+
+  const onFollowingChannelCLick = (channelId: string) => {
+    if (selectedChannel === channelId) {
+      setSelectedChannel(userId);
+    } else {
+      setSelectedChannel(channelId);
+    }
+  };
+  const followingList = channels.map((channel) => ({
+    id: channel.id,
+    alt: '썸네일',
+    src: channel.profileImg,
+    size: 'md' as const,
+    name: channel.channelName,
+  }));
 
   return (
     <div css={containerStyle}>
       {followingList && followingList.length > 0 ? (
         <div css={followingHeaderStyle}>
           <div css={followingListStyle}>
-            {followingList.map((following, index) => (
-              <div key={index}>
-                <div css={followingCoverStyle}>
+            {followingList.map((following) => (
+              <div key={following.id}>
+                <button
+                  css={followingCoverStyle(selectedChannel === following.id)}
+                  onClick={() => onFollowingChannelCLick(following.id)}
+                >
                   <Profile
                     alt={following.alt}
                     src={following.src}
                     size={following.size}
                   />
-                </div>
+                </button>
                 <p css={followingTextStyle}>{following.name}</p>
               </div>
             ))}
@@ -73,21 +97,21 @@ const followingListStyle = css`
   flex-grow: 1;
   display: flex;
   gap: 10px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
 `;
 
-const followingCoverStyle = css`
-  border-radius: 100%;
-  border: 1px solid ${colors.gray03};
-  height: 50px;
-
-  & img {
-    transform: scale(0.9);
-    border-radius: 100%;
-  }
+const followingCoverStyle = (isSelected: boolean) => css`
+  border-radius: 50%;
+  border: ${isSelected
+    ? `2px solid ${colors.primaryNormal}`
+    : `1px solid ${colors.gray03}`}; // 클릭 상태에 따른 border 스타일
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1px;
+  background: none;
+  cursor: pointer;
 `;
-
 const followingTextStyle = css`
   font-size: ${fontSize.xs};
   text-align: center;

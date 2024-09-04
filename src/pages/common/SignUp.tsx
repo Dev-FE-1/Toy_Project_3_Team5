@@ -65,6 +65,13 @@ export const SignUp = () => {
   };
 
   const onIdCheck = async () => {
+    const idValidationMessage = validateId(id);
+    if (idValidationMessage) {
+      setIdCheckMessage(idValidationMessage);
+      setIsIdChecked(false);
+      return;
+    }
+
     try {
       const idExists = await checkIdExists(id);
       if (idExists) {
@@ -78,6 +85,13 @@ export const SignUp = () => {
   };
 
   const onChannelNameCheck = async () => {
+    const channelNameValidation = validateChannelName(channelName);
+    if (channelNameValidation) {
+      setChannelNameCheckMessage(channelNameValidation);
+      setIsChannelNameChecked(false);
+      return;
+    }
+
     try {
       const exists = await checkChannelNameExists(channelName.trim());
       if (exists) {
@@ -95,7 +109,19 @@ export const SignUp = () => {
   ) => {
     setChannelName(e.target.value);
     setIsChannelNameChecked(false);
-    setChannelNameCheckMessage('다시 중복검사를 진행해주세요.');
+    setChannelNameCheckMessage(
+      e.target.value === '' ? '' : '다시 중복검사를 진행해주세요.'
+    );
+  };
+
+  const onIdChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setId(e.target.value);
+    setIsIdChecked(false);
+    setIdCheckMessage(
+      e.target.value === '' ? '' : '다시 중복검사를 진행해주세요.'
+    );
   };
 
   const onSignUp = async (e: React.FormEvent) => {
@@ -131,7 +157,7 @@ export const SignUp = () => {
         likedPlaylist: [],
         profileImg: '',
         tags: [],
-        isFirstLogin: false,
+        isFirstLogin: true,
       });
       navigate(ROUTES.SIGN_IN);
       toastTrigger('회원가입이 완료되었습니다! 🥳', 'success');
@@ -184,9 +210,7 @@ export const SignUp = () => {
             placeholder='아이디'
             value={id}
             validate={validateId}
-            onChange={(e) => {
-              setId(e.target.value);
-            }}
+            onChange={onIdChange}
             width='315px'
             externalErrorMessage={idCheckMessage}
           />

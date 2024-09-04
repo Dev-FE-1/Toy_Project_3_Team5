@@ -1,11 +1,12 @@
+import { ToastStatusType } from '@/components/Toast';
 import { useToastStore } from '@/stores/useToastStore';
 
 const useToast = () => {
-  const { isToastOn, toastMsg, toastOn, toastOff } = useToastStore();
+  const { isToastOn, toastMsg, toastOn, toastOff, status } = useToastStore();
 
   const handler = {
-    toastTrigger: (msg: string) => {
-      toastOn(msg);
+    toastTrigger: (msg: string, status: ToastStatusType = 'success') => {
+      toastOn(msg, status);
     },
     onClose: () => {
       toastOff();
@@ -15,6 +16,7 @@ const useToast = () => {
   return {
     isToastOn,
     toastMsg,
+    status,
     toastTrigger: handler.toastTrigger,
     onClose: handler.onClose,
   };

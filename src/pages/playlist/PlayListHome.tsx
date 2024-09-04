@@ -11,6 +11,10 @@ import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+import {
+  filterPlaylistByVisibility,
+  sortPlaylistsByOption,
+} from '@/utils/filterUtils';
 
 const PAGE_SIZE = 5;
 
@@ -45,6 +49,14 @@ export const PlayListHome = () => {
     }
   );
 
+  const filteredPlaylist = useMemo(() => {
+    const filteredPlaylist = filterPlaylistByVisibility(
+      playlist,
+      filterOptions[1]
+    );
+    return sortPlaylistsByOption(filteredPlaylist, filterOptions[0]);
+  }, [playlist, filterOptions]);
+
   const onAddBtnClick = (): void => {
     navigate(ROUTES.PLAYLIST_ADD());
   };
@@ -64,8 +76,10 @@ export const PlayListHome = () => {
           onClick={onAddBtnClick}
         />
       </div>
-      {playlist.length > 0 && <p>총 {playlist.length}개의 플리</p>}
-      {isFetching === false && playlist.length === 0 ? (
+      {filteredPlaylist.length > 0 && (
+        <p>총 {filteredPlaylist.length}개의 플리</p>
+      )}
+      {isFetching === false && filteredPlaylist.length === 0 ? (
         <div css={emptyStateStyles}>
           <img src='/src/assets/folderIcon.png' alt='아이콘 이미지' />
           <div className='textContainer'>
@@ -75,7 +89,7 @@ export const PlayListHome = () => {
         </div>
       ) : (
         <ul className='scroll-container' css={cardContainerStyles}>
-          {playlist.map((playlistItem) => (
+          {filteredPlaylist.map((playlistItem) => (
             <li className='list' key={playlistItem.playlistId}>
               <PlaylistCard
                 size='small'
@@ -85,7 +99,9 @@ export const PlayListHome = () => {
               />
             </li>
           ))}
-          {isFetching && playlist.length >= PAGE_SIZE && <LoadingSpinner />}
+          {isFetching && filteredPlaylist.length >= PAGE_SIZE && (
+            <LoadingSpinner />
+          )}
           <div
             ref={infiniteScrollRef}
             style={{

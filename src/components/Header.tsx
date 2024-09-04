@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { ChevronLeft, SearchIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import defaultProfile from '@/assets/profile_default.png';
 import IconButton from '@/components/IconButton';
 import Logo from '@/components/Logo';
@@ -15,7 +15,15 @@ import { HeaderProps } from '@/types/header';
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const [searchText, setSearchText] = useState<string>('');
   const { user, profileImage } = useAuthStore();
+  const { keyword } = useParams<{ keyword?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/search/') && keyword) {
+      setSearchText(decodeURIComponent(keyword));
+    }
+  }, [location.pathname, keyword]);
 
   const onProfileClick = () => {
     if (user) {

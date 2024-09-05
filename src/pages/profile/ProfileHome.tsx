@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { signOut } from 'firebase/auth';
+import { doc, deleteDoc } from 'firebase/firestore';
 import { Trash2, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -15,10 +16,11 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { auth } from '@/firebase/firbaseConfig';
+import { auth, db } from '@/firebase/firbaseConfig';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Comment {
+  id: string;
   content: string;
   playlistId: number;
   playlistTitle: string;
@@ -28,6 +30,7 @@ export const ProfileHome = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [myPlaylistCount, setMyPlaylistCount] = useState<number>(0);
   const [commentsPlus, setCommentsPlus] = useState<number>(7);
+  const [checkedComments, setCheckedComments] = useState<string[]>([]);
 
   const navigate = useNavigate();
 
@@ -42,23 +45,51 @@ export const ProfileHome = () => {
 
   useEffect(() => {
     const fetchComments = async () => {
-      try {
-        const userComments = await getUserComments(userId);
+      const userComments = await getUserComments(userId);
 
-        const commentWithTitle = await Promise.all(
-          userComments.map(async (comment) => {
-            const playlistTitle = await getPlaylistTitle(comment.playlistId);
-            return { ...comment, playlistTitle };
-          })
-        );
-        const playlistCount = await getMyPlaylistCount(userId);
-        setMyPlaylistCount(playlistCount ?? 0);
-        setComments(commentWithTitle);
-      } catch (error) {}
+      const commentWithTitle = await Promise.all(
+        userComments.map(async (comment) => {
+          const playlistTitle = await getPlaylistTitle(comment.playlistId);
+          return {
+            id: comment.commentsId,
+            content: comment.content,
+            playlistId: comment.playlistId,
+            playlistTitle,
+          };
+        })
+      );
+      const playlistCount = await getMyPlaylistCount(userId);
+      setMyPlaylistCount(playlistCount ?? 0);
+      setComments(commentWithTitle);
     };
 
     fetchComments();
   }, []);
+
+  const deleteComment = async (commentId: string) => {
+    const commentRef = doc(db, 'comments', commentId);
+    await deleteDoc(commentRef);
+  };
+
+  const commentSelection = (commentId: string, isChecked: boolean) => {
+    setCheckedComments((prev) => {
+      if (isChecked) {
+        return [...prev, commentId];
+      } else {
+        return prev.filter((id) => id !== commentId);
+      }
+    });
+  };
+
+  const deleteSelectedComments = async () => {
+    await Promise.all(
+      checkedComments.map((commentId) => deleteComment(commentId))
+    );
+    setComments((prev) =>
+      prev.filter((comment) => !checkedComments.includes(comment.id))
+    );
+    setCheckedComments([]);
+  };
 
   const onCommentsPlus = () => {
     setCommentsPlus((prev) => prev + 5);
@@ -109,7 +140,7 @@ export const ProfileHome = () => {
           <button css={allSelectBtnStyle}>전체 선택</button>
           <IconButton
             IconComponent={Trash2}
-            onClick={() => {}}
+            onClick={deleteSelectedComments}
             size='md'
             color='red'
           />
@@ -117,9 +148,12 @@ export const ProfileHome = () => {
         <ul css={commentSelectStyle}>
           {comments
             .slice(0, commentsPlus)
-            .map(({ playlistTitle, content }, index) => (
+            .map(({ id, playlistTitle, content }, index) => (
               <li key={index} css={commentStyle}>
-                <CheckBox />
+                <CheckBox
+                  checked={checkedComments.includes(id)}
+                  onChange={(isChecked) => commentSelection(id, isChecked)}
+                />
                 <Profile src={profileImage} alt='프로필 이미지' size='sm' />
                 <div css={commentDesStyle}>
                   <span>{playlistTitle}</span>

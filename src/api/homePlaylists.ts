@@ -6,62 +6,95 @@ import {
   query,
   where,
   startAfter,
-  QueryDocumentSnapshot,
-  DocumentData,
   limit,
+  Query,
+  DocumentData,
 } from 'firebase/firestore';
 import { getCommentCount } from '@/api/myplaylists';
 import { db } from '@/firebase/firbaseConfig';
 import { PlayListDataProps } from '@/types/playlistType';
 
 const fetchHomePlaylists = async (
-  pageParam: QueryDocumentSnapshot<DocumentData> | null,
+  pageParam: number,
   sortOption: string,
   pageSize: number
-) => {
+): Promise<{
+  playlistsData: PlayListDataProps[];
+  nextCursor: number | null;
+}> => {
   const playlistCollection = collection(db, 'playlist');
+  const isCommentSort = sortOption === '댓글순';
   const orderByField = sortOption === '좋아요순' ? 'likes' : 'regDate';
-  const orderDirection: 'asc' | 'desc' = 'desc';
 
-  let q = query(
-    playlistCollection,
-    where('isPublic', '==', true),
-    orderBy(orderByField, orderDirection),
-    limit(pageSize)
-  );
+  const fetchPlaylists = async (q: Query<DocumentData>) => {
+    const querySnapshot = await getDocs(q);
 
-  if (pageParam) q = query(q, startAfter(pageParam));
+    return await Promise.all(
+      querySnapshot.docs.map(async (doc) => ({
+        playlistId: doc.id,
+        commentCount: await getCommentCount(doc.id),
+        ...(doc.data() as Omit<
+          PlayListDataProps,
+          'playlistId' | 'commentCount'
+        >),
+      }))
+    );
+  };
 
-  const querySnapshot = await getDocs(q);
-  const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+  if (isCommentSort) {
+    const q = query(
+      playlistCollection,
+      where('isPublic', '==', true),
+      orderBy('regDate', 'desc')
+    );
 
-  const allPlaylists = await Promise.all(
-    querySnapshot.docs.map(async (doc) => ({
-      playlistId: doc.id,
-      commentCount: await getCommentCount(doc.id),
-      ...(doc.data() as Omit<PlayListDataProps, 'playlistId' | 'commentCount'>),
-    }))
-  );
+    const allPlaylists = await fetchPlaylists(q);
+    allPlaylists.sort((a, b) => (b.commentCount ?? 0) - (a.commentCount ?? 0));
 
-  return { playlistsData: allPlaylists, nextCursor: lastVisible };
+    const startIndex = pageParam * pageSize;
+    const paginatedData = allPlaylists.slice(startIndex, startIndex + pageSize);
+    const nextCursor =
+      startIndex + pageSize < allPlaylists.length ? pageParam + 1 : null;
+
+    return { playlistsData: paginatedData, nextCursor };
+  } else {
+    let q = query(
+      playlistCollection,
+      where('isPublic', '==', true),
+      orderBy(orderByField, 'desc'),
+      limit(pageSize)
+    );
+
+    if (pageParam > 0) {
+      const previousQuery = query(
+        playlistCollection,
+        where('isPublic', '==', true),
+        orderBy(orderByField, 'desc'),
+        limit(pageParam * pageSize)
+      );
+      const previousSnapshot = await getDocs(previousQuery);
+      const lastDoc = previousSnapshot.docs[previousSnapshot.docs.length - 1];
+
+      if (lastDoc) {
+        q = query(q, startAfter(lastDoc));
+      }
+    }
+
+    const allPlaylists = await fetchPlaylists(q);
+    const nextCursor = allPlaylists.length < pageSize ? null : pageParam + 1;
+
+    return { playlistsData: allPlaylists, nextCursor };
+  }
 };
 
 export const useFetchHomePlaylists = (
   sortOption: string = '최신순',
   pageSize: number = 5
-) => {
-  const queryOptions = {
+) =>
+  useInfiniteQuery({
     queryKey: ['homePlaylists', sortOption],
-    queryFn: async ({
-      pageParam,
-    }: {
-      pageParam?: QueryDocumentSnapshot<DocumentData> | null;
-    }) => fetchHomePlaylists(pageParam || null, sortOption, pageSize),
-    getNextPageParam: (lastPage: {
-      nextCursor: QueryDocumentSnapshot<DocumentData> | null;
-    }) => lastPage.nextCursor,
-    initialPageParam: null,
-  };
-
-  return useInfiniteQuery(queryOptions);
-};
+    queryFn: ({ pageParam = 0 }) =>
+      fetchHomePlaylists(pageParam, sortOption, pageSize),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: 0,
+  });

@@ -48,7 +48,7 @@ const Home: React.FC = () => {
           <div css={emptyWrapperStyle}>
             <img src={folderIcon} alt='폴더 아이콘' />
             <div>
-              <p>검색한 결과에 해당하는 플리가 없습니다.</p>
+              <p>정렬 조건에 해당하는 플리가 없습니다.</p>
             </div>
           </div>
         ) : (

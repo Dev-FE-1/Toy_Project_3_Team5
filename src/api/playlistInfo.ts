@@ -1,3 +1,4 @@
+import firebase from 'firebase/compat/app';
 import {
   collection,
   deleteDoc,
@@ -13,6 +14,7 @@ import {
 import {
   deleteObject,
   getDownloadURL,
+  listAll,
   ref,
   uploadBytes,
 } from 'firebase/storage';
@@ -84,7 +86,7 @@ export const deletePlaylist = async (
   const docRef = doc(db, COLLECTION.playlist, `${playlistId}`);
   try {
     await deleteDoc(docRef);
-    removeThumbnail(`${playlistId}`);
+    await removeThumbnail(`${playlistId}`);
     return { status: 'success', result: true };
   } catch (err) {
     console.error(err);
@@ -116,7 +118,15 @@ const removeThumbnail = async (docId: string): Promise<boolean> => {
   const locationRef = ref(storage, path);
 
   try {
-    await deleteObject(locationRef);
+    listAll(locationRef).then((dir) => {
+      dir.items.forEach(async (fileRef) => {
+        await deleteObject(fileRef);
+      });
+      dir.prefixes.forEach(async (folderRef) => {
+        await deleteObject(folderRef);
+      });
+    });
+
     return true;
   } catch (err) {
     console.error(err);

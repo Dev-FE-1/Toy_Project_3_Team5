@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import {
   Heart,
@@ -18,6 +18,7 @@ import ROUTES from '@/constants/route';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
+import { useVisibilityStore } from '@/stores/useVisibilityStore';
 import { PlayListDataProps } from '@/types/playlistType';
 import { omittedText } from '@/utils/textUtils';
 
@@ -42,32 +43,38 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   showLockButton = false,
   showKebabMenu = false,
 }) => {
-  const { openModal } = useModalStore();
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
+  const { visibilities, toggleVisibility, setInitialVisibility } =
+    useVisibilityStore();
+  useVisibilityStore();
+  const isPublic = playlistItem.playlistId
+    ? visibilities[playlistItem.playlistId]
+    : false;
+
   const [isLiked, setIsLiked] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
-  const [isLocked, setIsLocked] = useState(!playlistItem.isPublic);
 
   const onCardClick = (): void => {
-    navigate(ROUTES.DETAIL());
+    navigate(ROUTES.DETAIL(playlistItem.playlistId));
   };
 
   const onEditBtnClick = (): void => {
-    navigate(ROUTES.PLAYLIST_MODIFY());
+    navigate(ROUTES.PLAYLIST_MODIFY(playlistItem.playlistId));
   };
 
   const onDeleteBtnClick = () => {
     openModal({
       type: 'delete',
       title: '플레이리스트 삭제',
-      content: '{플레이리스트명}을 삭제하시겠습니까?',
+      content: `'${playlistItem.description}'을 삭제하시겠습니까?`,
       onAction: () => {
         ('');
       },
     });
   };
-  const { toastTrigger } = useToast();
 
+  const { toastTrigger } = useToast();
   const { user } = useAuthStore();
 
   const onClickHeart = () => {
@@ -88,6 +95,18 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
       onClick: onDeleteBtnClick,
     },
   ];
+
+  useEffect(() => {
+    if (playlistItem.playlistId) {
+      setInitialVisibility(playlistItem.playlistId, playlistItem.isPublic);
+    }
+  }, [playlistItem.playlistId, playlistItem.isPublic, setInitialVisibility]);
+
+  const handleToggleVisibility = () => {
+    if (playlistItem.playlistId) {
+      toggleVisibility(playlistItem.playlistId);
+    }
+  };
 
   const renderLargeCard = () => (
     <article css={largeCardStyles}>
@@ -181,8 +200,8 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         )}
         {showLockButton && (
           <IconButton
-            IconComponent={isLocked ? LockKeyhole : LockKeyholeOpen}
-            onClick={() => setIsLocked(!isLocked)}
+            IconComponent={isPublic ? LockKeyholeOpen : LockKeyhole}
+            onClick={handleToggleVisibility}
             color='gray'
           />
         )}

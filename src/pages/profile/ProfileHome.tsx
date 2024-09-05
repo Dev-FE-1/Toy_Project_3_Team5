@@ -7,7 +7,7 @@ import {
   getUserComments,
   getPlaylistTitle,
   getMyPlaylistCount,
-} from '@/api/mypageInfo';
+} from '@/api/profileInfo';
 import Button from '@/components/Button';
 import CheckBox from '@/components/CheckBox';
 import IconButton from '@/components/IconButton';
@@ -27,6 +27,7 @@ interface Comment {
 export const ProfileHome = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [myPlaylistCount, setMyPlaylistCount] = useState<number>(0);
+  const [commentsPlus, setCommentsPlus] = useState<number>(7);
 
   const navigate = useNavigate();
 
@@ -47,20 +48,21 @@ export const ProfileHome = () => {
         const commentWithTitle = await Promise.all(
           userComments.map(async (comment) => {
             const playlistTitle = await getPlaylistTitle(comment.playlistId);
-            return {
-              ...comment,
-              playlistTitle,
-            };
+            return { ...comment, playlistTitle };
           })
         );
         const playlistCount = await getMyPlaylistCount(userId);
-        setMyPlaylistCount(playlistCount);
+        setMyPlaylistCount(playlistCount ?? 0);
         setComments(commentWithTitle);
       } catch (error) {}
     };
 
     fetchComments();
   }, []);
+
+  const onCommentsPlus = () => {
+    setCommentsPlus((prev) => prev + 5);
+  };
 
   const logout = async () => {
     await signOut(auth).then(() => {
@@ -113,20 +115,22 @@ export const ProfileHome = () => {
           />
         </div>
         <ul css={commentSelectStyle}>
-          {comments.map(({ playlistTitle, content }, index) => (
-            <li key={index} css={commentStyle}>
-              <CheckBox />
-              <Profile src={profileImage} alt='프로필 이미지' size='sm' />
-              <div css={commentDesStyle}>
-                <span>{playlistTitle}</span>
-                <div>{content}</div>
-              </div>
-            </li>
-          ))}
+          {comments
+            .slice(0, commentsPlus)
+            .map(({ playlistTitle, content }, index) => (
+              <li key={index} css={commentStyle}>
+                <CheckBox />
+                <Profile src={profileImage} alt='프로필 이미지' size='sm' />
+                <div css={commentDesStyle}>
+                  <span>{playlistTitle}</span>
+                  <div>{content}</div>
+                </div>
+              </li>
+            ))}
         </ul>
         <Button
           label='더보기'
-          onClick={() => {}}
+          onClick={onCommentsPlus}
           size='lg'
           fullWidth
           color='gray'
@@ -271,4 +275,5 @@ const logoutStyle = css`
   color: ${colors.gray05};
   padding: 14px;
   cursor: pointer;
+  margin-bottom: 75px;
 `;

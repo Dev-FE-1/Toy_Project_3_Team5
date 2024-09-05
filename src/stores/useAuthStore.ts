@@ -25,7 +25,11 @@ interface AuthState {
   isFirstLogin: boolean;
   setUser: (user: User | null) => void;
   clearUser: () => void;
-  fetchUserData: (id: string) => void;
+  fetchUserData: (userId: string) => void;
+  addLikedPlaylistItem: (playlistId: number) => void;
+  addSavedPlaylistItem: (playlistId: number) => void;
+  removeLikedPlaylistItem: (playlistId: number) => void;
+  removeSavedPlaylistItem: (playlistId: number) => void;
 }
 
 type AuthPersist = (
@@ -46,7 +50,6 @@ export const useAuthStore = create<AuthState>(
       channelFollowing: [],
       tags: [],
       isFirstLogin: true,
-
       setUser: (user) => set({ user }),
       clearUser: () =>
         set({
@@ -58,6 +61,9 @@ export const useAuthStore = create<AuthState>(
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
+
+          console.log(id);
+          console.log(data);
 
           set({
             profileImage: data?.profileImg || '',
@@ -71,6 +77,22 @@ export const useAuthStore = create<AuthState>(
           });
         }
       },
+      addLikedPlaylistItem: (playlistId) =>
+        set((state) => ({
+          likedPlaylist: [...state.likedPlaylist, playlistId],
+        })),
+      addSavedPlaylistItem: (playlistId) =>
+        set((state) => ({
+          savedPlaylist: [...state.savedPlaylist, playlistId],
+        })),
+      removeLikedPlaylistItem: (playlistId) =>
+        set((state) => ({
+          likedPlaylist: state.likedPlaylist.filter((i) => i !== playlistId),
+        })),
+      removeSavedPlaylistItem: (playlistId) =>
+        set((state) => ({
+          savedPlaylist: state.savedPlaylist.filter((i) => i !== playlistId),
+        })),
     }),
     {
       name: 'auth-storage',
@@ -103,19 +125,16 @@ onAuthStateChanged(auth, async (user) => {
   setUser(user);
   if (user) {
     const email = user.email || '';
-    const userIdFromEmail = email.split('@')[0];
+    const userId = email.split('@')[0];
 
     const usersCollectionRef = collection(db, 'users');
     const userQuery = query(usersCollectionRef, where('uid', '==', user.uid));
     const querySnapshot = await getDocs(userQuery);
 
     if (!querySnapshot.empty) {
-      const userDoc = querySnapshot.docs[0];
-      const { id } = userDoc;
+      useAuthStore.setState({ userId });
 
-      useAuthStore.setState({ userId: userIdFromEmail });
-
-      fetchUserData(id);
+      fetchUserData(userId);
     } else {
       console.error('User not found in Firestore');
     }

@@ -12,12 +12,14 @@ import {
 import Button from '@/components/Button';
 import CheckBox from '@/components/CheckBox';
 import IconButton from '@/components/IconButton';
+import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import { auth, db } from '@/firebase/firbaseConfig';
 import { useAuthStore } from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
 
 interface Comment {
   id: string;
@@ -33,6 +35,7 @@ export const ProfileHome = () => {
   const [checkedComments, setCheckedComments] = useState<string[]>([]);
   const [allChecked, setAllChecked] = useState<boolean>(false);
 
+  const { openModal } = useModalStore();
   const navigate = useNavigate();
 
   const {
@@ -113,6 +116,15 @@ export const ProfileHome = () => {
     });
   };
 
+  const onDeleteButtonClick = () => {
+    openModal({
+      type: 'delete',
+      title: '댓글 삭제',
+      content: '댓글을 삭제하시겠습니까?',
+      onAction: deleteSelectedComments,
+    });
+  };
+
   return (
     <div css={containerStyle}>
       <div css={profileContainerStyle}>
@@ -153,7 +165,7 @@ export const ProfileHome = () => {
           </button>
           <IconButton
             IconComponent={Trash2}
-            onClick={deleteSelectedComments}
+            onClick={onDeleteButtonClick}
             size='md'
             color='red'
           />
@@ -192,6 +204,7 @@ export const ProfileHome = () => {
         />
         로그아웃
       </div>
+      <Modal />
     </div>
   );
 };

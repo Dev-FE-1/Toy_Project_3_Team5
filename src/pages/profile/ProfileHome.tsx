@@ -166,41 +166,49 @@ export const ProfileHome = () => {
       </div>
       <div css={commentContainerStyle}>
         <div css={commentHeaderStyle}>내가 쓴 댓글 {comments.length}</div>
-        <div css={deleteContainerStyle}>
-          <button css={allSelectBtnStyle} onClick={onAllComments}>
-            {allChecked ? '전체 해제' : '전체 선택'}
-          </button>
-          <IconButton
-            IconComponent={Trash2}
-            onClick={onDeleteButtonClick}
-            size='md'
-            color='red'
-          />
-        </div>
-        <ul css={commentSelectStyle}>
-          {comments
-            .slice(0, commentsPlus)
-            .map(({ id, playlistTitle, content }, index) => (
-              <li key={index} css={commentStyle}>
-                <CheckBox
-                  checked={checkedComments.includes(id)}
-                  onChange={(isChecked) => commentSelection(id, isChecked)}
-                />
-                <Profile src={profileImage} alt='프로필 이미지' size='sm' />
-                <div css={commentDesStyle}>
-                  <span>{playlistTitle}</span>
-                  <div>{content}</div>
-                </div>
-              </li>
-            ))}
-        </ul>
-        <Button
-          label='더보기'
-          onClick={onCommentsPlus}
-          size='lg'
-          fullWidth
-          color='gray'
-        />
+        {comments.length === 0 ? (
+          <div css={emptyCommentStyle}>댓글 목록이 없어요.</div>
+        ) : (
+          <>
+            <div css={deleteContainerStyle}>
+              <button css={allSelectBtnStyle} onClick={onAllComments}>
+                {allChecked ? '전체 해제' : '전체 선택'}
+              </button>
+              <IconButton
+                IconComponent={Trash2}
+                onClick={onDeleteButtonClick}
+                size='md'
+                color='red'
+              />
+            </div>
+            <ul css={commentSelectStyle}>
+              {comments
+                .slice(0, commentsPlus)
+                .map(({ id, playlistTitle, content }, index) => (
+                  <li key={index} css={commentStyle}>
+                    <CheckBox
+                      checked={checkedComments.includes(id)}
+                      onChange={(isChecked) => commentSelection(id, isChecked)}
+                    />
+                    <Profile src={profileImage} alt='프로필 이미지' size='sm' />
+                    <div css={commentDesStyle}>
+                      <span>{playlistTitle}</span>
+                      <div>{content}</div>
+                    </div>
+                  </li>
+                ))}
+            </ul>
+            {comments.length > commentsPlus && (
+              <Button
+                label='더보기'
+                onClick={onCommentsPlus}
+                size='lg'
+                fullWidth
+                color='gray'
+              />
+            )}
+          </>
+        )}
       </div>
       <div css={logoutStyle} onClick={logout}>
         <IconButton
@@ -346,4 +354,13 @@ const logoutStyle = css`
   padding: 14px;
   cursor: pointer;
   margin-bottom: 75px;
+`;
+
+const emptyCommentStyle = css`
+  height: calc(100vh - 520px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${colors.gray05};
+  font-size: ${fontSize.md};
 `;

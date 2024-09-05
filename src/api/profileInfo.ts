@@ -14,6 +14,7 @@ const getUserComments = async (userId: string) => {
     const q = query(comments, where('userId', '==', userId));
     const querySnapshot = await getDocs(q);
     const userComments = querySnapshot.docs.map((doc) => ({
+      commentsId: doc.id,
       content: doc.data().content,
       playlistId: doc.data().playlistId,
     }));

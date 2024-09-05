@@ -1,27 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { css } from '@emotion/react';
 import { Check, Square } from 'lucide-react';
 import colors from '@/constants/colors';
 
 interface CheckboxProps {
-  checked?: boolean;
-  onChange?: (checked: boolean) => void;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
 }
 
 const CheckBox: React.FC<CheckboxProps> = ({ checked = false, onChange }) => {
-  const [isChecked, setIsChecked] = useState(checked);
-
   const onCheckBoxChange = () => {
-    setIsChecked(!isChecked);
-    if (onChange) {
-      onChange(!isChecked);
-    }
+    onChange(!checked);
   };
 
   return (
     <div onClick={onCheckBoxChange} css={checkBoxContainer}>
       <Square css={checkBoxStyle} size={24} color={colors.gray05} />
-      {isChecked && <Check css={checkStyle} size={20} color={colors.white} />}
+      {checked && <Check css={checkStyle} size={20} color={colors.white} />}
     </div>
   );
 };

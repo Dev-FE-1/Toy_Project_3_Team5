@@ -41,8 +41,7 @@ const Navbar: React.FC = () => {
 
         const onClick = () => {
           if (list.label === '마이플리' && userId) {
-            const route = `/playlist/${userId}`;
-            navigate(route);
+            navigate(ROUTES.PLAYLIST(userId));
           } else {
             navigate(list.to);
           }

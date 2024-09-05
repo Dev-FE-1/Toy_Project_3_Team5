@@ -11,7 +11,7 @@ interface VideoProps {
 
 const MAX_LENGTH = {
   title: 50,
-  name: 15,
+  name: 20,
 };
 
 const Video = ({ imgUrl, title, userName }: VideoProps) => (
@@ -28,12 +28,16 @@ const Video = ({ imgUrl, title, userName }: VideoProps) => (
 const VideoContainer = css`
   display: flex;
   cursor: pointer;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 `;
 
 const ThumbnailStyle = css`
-  width: 128px;
-  height: 72px;
+  width: 100px;
+  height: 75px;
+  max-width: 100px;
+  max-height: 75px;
+  min-width: 100px;
+  min-height: 75px;
   margin-right: 10px;
   border-radius: 10px;
 `;

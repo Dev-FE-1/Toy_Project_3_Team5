@@ -10,8 +10,10 @@ import { omittedText } from '@/utils/textUtils';
 
 export interface AddedLinkProps extends VideoProps {
   videoId: string;
+  isLinkView?: boolean;
   link: string;
-  onRemove: (videoId: string) => void;
+  isRemovable?: boolean;
+  onRemove?: (videoId: string) => void;
   isDragNDrop?: boolean;
   onDragNDrop?: () => void;
 }
@@ -19,7 +21,9 @@ export interface AddedLinkProps extends VideoProps {
 const AddedVideo: React.FC<AddedLinkProps> = ({
   videoId,
   imgUrl,
+  isRemovable = true,
   onRemove,
+  isLinkView = true,
   link,
   title,
   userName,
@@ -36,13 +40,15 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
     )}
     <div css={linkInfoStyle}>
       <div css={videoLinkStyle}>
-        <p title={link}>{omittedText(link, 40)}</p>
-        <IconButton
-          IconComponent={X}
-          onClick={() => {
-            onRemove(videoId);
-          }}
-        />
+        {isLinkView && <p title={link}>{omittedText(link, 40)}</p>}
+        {isRemovable && onRemove && (
+          <IconButton
+            IconComponent={X}
+            onClick={() => {
+              onRemove(videoId);
+            }}
+          />
+        )}
       </div>
       <Video imgUrl={imgUrl} title={title} userName={userName} />
     </div>
@@ -52,7 +58,8 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
 const videoItemStyle = css`
   display: flex;
   width: calc(100vw - 40px);
-  max-width: calc(430px - 40px);
+  /* max-width: calc(430px - 40px); */
+  max-width: 100%;
   margin-bottom: 10px;
   border: 1px solid ${colors.gray02};
   border-radius: 5px;

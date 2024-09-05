@@ -7,7 +7,7 @@ import Button from '@/components/Button';
 import Comment from '@/components/Comment';
 import IconButton from '@/components/IconButton';
 import MiniPlaylist from '@/components/MiniPlaylist';
-import { AddedLinkProps } from '@/components/playlist/AddedVideo';
+import AddedVideo, { AddedLinkProps } from '@/components/playlist/AddedVideo';
 import Profile from '@/components/Profile';
 import Toggle from '@/components/Toggle';
 import Video from '@/components/Video';
@@ -72,6 +72,7 @@ const Detail = () => {
 
   const playlistInfo: PlayListDataProps = fetchTestData;
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
+  const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
@@ -79,9 +80,16 @@ const Detail = () => {
 
   useEffect(() => {
     (async () => {
-      const { result } = await getVideoInfo(playlistInfo.links[0]);
-      if (!!!result) return;
-      setCurrentVideo(result);
+      // const { result } = await getVideoInfo(playlistInfo.links);
+      // if (!!!result) return;
+      // setCurrentVideo(result);
+
+      playlistInfo.links.map(async (link, index) => {
+        const { result } = await getVideoInfo(link);
+        if (result) videoList.push(result);
+        if (index === 0) setCurrentVideo(result);
+      });
+
       // const embedCode = makeEmbedUrl(result.videoId, 'youtube');
       // setEmbedLink(embedCode);
     })();
@@ -89,8 +97,7 @@ const Detail = () => {
 
   return (
     <div css={containerStyle}>
-      <h1>디테일페이지</h1>
-      {currentVideo && playlistInfo && (
+      {currentVideo && (
         <div css={currentVideoStyle}>
           <iframe
             css={iframeStyle}
@@ -99,15 +106,18 @@ const Detail = () => {
             allowFullScreen
             title={currentVideo.title}
           />
-          <div css={videoTextDivStyle}>
-            <div css={videoTitleStyle}>
-              {omittedText(currentVideo?.title, MAX_LENGTH.videoTitle)}
-            </div>
-            <div css={playlistTagStyle}>
-              {playlistInfo.tags.map((tag, index) => (
-                <div key={index}>{tag}</div>
-              ))}
-            </div>
+        </div>
+      )}
+
+      {currentVideo && (
+        <div css={videoTextDivStyle}>
+          <div css={videoTitleStyle}>
+            {omittedText(currentVideo?.title, MAX_LENGTH.videoTitle)}
+          </div>
+          <div css={playlistTagStyle}>
+            {playlistInfo.tags.map((tag, index) => (
+              <div key={index}>{tag}</div>
+            ))}
           </div>
         </div>
       )}
@@ -185,14 +195,7 @@ const Detail = () => {
               shape='round'
             />
           </div>
-          <div
-            css={css`
-              display: flex;
-              justify-content: space-evenly;
-              border-top: 1px solid ${colors.gray02};
-              border-bottom: 1px solid ${colors.gray02};
-            `}
-          >
+          <div css={userInfoStyle}>
             <IconButton
               IconComponent={Heart}
               onClick={() => {}}
@@ -212,20 +215,28 @@ const Detail = () => {
               label='저장'
             />
           </div>
-          <div>
+          <div css={oneLineStyle}>
             <Toggle
               enabled={autoPlay}
               setEnabled={setAutoPlay}
               label={{ active: '다음으로 재생될 영상', inactive: '' }}
             />
           </div>
-          <div>
-            <Video imgUrl={''} title='프라하~' userName='asiunvsidjv(닉네임)' />
-            <Video
-              imgUrl={''}
-              title='영상제목입니다.'
-              userName='asiunvsidjv(닉네임)'
-            />
+          <div css={videoListInfoStyle(true, 1)}>
+            {videoList &&
+              videoList.map((video, index) => (
+                <AddedVideo
+                  key={`video-${index}`}
+                  videoId={video.videoId}
+                  imgUrl={video.imgUrl}
+                  link={video.link}
+                  title={video.title}
+                  userName={video.userName}
+                  isDragNDrop={false}
+                  isRemovable={false}
+                  isLinkView={false}
+                />
+              ))}
           </div>
         </div>
       )}
@@ -310,15 +321,25 @@ const containerStyle = css`
   flex-direction: column;
 `;
 
-const currentVideoStyle = css``;
+const currentVideoStyle = css`
+  width: 430px; // 영상 상단 고정에 필요한 값
+  height: 242px; // 영상 상단 고정에 필요한 값
+  display: block;
+`;
 
 const iframeStyle = css`
   width: 430px;
   height: 242px;
+  position: fixed; // 영상 상단 고정
+  z-index: 1000;
 `;
 
 const videoTextDivStyle = css`
   padding: 10px 20px;
+  z-index: 0;
+  & > * {
+    z-index: 0;
+  }
 `;
 
 const videoTitleStyle = css`
@@ -343,12 +364,13 @@ const playlistInfoStyle = css`
   border-radius: 10px;
   padding: 10px;
   gap: 5px;
-  margin: 10px;
+  margin: 10px 20px;
 `;
 
 const oneLineStyle = css`
   display: flex;
   flex-direction: row;
+  margin: 10px 0;
 `;
 
 const headerDetailStyle = css`
@@ -375,6 +397,31 @@ const descStyle = css`
     &:hover {
       color: ${colors.primaryLight};
     }
+  }
+`;
+
+const userInfoStyle = css`
+  ${oneLineStyle};
+
+  display: flex;
+  justify-content: space-evenly;
+  border-top: 1px solid ${colors.gray02};
+  border-bottom: 1px solid ${colors.gray02};
+`;
+
+const videoListInfoStyle = (isScroll: boolean, currentIndex: number) => css`
+  ${oneLineStyle};
+  flex-direction: column;
+
+  ${isScroll &&
+  css`
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  `}
+
+  &>div:nth-child(${currentIndex}) {
+    background-color: ${colors.gray02};
   }
 `;
 

@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
+import { useChannelFetch } from '@/api/followingPlaylists';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
-import useChannelFetch from '@/hooks/useChannelFetch';
 import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylistFetch';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -34,7 +34,7 @@ const Following = () => {
       }
     },
     {
-      root: document.querySelector('.scroll-container'),
+      root: null,
       rootMargin: '0px 0px -20px 0px',
       threshold: 0.5,
     }
@@ -43,7 +43,6 @@ const Following = () => {
   const onFollowingChannelClick = (channelId: string) => {
     setSelectedChannel(selectedChannel === channelId ? userId : channelId);
   };
-
   const followingList = channels.map((channel) => ({
     id: channel.id,
     alt: '썸네일',
@@ -86,7 +85,9 @@ const Following = () => {
         {playlists.map((playlist, index) => (
           <PlaylistCard key={index} playlistItem={playlist} size='large' />
         ))}
-        {isFetching && playlists.length >= PAGE_SIZE && <LoadingSpinner />}
+        <div css={loadingSpinnerStyle}>
+          {isFetching && playlists.length >= PAGE_SIZE && <LoadingSpinner />}
+        </div>
         <div
           ref={infiniteScrollRef}
           style={{ minHeight: '72px', width: '100%' }}
@@ -140,5 +141,9 @@ const playlistContainer = css`
   gap: 20px;
   padding: 100px 20px 20px 20px;
 `;
-
+const loadingSpinnerStyle = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 export default Following;

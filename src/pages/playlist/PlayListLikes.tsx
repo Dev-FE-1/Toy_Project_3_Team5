@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { useChennelData } from '@/api/chennelInfo';
 import { useFetchLikedPlaylist } from '@/api/myplaylists';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -17,6 +18,9 @@ const PAGE_SIZE = 5;
 
 export const PlayListLikes = () => {
   const navigate = useNavigate();
+  const { userId } = useParams<{ userId: string }>();
+  const { chennelData } = useChennelData(userId);
+
   const [filterOptions, setFilterOptions] = useState<number[]>([0]);
 
   const optionGroups = [
@@ -67,12 +71,14 @@ export const PlayListLikes = () => {
             selectedIndexes={filterOptions}
             setSelectedIndexes={setFilterOptions}
           />
-          <Button
-            label='플레이리스트 생성'
-            IconComponent={Plus}
-            shape='text'
-            onClick={onAddBtnClick}
-          />
+          {chennelData?.isMyChannel && (
+            <Button
+              label='플레이리스트 생성'
+              IconComponent={Plus}
+              shape='text'
+              onClick={onAddBtnClick}
+            />
+          )}
         </div>
         {sortedPlaylist.length > 0 && (
           <p>총 {sortedPlaylist.length}개의 플리</p>
@@ -122,7 +128,7 @@ const homeContainerStyles = css`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px 20px;
+  padding: 12px 20px 0 20px;
   height: calc(100% - ${profileHeight} - ${tabHeight});
 
   .filter-area {

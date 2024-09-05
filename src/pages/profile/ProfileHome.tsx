@@ -31,6 +31,7 @@ export const ProfileHome = () => {
   const [myPlaylistCount, setMyPlaylistCount] = useState<number>(0);
   const [commentsPlus, setCommentsPlus] = useState<number>(7);
   const [checkedComments, setCheckedComments] = useState<string[]>([]);
+  const [allChecked, setAllChecked] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -95,6 +96,16 @@ export const ProfileHome = () => {
     setCommentsPlus((prev) => prev + 5);
   };
 
+  const onAllComments = () => {
+    if (allChecked) {
+      setCheckedComments([]);
+    } else {
+      const allCommentIds = comments.map((comment) => comment.id);
+      setCheckedComments(allCommentIds);
+    }
+    setAllChecked(!allChecked);
+  };
+
   const logout = async () => {
     await signOut(auth).then(() => {
       clearUser();
@@ -137,7 +148,9 @@ export const ProfileHome = () => {
       <div css={commentContainerStyle}>
         <div css={commentHeaderStyle}>내가 쓴 댓글 {comments.length}</div>
         <div css={deleteContainerStyle}>
-          <button css={allSelectBtnStyle}>전체 선택</button>
+          <button css={allSelectBtnStyle} onClick={onAllComments}>
+            {allChecked ? '전체 해제' : '전체 선택'}
+          </button>
           <IconButton
             IconComponent={Trash2}
             onClick={deleteSelectedComments}

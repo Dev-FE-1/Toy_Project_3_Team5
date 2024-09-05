@@ -1,0 +1,448 @@
+[
+  {
+    "docid": "1",
+    "userId": "test1234",
+    "tags": ["#음악", "#코딩", "#경건해지는 마음"],
+    "links": [
+      "https://www.youtube.com/watch?v=n6B5gQXlB-0",
+      "https://www.youtube.com/watch?v=lzm-7YfBJBU",
+      "https://www.youtube.com/watch?v=yss4rIrHl6o"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_022b0e10-ed50-47b9-9b4b-d686d8fa170a.jpg?alt=media&token=9d1ca5cf-9699-44aa-9051-b4d895a61f87",
+    "likes": 5000,
+    "regDate": "2024-09-02T17:55:50.181Z",
+    "description": "경건해지는 인급동 노래모음",
+    "title": "인급동 노래모음 9월3일",
+    "isPublic": true
+  },
+  {
+    "docid": "2",
+    "userId": "test1234",
+    "tags": ["#음악", "#코딩"],
+    "links": [
+      "https://www.youtube.com/watch?v=n6B5gQXlB-0",
+      "https://www.youtube.com/watch?v=yss4rIrHl6o"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_15b30316-4861-4c9c-a470-9ca00d022bbf.jpg?alt=media&token=4fed1331-d47f-41c6-a5ea-7a3d1a7375d3",
+    "likes": 5000,
+    "regDate": "2024-09-02T17:55:50.181Z",
+    "description": "경건해지는 인급동 노래모음2",
+    "title": "인급동 노래모음 9월3일 2회차",
+    "isPublic": true
+  },
+  {
+    "docid": "3",
+    "userId": "test1234",
+    "tags": ["#팝", "#드라마"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_846fb20a-aca5-4788-bb95-4aff67abd690.jpg?alt=media&token=9c75e077-738e-4722-af3f-2797ec55e37a",
+    "likes": 34,
+    "regDate": "2024-09-02T17:55:50.181Z",
+    "description": "팝과 드라마 장르의 다양한 매력을 담은 플레이리스트입니다.",
+    "title": "다양한 팝과 드라마",
+    "isPublic": true
+  },
+  {
+    "docid": "4",
+    "userId": "test1234",
+    "tags": ["#록", "#판타지"],
+    "links": ["https://www.youtube.com/watch?v=05BmN1WX_xw"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a7dea79d-d0a8-4841-bc76-10674fc581c2.jpg?alt=media&token=c3d09ac3-9764-4770-baf4-34fb87062537",
+    "likes": 22,
+    "regDate": "2024-08-30-14-00",
+    "description": "록과 판타지 장르의 신비로운 조화를 담은 플레이리스트입니다.",
+    "title": "신비로운 록과 판타지",
+    "isPublic": false
+  },
+  {
+    "docid": "5",
+    "userId": "test1234",
+    "tags": ["#재즈", "#일렉트로닉"],
+    "links": [
+      "https://www.youtube.com/watch?v=6CHs4x2uqcQ",
+      "https://www.youtube.com/watch?v=_41K4CpsZwg"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_7f700cef-e503-4304-b38b-73d3a5302653.jpg?alt=media&token=395a16db-ac49-462c-a76c-0236b051e519",
+    "likes": 19,
+    "regDate": "2024-08-30-16-20",
+    "description": "재즈와 일렉트로닉 장르의 독특한 조화를 담은 플레이리스트입니다.",
+    "title": "독특한 재즈와 일렉트로닉",
+    "isPublic": true
+  },
+  {
+    "docid": "6",
+    "userId": "test1234",
+    "tags": ["#호러", "#드라마"],
+    "links": ["https://www.youtube.com/watch?v=rNZrgK-MX_s&t=1912s"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_b938fb8c-c88c-4894-b4f7-f33661bb7c63.jpg?alt=media&token=7907b7cc-7dc7-499c-861a-789aa04deda6",
+    "likes": 26,
+    "regDate": "2024-08-30-13-50",
+    "description": "호러와 드라마 장르의 감성적인 조화를 담은 플레이리스트입니다.",
+    "title": "감성적인 호러와 드라마",
+    "isPublic": false
+  },
+  {
+    "docid": "7",
+    "userId": "test1234",
+    "tags": ["#코미디", "#인디"],
+    "links": [
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1",
+      "https://www.youtube.com/watch?v=05BmN1WX_xw"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a2aa0e69-7920-4054-a9b4-38efef560734.jpg?alt=media&token=bcc7f0a6-5eb2-425b-b8e6-b978edad2274",
+    "likes": 24,
+    "regDate": "2024-08-30-18-10",
+    "description": "코미디와 인디 장르의 유쾌한 조화를 담은 플레이리스트입니다.",
+    "title": "유쾌한 코미디와 인디",
+    "isPublic": true
+  },
+  {
+    "docid": "8",
+    "userId": "test1234",
+    "tags": ["#재즈", "#드라마"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=rNZrgK-MX_s&t=1912s"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_ad78363d-aa13-4c6c-8da3-5222b716ea4b.jpg?alt=media&token=f8b14f97-a6e3-41dd-b82a-96ff449e9960",
+    "likes": 28,
+    "regDate": "2024-08-30-15-00",
+    "description": "재즈와 드라마 장르의 감성적인 조화를 담은 플레이리스트입니다.",
+    "title": "감성적인 재즈와 드라마",
+    "isPublic": false
+  },
+  {
+    "docid": "9",
+    "userId": "test1234",
+    "tags": ["#팝", "#일렉트로닉"],
+    "links": ["https://www.youtube.com/watch?v=05BmN1WX_xw"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_846fb20a-aca5-4788-bb95-4aff67abd690.jpg?alt=media&token=9c75e077-738e-4722-af3f-2797ec55e37a",
+    "likes": 20,
+    "regDate": "2024-08-30-17-30",
+    "description": "팝과 일렉트로닉 장르의 신나는 조화를 담은 플레이리스트입니다.",
+    "title": "신나는 팝과 일렉트로닉",
+    "isPublic": true
+  },
+  {
+    "docid": "10",
+    "userId": "test1234",
+    "tags": ["#판타지", "#드라마"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1",
+      "https://www.youtube.com/watch?v=rNZrgK-MX_s&t=1912s"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_15b30316-4861-4c9c-a470-9ca00d022bbf.jpg?alt=media&token=4fed1331-d47f-41c6-a5ea-7a3d1a7375d3",
+    "likes": 29,
+    "regDate": "2024-08-30-11-45",
+    "description": "판타지와 드라마 장르의 신비로운 조화를 담은 플레이리스트입니다.",
+    "title": "신비로운 판타지와 드라마",
+    "isPublic": true
+  },
+  {
+    "docid": "11",
+    "userId": "test1234",
+    "tags": ["#호러", "#인디"],
+    "links": [
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a7dea79d-d0a8-4841-bc76-10674fc581c2.jpg?alt=media&token=c3d09ac3-9764-4770-baf4-34fb87062537",
+    "likes": 27,
+    "regDate": "2024-08-30-19-10",
+    "description": "호러와 인디 장르의 독특한 조화를 담은 플레이리스트입니다.",
+    "title": "독특한 호러와 인디",
+    "isPublic": false
+  },
+
+  {
+    "docid": "12",
+    "userId": "test1234",
+    "tags": ["#재즈", "#코미디"],
+    "links": ["https://www.youtube.com/watch?v=_41K4CpsZwg"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a2aa0e69-7920-4054-a9b4-38efef560734.jpg?alt=media&token=bcc7f0a6-5eb2-425b-b8e6-b978edad2274",
+    "likes": 21,
+    "regDate": "2024-08-30-12-15",
+    "description": "재즈와 코미디 장르의 즐거운 조화를 담은 플레이리스트입니다.",
+    "title": "즐거운 재즈와 코미디",
+    "isPublic": true
+  },
+  {
+    "docid": "13",
+    "userId": "test1234",
+    "tags": ["#코미디", "#팝"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1",
+      "https://www.youtube.com/watch?v=05BmN1WX_xw"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_ad78363d-aa13-4c6c-8da3-5222b716ea4b.jpg?alt=media&token=f8b14f97-a6e3-41dd-b82a-96ff449e9960",
+    "likes": 26,
+    "regDate": "2024-08-30-20-00",
+    "description": "코미디와 팝 장르의 신나는 조화를 담은 플레이리스트입니다.",
+    "title": "신나는 코미디와 팝",
+    "isPublic": false
+  },
+  {
+    "docid": "14",
+    "userId": "test1234",
+    "tags": ["#일렉트로닉", "#판타지"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1",
+      "https://www.youtube.com/watch?v=05BmN1WX_xw"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_846fb20a-aca5-4788-bb95-4aff67abd690.jpg?alt=media&token=9c75e077-738e-4722-af3f-2797ec55e37a",
+    "likes": 30,
+    "regDate": "2024-08-30-21-20",
+    "description": "일렉트로닉과 판타지 장르의 신비로운 조화를 담은 플레이리스트입니다.",
+    "title": "신비로운 일렉트로닉과 판타지",
+    "isPublic": true
+  },
+  {
+    "docid": "15",
+    "userId": "test1234",
+    "tags": ["#드라마", "#팝"],
+    "links": [
+      "https://www.youtube.com/watch?v=05BmN1WX_xw",
+      "https://www.youtube.com/watch?v=6CHs4x2uqcQ"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_7f700cef-e503-4304-b38b-73d3a5302653.jpg?alt=media&token=395a16db-ac49-462c-a76c-0236b051e519",
+    "likes": 25,
+    "regDate": "2024-08-30-10-30",
+    "description": "드라마와 팝 장르의 감성적인 조화를 담은 플레이리스트입니다.",
+    "title": "감성적인 드라마와 팝",
+    "isPublic": true
+  },
+  {
+    "docid": "16",
+    "userId": "test1234",
+    "tags": ["#코미디", "#일렉트로닉"],
+    "links": ["https://www.youtube.com/watch?v=6CHs4x2uqcQ"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a7dea79d-d0a8-4841-bc76-10674fc581c2.jpg?alt=media&token=c3d09ac3-9764-4770-baf4-34fb87062537",
+    "likes": 23,
+    "regDate": "2024-08-30-11-30",
+    "description": "코미디와 일렉트로닉 장르의 신나는 조화를 담은 플레이리스트입니다.",
+    "title": "신나는 코미디와 일렉트로닉",
+    "isPublic": false
+  },
+  {
+    "docid": "17",
+    "userId": "test1234",
+    "tags": ["#인디", "#판타지"],
+    "links": [
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1",
+      "https://www.youtube.com/watch?v=rNZrgK-MX_s&t=1912s"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_022b0e10-ed50-47b9-9b4b-d686d8fa170a.jpg?alt=media&token=9d1ca5cf-9699-44aa-9051-b4d895a61f87",
+    "likes": 27,
+    "regDate": "2024-08-30-13-05",
+    "description": "인디와 판타지 장르의 독특한 조화를 담은 플레이리스트입니다.",
+    "title": "독특한 인디와 판타지",
+    "isPublic": true
+  },
+  {
+    "docid": "18",
+    "userId": "test1234",
+    "tags": ["#호러", "#일렉트로닉"],
+    "links": ["https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_15b30316-4861-4c9c-a470-9ca00d022bbf.jpg?alt=media&token=4fed1331-d47f-41c6-a5ea-7a3d1a7375d3",
+    "likes": 31,
+    "regDate": "2024-08-30-12-00",
+    "description": "호러와 일렉트로닉 장르의 신비로운 조화를 담은 플레이리스트입니다.",
+    "title": "신비로운 호러와 일렉트로닉",
+    "isPublic": false
+  },
+  {
+    "docid": "19",
+    "userId": "test1234",
+    "tags": ["#코미디", "#재즈"],
+    "links": [
+      "https://www.youtube.com/watch?v=_41K4CpsZwg",
+      "https://www.youtube.com/watch?v=rNZrgK-MX_s&t=1912s"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a2aa0e69-7920-4054-a9b4-38efef560734.jpg?alt=media&token=bcc7f0a6-5eb2-425b-b8e6-b978edad2274",
+    "likes": 26,
+    "regDate": "2024-08-30-14-45",
+    "description": "코미디와 재즈 장르의 유쾌한 조화를 담은 플레이리스트입니다.",
+    "title": "유쾌한 코미디와 재즈",
+    "isPublic": true
+  },
+  {
+    "docid": "20",
+    "userId": "test1234",
+    "tags": ["#드라마", "#일렉트로닉"],
+    "links": [
+      "https://www.youtube.com/watch?v=05BmN1WX_xw",
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a7dea79d-d0a8-4841-bc76-10674fc581c2.jpg?alt=media&token=c3d09ac3-9764-4770-baf4-34fb87062537",
+    "likes": 30,
+    "regDate": "2024-08-30-15-30",
+    "description": "드라마와 일렉트로닉 장르의 신나는 조화를 담은 플레이리스트입니다.",
+    "title": "신나는 드라마와 일렉트로닉",
+    "isPublic": false
+  },
+  {
+    "docid": "21",
+    "userId": "test1234",
+    "tags": ["#호러", "#팝"],
+    "links": [
+      "https://www.youtube.com/watch?v=6CHs4x2uqcQ",
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_ad78363d-aa13-4c6c-8da3-5222b716ea4b.jpg?alt=media&token=f8b14f97-a6e3-41dd-b82a-96ff449e9960",
+    "likes": 28,
+    "regDate": "2024-08-30-16-30",
+    "description": "호러와 팝 장르의 신비로운 조화를 담은 플레이리스트입니다.",
+    "title": "신비로운 호러와 팝",
+    "isPublic": true
+  },
+  {
+    "docid": "22",
+    "userId": "test1234",
+    "tags": ["#재즈", "#판타지"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=05BmN1WX_xw",
+      "https://www.youtube.com/watch?v=rNZrgK-MX_s&t=1912s"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_b938fb8c-c88c-4894-b4f7-f33661bb7c63.jpg?alt=media&token=7907b7cc-7dc7-499c-861a-789aa04deda6",
+    "likes": 29,
+    "regDate": "2024-08-30-17-20",
+    "description": "재즈와 판타지 장르의 감성적인 조화를 담은 플레이리스트입니다.",
+    "title": "감성적인 재즈와 판타지",
+    "isPublic": false
+  },
+  {
+    "docid": "23",
+    "userId": "test1234",
+    "tags": ["#코미디", "#재즈"],
+    "links": ["https://www.youtube.com/watch?v=05BmN1WX_xw"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_ad78363d-aa13-4c6c-8da3-5222b716ea4b.jpg?alt=media&token=f8b14f97-a6e3-41dd-b82a-96ff449e9960",
+    "likes": 25,
+    "regDate": "2024-08-30-18-00",
+    "description": "코미디와 재즈 장르의 독특한 조화를 담은 플레이리스트입니다.",
+    "title": "독특한 코미디와 재즈",
+    "isPublic": true
+  },
+  {
+    "docid": "24",
+    "userId": "test1234",
+    "tags": ["#인디", "#드라마"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1",
+      "https://www.youtube.com/watch?v=6CHs4x2uqcQ"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_846fb20a-aca5-4788-bb95-4aff67abd690.jpg?alt=media&token=9c75e077-738e-4722-af3f-2797ec55e37a",
+    "likes": 24,
+    "regDate": "2024-08-30-19-45",
+    "description": "인디와 드라마 장르의 다양한 매력을 담은 플레이리스트입니다.",
+    "title": "다양한 인디와 드라마",
+    "isPublic": true
+  },
+  {
+    "docid": "25",
+    "userId": "test1234",
+    "tags": ["#호러", "#일렉트로닉"],
+    "links": [
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_022b0e10-ed50-47b9-9b4b-d686d8fa170a.jpg?alt=media&token=9d1ca5cf-9699-44aa-9051-b4d895a61f87",
+    "likes": 22,
+    "regDate": "2024-08-30-20-15",
+    "description": "호러와 일렉트로닉 장르의 신비로운 조화를 담은 플레이리스트입니다.",
+    "title": "신비로운 호러와 일렉트로닉",
+    "isPublic": false
+  },
+  {
+    "docid": "26",
+    "userId": "test1234",
+    "tags": ["#팝", "#코미디"],
+    "links": [
+      "https://www.youtube.com/watch?v=05BmN1WX_xw",
+      "https://www.youtube.com/watch?v=_41K4CpsZwg"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_15b30316-4861-4c9c-a470-9ca00d022bbf.jpg?alt=media&token=4fed1331-d47f-41c6-a5ea-7a3d1a7375d3",
+    "likes": 30,
+    "regDate": "2024-08-30-21-00",
+    "description": "팝과 코미디 장르의 신나는 조화를 담은 플레이리스트입니다.",
+    "title": "신나는 팝과 코미디",
+    "isPublic": true
+  },
+  {
+    "docid": "27",
+    "userId": "test1234",
+    "tags": ["#일렉트로닉", "#판타지"],
+    "links": [
+      "https://www.youtube.com/watch?v=6CHs4x2uqcQ",
+      "https://www.youtube.com/watch?v=rNZrgK-MX_s&t=1912s"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_7f700cef-e503-4304-b38b-73d3a5302653.jpg?alt=media&token=395a16db-ac49-462c-a76c-0236b051e519",
+    "likes": 25,
+    "regDate": "2024-08-30-22-10",
+    "description": "일렉트로닉과 판타지 장르의 독특한 조화를 담은 플레이리스트입니다.",
+    "title": "독특한 일렉트로닉과 판타지",
+    "isPublic": false
+  },
+  {
+    "docid": "28",
+    "userId": "test1234",
+    "tags": ["#호러", "#재즈"],
+    "links": ["https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s"],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_846fb20a-aca5-4788-bb95-4aff67abd690.jpg?alt=media&token=9c75e077-738e-4722-af3f-2797ec55e37a",
+    "likes": 28,
+    "regDate": "2024-08-30-23-00",
+    "description": "호러와 재즈 장르의 신비로운 조화를 담은 플레이리스트입니다.",
+    "title": "신비로운 호러와 재즈",
+    "isPublic": true
+  },
+  {
+    "docid": "29",
+    "userId": "test1234",
+    "tags": ["#드라마", "#인디"],
+    "links": [
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1",
+      "https://www.youtube.com/watch?v=_41K4CpsZwg"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_a2aa0e69-7920-4054-a9b4-38efef560734.jpg?alt=media&token=bcc7f0a6-5eb2-425b-b8e6-b978edad2274",
+    "likes": 32,
+    "regDate": "2024-08-30-10-45",
+    "description": "드라마와 인디 장르의 감성적인 조화를 담은 플레이리스트입니다.",
+    "title": "감성적인 드라마와 인디",
+    "isPublic": false
+  },
+  {
+    "docid": "30",
+    "userId": "test1234",
+    "tags": ["#팝", "#호러"],
+    "links": [
+      "https://www.youtube.com/watch?v=PsO6ZnUZI0g&list=RDEMfxjOmi63mKrTIaFmvquTIA&start_radio=1"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_7f700cef-e503-4304-b38b-73d3a5302653.jpg?alt=media&token=395a16db-ac49-462c-a76c-0236b051e519",
+    "likes": 23,
+    "regDate": "2024-08-30-11-15",
+    "description": "팝과 호러 장르의 다양한 매력을 담은 플레이리스트입니다.",
+    "title": "다양한 팝과 호러",
+    "isPublic": true
+  },
+  {
+    "docid": "31",
+    "userId": "test1234",
+    "tags": ["#일렉트로닉", "#코미디"],
+    "links": [
+      "https://www.youtube.com/watch?v=KfbFaQJK7Sc&t=121s",
+      "https://www.youtube.com/watch?v=05BmN1WX_xw",
+      "https://www.youtube.com/watch?v=6CHs4x2uqcQ"
+    ],
+    "thumbnail": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/example%2F_b938fb8c-c88c-4894-b4f7-f33661bb7c63.jpg?alt=media&token=7907b7cc-7dc7-499c-861a-789aa04deda6",
+    "likes": 26,
+    "regDate": "2024-08-30-12-30",
+    "description": "일렉트로닉과 코미디 장르의 신나는 조화를 담은 플레이리스트입니다.",
+    "title": "신나는 일렉트로닉과 코미디",
+    "isPublic": false
+  }
+]

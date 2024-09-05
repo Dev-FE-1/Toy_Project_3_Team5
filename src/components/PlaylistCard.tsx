@@ -50,9 +50,11 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   const { openModal } = useModalStore();
   const { visibilities, toggleVisibility, setInitialVisibility } =
     useVisibilityStore();
-  const { isLiked, isAdded, toggleLike, toggleSave } = usePlaylistActions(
-    playlistItem.playlistId ? +playlistItem.playlistId : 0
-  );
+  const { isLiked, isAdded, toggleLike, toggleSave, likes } =
+    usePlaylistActions(
+      playlistItem.playlistId ? +playlistItem.playlistId : 0,
+      playlistItem.likes
+    );
   const isPublic = playlistItem.playlistId
     ? visibilities[playlistItem.playlistId]
     : false;
@@ -153,7 +155,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
             />
-            {playlistItem.likes}
+            {likes !== null ? likes : playlistItem.likes}
           </div>
           <div className='icon'>
             <MessageSquareMore />

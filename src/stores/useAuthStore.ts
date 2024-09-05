@@ -62,9 +62,6 @@ export const useAuthStore = create<AuthState>(
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
 
-          console.log(id);
-          console.log(data);
-
           set({
             profileImage: data?.profileImg || '',
             channelName: data?.channelName || '',

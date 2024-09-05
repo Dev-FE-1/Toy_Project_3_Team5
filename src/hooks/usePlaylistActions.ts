@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useUpdateUserPlaylists } from '@/api/playlistActions';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 
-const usePlaylistActions = (playlistId: number) => {
+const usePlaylistActions = (playlistId: number, initialLikes: number) => {
   const {
     likedPlaylist,
     savedPlaylist,
@@ -12,30 +13,34 @@ const usePlaylistActions = (playlistId: number) => {
     addSavedPlaylistItem,
     removeSavedPlaylistItem,
   } = useAuthStore();
-  const [isLiked, setIsLiked] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
+  const { updatePlaylists } = useUpdateUserPlaylists();
+  const [isLiked, setIsLiked] = useState(likedPlaylist.includes(playlistId));
+  const [isAdded, setIsAdded] = useState(savedPlaylist.includes(playlistId));
+  const [likes, setLikes] = useState<number>(initialLikes);
   const { toastTrigger } = useToast();
 
-  useEffect(() => {
-    if (user && playlistId) {
-      setIsLiked(likedPlaylist.includes(playlistId));
-      setIsAdded(savedPlaylist.includes(playlistId));
-    }
-  }, [user, playlistId, likedPlaylist, savedPlaylist]);
-
-  const toggleLike = () => {
+  const toggleLike = async () => {
     if (!user) {
       toastTrigger('로그인이 필요합니다.');
       return;
     }
 
-    if (isLiked) {
-      removeLikedPlaylistItem(playlistId);
-      setIsLiked(false);
-    } else {
+    const newIsLiked = !isLiked;
+
+    setIsLiked(newIsLiked);
+    setLikes((prevLikes) => (newIsLiked ? prevLikes + 1 : prevLikes - 1));
+
+    if (newIsLiked) {
       addLikedPlaylistItem(playlistId);
-      setIsLiked(true);
+    } else {
+      removeLikedPlaylistItem(playlistId);
     }
+
+    await updatePlaylists({
+      playlistType: 'liked',
+      playlistId,
+      isPlus: newIsLiked,
+    });
   };
 
   const toggleSave = () => {
@@ -44,16 +49,24 @@ const usePlaylistActions = (playlistId: number) => {
       return;
     }
 
-    if (isAdded) {
-      removeSavedPlaylistItem(playlistId);
-      setIsAdded(false);
-    } else {
+    const newIsAdded = !isAdded;
+    setIsAdded(newIsAdded);
+
+    if (newIsAdded) {
       addSavedPlaylistItem(playlistId);
-      setIsAdded(true);
+    } else {
+      removeSavedPlaylistItem(playlistId);
     }
+
+    updatePlaylists({ playlistType: 'saved', playlistId });
   };
 
-  return { isLiked, isAdded, toggleLike, toggleSave };
+  useEffect(() => {
+    setIsLiked(likedPlaylist.includes(playlistId));
+    setIsAdded(savedPlaylist.includes(playlistId));
+  }, [likedPlaylist, savedPlaylist, playlistId]);
+
+  return { isLiked, isAdded, toggleLike, toggleSave, likes };
 };
 
 export default usePlaylistActions;

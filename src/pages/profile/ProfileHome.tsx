@@ -158,7 +158,10 @@ export const ProfileHome = () => {
             <div>{channelFollower.length}</div>
             <div>팔로워</div>
           </div>
-          <div css={infoStyle} onClick={() => navigate(ROUTES.FOLLOWING)}>
+          <div
+            css={infoStyle}
+            onClick={() => navigate(ROUTES.PROFILE_FOLLOWING(userId))}
+          >
             <div>{channelFollowing.length}</div>
             <div>팔로잉</div>
           </div>

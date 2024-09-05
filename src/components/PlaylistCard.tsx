@@ -9,6 +9,7 @@ import {
   ListPlus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { deletePlaylist } from '@/api/playlistInfo';
 import IconButton from '@/components/IconButton';
 import KebabButton from '@/components/KebabButton';
 import Modal from '@/components/Modal';
@@ -31,6 +32,7 @@ interface PlaylistCardProps {
   showLikeButton?: boolean;
   showLockButton?: boolean;
   showKebabMenu?: boolean;
+  onDelete?: (playlistId: number) => void; // 명시적으로 타입 정의
 }
 
 const MAXLENGTH = 50;
@@ -42,6 +44,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   showLikeButton = false,
   showLockButton = false,
   showKebabMenu = false,
+  onDelete,
 }) => {
   const navigate = useNavigate();
   const { openModal } = useModalStore();
@@ -68,8 +71,25 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
       type: 'delete',
       title: '플레이리스트 삭제',
       content: `'${playlistItem.description}'을 삭제하시겠습니까?`,
-      onAction: () => {
-        ('');
+      onAction: async () => {
+        if (playlistItem.playlistId) {
+          const playlistIdNumber = Number(playlistItem.playlistId);
+          if (isNaN(playlistIdNumber)) {
+            toastTrigger('올바르지 않은 플레이리스트 ID입니다.');
+            return;
+          }
+          const response = await deletePlaylist(playlistIdNumber);
+          if (response.status === 'success') {
+            toastTrigger('플레이리스트가 삭제되었습니다.');
+            if (onDelete) {
+              onDelete(playlistIdNumber);
+            }
+          } else {
+            toastTrigger('플레이리스트 삭제에 실패했습니다.');
+          }
+        } else {
+          toastTrigger('플레이리스트 ID가 없습니다.');
+        }
       },
     });
   };

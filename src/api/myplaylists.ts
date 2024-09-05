@@ -50,7 +50,7 @@ const getOwnerChannelName = async (userId: string): Promise<string> => {
   }
 };
 
-const getCommentCount = async (playlistId: string): Promise<number> => {
+export const getCommentCount = async (playlistId: string): Promise<number> => {
   try {
     const commentsRef = collection(db, 'comments');
     const numericPlaylistId = parseInt(playlistId, 10);

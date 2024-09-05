@@ -170,8 +170,8 @@ const PlayListAdd = () => {
       ]);
       init.hashtag();
     },
-    removeHashtag: (id: number) => {
-      setAddedHashtag(addedHashtag.filter((tag) => tag.id !== id));
+    removeHashtag: (label: string) => {
+      setAddedHashtag(addedHashtag.filter((tag) => tag.label !== label));
     },
     createPlaylist: async () => {
       const checkResult = check.required();

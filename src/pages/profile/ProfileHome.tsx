@@ -103,8 +103,11 @@ export const ProfileHome = () => {
     if (allChecked) {
       setCheckedComments([]);
     } else {
-      const allCommentIds = comments.map((comment) => comment.id);
-      setCheckedComments(allCommentIds);
+      const visibleComment = comments
+        .slice(0, commentsPlus)
+        .map((comment) => comment.id);
+
+      setCheckedComments(visibleComment);
     }
     setAllChecked(!allChecked);
   };

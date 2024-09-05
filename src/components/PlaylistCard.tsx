@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { css } from '@emotion/react';
 import {
   Heart,
@@ -16,8 +16,8 @@ import Modal from '@/components/Modal';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import usePlaylistActions from '@/hooks/usePlaylistActions';
 import useToast from '@/hooks/useToast';
-import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 import { useVisibilityStore } from '@/stores/useVisibilityStore';
 import { PlayListDataProps } from '@/types/playlistType';
@@ -50,13 +50,12 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   const { openModal } = useModalStore();
   const { visibilities, toggleVisibility, setInitialVisibility } =
     useVisibilityStore();
-  useVisibilityStore();
+  const { isLiked, isAdded, toggleLike, toggleSave } = usePlaylistActions(
+    playlistItem.playlistId ? +playlistItem.playlistId : 0
+  );
   const isPublic = playlistItem.playlistId
     ? visibilities[playlistItem.playlistId]
     : false;
-
-  const [isLiked, setIsLiked] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
 
   const onCardClick = (): void => {
     navigate(ROUTES.DETAIL(playlistItem.playlistId));
@@ -95,15 +94,6 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   };
 
   const { toastTrigger } = useToast();
-  const { user } = useAuthStore();
-
-  const onClickHeart = () => {
-    if (!user) {
-      toastTrigger('로그인이 필요합니다.');
-    } else {
-      setIsLiked(!isLiked);
-    }
-  };
 
   const menuItems = [
     {
@@ -159,7 +149,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
           <div className='icon'>
             <IconButton
               IconComponent={Heart}
-              onClick={onClickHeart}
+              onClick={toggleLike}
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
             />
@@ -206,14 +196,14 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         {showAddButton && (
           <IconButton
             IconComponent={isAdded ? ListX : ListPlus}
-            onClick={() => setIsAdded(!isAdded)}
+            onClick={toggleSave}
             color='gray'
           />
         )}
         {showLikeButton && (
           <IconButton
             IconComponent={Heart}
-            onClick={onClickHeart}
+            onClick={toggleLike}
             color={isLiked ? 'red' : 'gray'}
             fillColor={isLiked ? 'red' : undefined}
           />

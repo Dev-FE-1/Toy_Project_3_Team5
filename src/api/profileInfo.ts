@@ -24,7 +24,7 @@ const getUserComments = async (userId: string) => {
   }
 };
 
-const getPlaylistTitle = async (playlistId: number): Promise<string> => {
+const getPlaylistTitle = async (playlistId: number) => {
   try {
     const playlistIdDoc = doc(db, 'playlist', playlistId.toString());
     const playlistIdDocSnap = await getDoc(playlistIdDoc);
@@ -32,11 +32,10 @@ const getPlaylistTitle = async (playlistId: number): Promise<string> => {
     return playlistData?.title;
   } catch (error) {
     console.error('title 가져오기 에러', error);
-    return '제목 없음';
   }
 };
 
-const getMyPlaylistCount = async (userId: string): Promise<number> => {
+const getMyPlaylistCount = async (userId: string) => {
   try {
     const playlists = collection(db, 'playlist');
     const q = query(playlists, where('userId', '==', userId));
@@ -44,7 +43,6 @@ const getMyPlaylistCount = async (userId: string): Promise<number> => {
     return querySnapshot.size;
   } catch (error) {
     console.error('내가 만든 플레이리스트 수 가져오기 에러', error);
-    return 0;
   }
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { ExternalLink, Heart, ListPlus, X } from 'lucide-react';
 import { useParams } from 'react-router-dom';
@@ -10,7 +10,6 @@ import MiniPlaylist from '@/components/MiniPlaylist';
 import AddedVideo, { AddedLinkProps } from '@/components/playlist/AddedVideo';
 import Profile from '@/components/Profile';
 import Toggle from '@/components/Toggle';
-import Video from '@/components/Video';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import { PlayListDataProps } from '@/types/playlistType';
@@ -61,6 +60,19 @@ const test = {
   provider_url: 'https://www.youtube.com/',
 };
 
+const COMMENT_TEST_DATA = [
+  {
+    content: '너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!',
+    imgUrl: '',
+    userName: 'dev.meryoung',
+  },
+  {
+    content: '너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!',
+    imgUrl: '',
+    userName: 'dev.meryoung',
+  },
+];
+
 const MAX_LENGTH = {
   videoTitle: 20,
   playlistTitle: 20,
@@ -77,6 +89,8 @@ const Detail = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     (async () => {
@@ -105,6 +119,7 @@ const Detail = () => {
             allow='autoplay; picture-in-picture; web-share'
             allowFullScreen
             title={currentVideo.title}
+            ref={iframeRef}
           />
         </div>
       )}
@@ -241,40 +256,16 @@ const Detail = () => {
         </div>
       )}
 
-      <div
-        css={css`
-          margin: 10px 0;
-          max-width: 430px;
-        `}
-      >
-        <h3>댓글 22</h3>
-        <div
-          css={css`
-            display: flex;
-            gap: 10px;
-            margin: 10px 0;
-          `}
-        >
-          <Profile alt='프로필' src={''} size='xs' />
-          <input
-            css={css`
-              background-color: ${colors.gray02};
-              border: 0;
-              border-radius: 5px;
-              /* height: inherit; */
-              flex-grow: 1;
-              padding: 0 10px;
-            `}
-            placeholder='댓글 추가...'
-          />
+      <div css={commentContainer}>
+        <div css={commentHeader}>
+          <span className='title'>댓글</span>
+          <span className='counter'>22</span>
         </div>
-        <div
-          css={css`
-            & > div {
-              margin: 10px 0;
-            }
-          `}
-        >
+        <div css={oneLineStyle}>
+          <Profile alt='프로필' src={''} size='xs' />
+          <input css={commentInputStyle} placeholder='댓글 추가...' />
+        </div>
+        <div css={commentStyle}>
           <Comment
             content='너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!'
             imgUrl={''}
@@ -319,6 +310,7 @@ const Detail = () => {
 const containerStyle = css`
   display: flex;
   flex-direction: column;
+  padding-bottom: 60px;
 `;
 
 const currentVideoStyle = css`
@@ -335,7 +327,7 @@ const iframeStyle = css`
 `;
 
 const videoTextDivStyle = css`
-  padding: 10px 20px;
+  margin: 10px 20px;
   z-index: 0;
   & > * {
     z-index: 0;
@@ -422,6 +414,44 @@ const videoListInfoStyle = (isScroll: boolean, currentIndex: number) => css`
 
   &>div:nth-child(${currentIndex}) {
     background-color: ${colors.gray02};
+  }
+`;
+
+const commentContainer = css`
+  margin: 20px;
+  max-width: 100%;
+`;
+
+const commentHeader = css`
+  ${oneLineStyle};
+
+  > .title {
+    font-weight: ${fontWeight.bold};
+  }
+
+  > .counter {
+    color: ${colors.gray05};
+    padding-left: 5px;
+  }
+`;
+
+const a = css`
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+`;
+
+const commentInputStyle = css`
+  background-color: ${colors.gray02};
+  border: 0;
+  border-radius: 5px;
+  flex-grow: 1;
+  padding: 0 10px;
+`;
+
+const commentStyle = css`
+  & > div {
+    margin: 10px 0;
   }
 `;
 

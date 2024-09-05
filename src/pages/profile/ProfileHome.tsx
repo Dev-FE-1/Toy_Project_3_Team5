@@ -14,10 +14,12 @@ import CheckBox from '@/components/CheckBox';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
+import Toast from '@/components/Toast';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import { auth, db } from '@/firebase/firbaseConfig';
+import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
@@ -36,6 +38,7 @@ export const ProfileHome = () => {
   const [allChecked, setAllChecked] = useState<boolean>(false);
 
   const { openModal } = useModalStore();
+  const { toastTrigger } = useToast();
   const navigate = useNavigate();
 
   const {
@@ -73,6 +76,7 @@ export const ProfileHome = () => {
   const deleteComment = async (commentId: string) => {
     const commentRef = doc(db, 'comments', commentId);
     await deleteDoc(commentRef);
+    toastTrigger('댓글 삭제가 완료되었습니다.', 'success');
   };
 
   const commentSelection = (commentId: string, isChecked: boolean) => {
@@ -206,6 +210,9 @@ export const ProfileHome = () => {
           color='gray'
         />
         로그아웃
+      </div>
+      <div style={{ width: '100%', textAlign: 'center' }}>
+        <Toast />
       </div>
       <Modal />
     </div>

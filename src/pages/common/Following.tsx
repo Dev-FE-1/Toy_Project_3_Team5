@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
-import { useChannelFetch } from '@/api/followingPlaylists';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
-import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylistFetch';
+import useChannel from '@/hooks/useChannel';
+import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylist';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { useAuthStore } from '@/stores/useAuthStore';
 const PAGE_SIZE = 5;
@@ -16,8 +17,9 @@ const PAGE_SIZE = 5;
 const Following = () => {
   const { userId } = useAuthStore();
   const [selectedChannel, setSelectedChannel] = useState(userId);
+  const navigate = useNavigate();
 
-  const channels = useChannelFetch(selectedChannel);
+  const channels = useChannel(selectedChannel);
   const { data, fetchNextPage, hasNextPage, isFetching } =
     useFollowingPlaylistFetch(selectedChannel);
 
@@ -42,6 +44,9 @@ const Following = () => {
 
   const onFollowingChannelClick = (channelId: string) => {
     setSelectedChannel(selectedChannel === channelId ? userId : channelId);
+  };
+  const onToFollowingListPage = (userId: string) => {
+    navigate(`/following/${userId}`);
   };
   const followingList = channels.map((channel) => ({
     id: channel.id,
@@ -74,7 +79,7 @@ const Following = () => {
           </div>
           <Button
             label='All'
-            onClick={onlistClick}
+            onClick={() => onToFollowingListPage(userId)}
             IconComponent={Plus}
             color='primary'
             shape='text'

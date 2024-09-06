@@ -1,54 +1,40 @@
-import React from 'react';
 import { css } from '@emotion/react';
 import { UserMinus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
-const ProfileFollower = () => {
+import { useFollowingList } from '@/hooks/useFollowingList';
+import { useAuthStore } from '@/stores/useAuthStore';
+
+const FollowingList = () => {
   const { userId } = useParams();
-
-  // mockdata 배열 정의
-  const mockdata = [
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'John Doe',
-    },
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'Jane Smith',
-    },
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'Emily Davis',
-    },
-  ];
-
+  const { followingList, handleUserMinusClick } = useFollowingList(
+    userId || ''
+  );
+  console.log(useAuthStore());
   return (
     <>
       <div css={rootContainer}>
-        <div css={numberingContainer}>총 {mockdata.length} 명</div>
+        <div css={numberingContainer}>총 {followingList.length} 명</div>
         <div css={profileListContainer}>
-          {mockdata.map((data, index) => (
+          {followingList.map((data, index) => (
             <div key={index} css={profileItem}>
               <span css={profileContainerStyle}>
                 <Profile src={data.src} alt={data.alt} size={data.size} />
                 <span>{data.name}</span>
               </span>
-              <button css={userMinusStyle}>
+              <button
+                css={userMinusStyle}
+                onClick={() => handleUserMinusClick(data.uid)}
+              >
                 <UserMinus css={userMinusStyle} />
               </button>
             </div>
           ))}
         </div>
       </div>
-
-      <div>hello {userId} 파라미터 체크중</div>
+      <Modal />
     </>
   );
 };
@@ -57,8 +43,6 @@ const rootContainer = css`
   display: flex;
   flex-direction: column;
 `;
-
-const tabBtnContainer = css``;
 
 const numberingContainer = css`
   padding-left: 20px;
@@ -92,4 +76,4 @@ const userMinusStyle = css`
   border: none;
 `;
 
-export default ProfileFollower;
+export default FollowingList;

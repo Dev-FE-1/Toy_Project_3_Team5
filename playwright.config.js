@@ -10,6 +10,6 @@ export default defineConfig({
   reporter: 'list',
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: 'http://localhost:5173', // 여기에 실제 개발 서버 URL을 입력하세요
+    baseURL: 'http://localhost:5173',
   },
 });

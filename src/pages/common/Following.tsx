@@ -1,32 +1,47 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { css } from '@emotion/react';
-
 import { Plus } from 'lucide-react';
+import { useChannelFetch } from '@/api/followingPlaylists';
 import Button from '@/components/Button';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
-import { fontSize, fontWeight } from '@/constants/font';
-
-import useChannelFetch from '@/hooks/useChannelFetch';
+import { fontSize } from '@/constants/font';
 import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylistFetch';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { PlayListDataProps } from '@/types/playlistType';
+const PAGE_SIZE = 5;
 
 const Following = () => {
   const { userId } = useAuthStore();
   const [selectedChannel, setSelectedChannel] = useState(userId);
 
-  const channels = useChannelFetch(selectedChannel); // 채널 데이터 가져오기
-  const playlists: PlayListDataProps[] =
+  const channels = useChannelFetch(selectedChannel);
+  const { data, fetchNextPage, hasNextPage, isFetching } =
     useFollowingPlaylistFetch(selectedChannel);
 
-  const onFollowingChannelCLick = (channelId: string) => {
-    if (selectedChannel === channelId) {
-      setSelectedChannel(userId);
-    } else {
-      setSelectedChannel(channelId);
+  const playlists = useMemo(
+    () => (data ? data.pages.flatMap((page) => page.playlist) : []),
+    [data]
+  );
+
+  const infiniteScrollRef = useInfiniteScroll(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
+      if (hasNextPage && !isFetching) {
+        await fetchNextPage();
+      }
+    },
+    {
+      root: null,
+      rootMargin: '0px 0px -20px 0px',
+      threshold: 0.5,
     }
+  );
+
+  const onFollowingChannelClick = (channelId: string) => {
+    setSelectedChannel(selectedChannel === channelId ? userId : channelId);
   };
   const followingList = channels.map((channel) => ({
     id: channel.id,
@@ -38,14 +53,14 @@ const Following = () => {
 
   return (
     <div css={containerStyle}>
-      {followingList && followingList.length > 0 ? (
+      {followingList.length > 0 && (
         <div css={followingHeaderStyle}>
           <div css={followingListStyle}>
             {followingList.map((following) => (
               <div key={following.id}>
                 <button
                   css={followingCoverStyle(selectedChannel === following.id)}
-                  onClick={() => onFollowingChannelCLick(following.id)}
+                  onClick={() => onFollowingChannelClick(following.id)}
                 >
                   <Profile
                     alt={following.alt}
@@ -65,18 +80,19 @@ const Following = () => {
             shape='text'
           />
         </div>
-      ) : (
-        <div>
-          <p css={recommandStyles}>추천 플레이리스트</p>
-        </div>
       )}
-      {playlists && playlists.length > 0 && (
-        <div css={playlistContainer}>
-          {playlists.map((playlist, index) => (
-            <PlaylistCard key={index} playlistItem={playlist} size='large' />
-          ))}
+      <div className='scroll-container' css={playlistContainer}>
+        {playlists.map((playlist, index) => (
+          <PlaylistCard key={index} playlistItem={playlist} size='large' />
+        ))}
+        <div css={loadingSpinnerStyle}>
+          {isFetching && playlists.length >= PAGE_SIZE && <LoadingSpinner />}
         </div>
-      )}
+        <div
+          ref={infiniteScrollRef}
+          style={{ minHeight: '72px', width: '100%' }}
+        ></div>
+      </div>
     </div>
   );
 };
@@ -104,7 +120,7 @@ const followingCoverStyle = (isSelected: boolean) => css`
   border-radius: 50%;
   border: ${isSelected
     ? `2px solid ${colors.primaryNormal}`
-    : `1px solid ${colors.gray03}`}; // 클릭 상태에 따른 border 스타일
+    : `1px solid ${colors.gray03}`};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -112,6 +128,7 @@ const followingCoverStyle = (isSelected: boolean) => css`
   background: none;
   cursor: pointer;
 `;
+
 const followingTextStyle = css`
   font-size: ${fontSize.xs};
   text-align: center;
@@ -124,12 +141,9 @@ const playlistContainer = css`
   gap: 20px;
   padding: 100px 20px 20px 20px;
 `;
-
-const recommandStyles = css`
-  font-size: ${fontSize.xxxl};
-  font-weight: ${fontWeight.bold};
-  padding: 10px;
-  margin-bottom: 10px;
+const loadingSpinnerStyle = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
-
 export default Following;

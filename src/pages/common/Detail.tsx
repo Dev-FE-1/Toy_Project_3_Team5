@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { ExternalLink, Heart, ListPlus, X } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { addComment } from '@/api/comment';
 import { getVideoInfo } from '@/api/video';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
@@ -12,8 +13,10 @@ import Profile from '@/components/Profile';
 import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
-import { PlayListDataProps } from '@/types/playlistType';
-import { omittedText } from '@/utils/textUtils';
+import useToast from '@/hooks/useToast';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { CommentProps, PlayListDataProps } from '@/types/playlistType';
+import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 import { makeEmbedUrl } from '@/utils/videoUtils';
 
 /**
@@ -77,20 +80,64 @@ const MAX_LENGTH = {
   videoTitle: 20,
   playlistTitle: 20,
   description: 100,
+  channelName: 10,
 };
 
 const Detail = () => {
-  const playlistId = useParams<{ playlistId: string }>();
+  const { playlistId } = useParams();
+  const { userId } = useAuthStore();
+  const { toastTrigger } = useToast();
 
   const playlistInfo: PlayListDataProps = fetchTestData;
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
   const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
+  const [commentList, setCommentList] = useState<CommentProps[]>([]);
+  const [inputComment, setInputComment] = useState<string>('');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const onChange = {
+    comment: (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputComment(e.target.value);
+    },
+  };
+  const onKeydown = {
+    comment: (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') onClick.comment();
+    },
+  };
+  const onClick = {
+    comment: async () => {
+      if (!!!validation.comment()) return;
+      const commentData: CommentProps = {
+        playlistId: Number(playlistId),
+        content: inputComment,
+        isEdited: false,
+        regDate: new Date().toISOString(),
+        userId,
+      };
+
+      const { status, result } = await addComment(commentData);
+      if (status === 'success') {
+        setInputComment('');
+        toastTrigger('댓글이 등록되었습니다.');
+      }
+    },
+  };
+  const validation = {
+    comment: (): boolean => {
+      if (isNaN(Number(playlistId))) return false;
+      if (inputComment.trim().length < 1) {
+        toastTrigger('댓글을 입력해주세요', 'fail');
+        return false;
+      }
+      return true;
+    },
+  };
 
   useEffect(() => {
     (async () => {
@@ -192,16 +239,13 @@ const Detail = () => {
           </div>
           <div css={oneLineStyle}>
             <Profile alt='이미지' src={''} size='sm' />
-            <div
-              css={css`
-                display: flex;
-                flex-direction: column;
-                flex-grow: 1;
-                padding: 0 10px;
-              `}
-            >
-              <span>여행자</span>
-              <span>50 팔로워</span>
+            <div css={userInfoTwoLineStyle}>
+              <span className='channelName'>
+                {omittedText('여행자', MAX_LENGTH.channelName)}
+              </span>
+              <span className='counter'>
+                {convertUnitNumber(183933)} 팔로워
+              </span>
             </div>
             <Button
               label='팔로우'
@@ -263,7 +307,13 @@ const Detail = () => {
         </div>
         <div css={oneLineStyle}>
           <Profile alt='프로필' src={''} size='xs' />
-          <input css={commentInputStyle} placeholder='댓글 추가...' />
+          <input
+            css={commentInputStyle}
+            placeholder='댓글 추가...'
+            value={inputComment}
+            onChange={onChange.comment}
+            onKeyDown={onKeydown.comment}
+          />
         </div>
         <div css={commentStyle}>
           <Comment
@@ -389,6 +439,21 @@ const descStyle = css`
     &:hover {
       color: ${colors.primaryLight};
     }
+  }
+`;
+
+const userInfoTwoLineStyle = css`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 0 10px;
+
+  > .channelName {
+    font-size: ${fontSize.lg};
+  }
+  > .counter {
+    font-size: ${fontSize.sm};
+    color: ${colors.gray05};
   }
 `;
 

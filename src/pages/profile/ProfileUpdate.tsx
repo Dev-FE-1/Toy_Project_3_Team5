@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  setDoc,
-} from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -24,22 +17,34 @@ import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import { db } from '@/firebase/firbaseConfig';
+import { useCheckDuplicate } from '@/hooks/useCheckDuplicate';
+import { useHashtagManage } from '@/hooks/useHashtagManage';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { checkChannelNameExists } from '@/utils/checkDuplicate';
 
 export const ProfileUpdate = () => {
   const { profileImage, channelName, userId } = useAuthStore();
-
-  const [hashtag, setHashtag] = useState<string>('');
-  const [hashtags, setHashtags] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
-
-  const [channelNameCheckMessage, setChannelNameCheckMessage] =
-    useState<string>('');
-  const [isChannelNameChecked, setIsChannelNameChecked] =
-    useState<boolean>(false);
   const [newChannelName, setNewChannelName] = useState<string>(channelName);
+
+  const {
+    message: channelNameCheckMessage,
+    isChecked: isChannelNameChecked,
+    checkDuplicate: checkChannelNameDuplicate,
+    setMessage: setChannelNameCheckMessage,
+    setIsChecked: setIsChannelNameChecked,
+  } = useCheckDuplicate();
+
+  const {
+    hashtags,
+    hashtag,
+    setHashtags,
+    setHashtag,
+    addHashtag,
+    removeHashtag,
+  } = useHashtagManage();
 
   const navigate = useNavigate();
   const { toastTrigger } = useToast();
@@ -53,22 +58,6 @@ export const ProfileUpdate = () => {
     fetchHashtags();
   }, [userId]);
 
-  const checkChannelNameExists = async (
-    channelName: string
-  ): Promise<boolean> => {
-    const q = query(
-      collection(db, 'users'),
-      where('channelName', '==', channelName)
-    );
-
-    try {
-      const querySnapshot = await getDocs(q);
-      return !querySnapshot.empty;
-    } catch (error) {
-      throw new Error('중복 체크에 실패했습니다.');
-    }
-  };
-
   const onChannelNameCheck = async () => {
     if (newChannelName === channelName) {
       setChannelNameCheckMessage('현재 채널 이름과 동일합니다.');
@@ -76,63 +65,20 @@ export const ProfileUpdate = () => {
       return;
     }
 
-    if (!newChannelName || newChannelName.length < 2) {
-      setChannelNameCheckMessage('채널 이름은 2자리 이상이어야 합니다.');
-      setIsChannelNameChecked(false);
-      return;
-    }
-
-    try {
-      const exists = await checkChannelNameExists(newChannelName.trim());
-      if (exists) {
-        setChannelNameCheckMessage('이미 사용 중인 채널 이름입니다.');
-        setIsChannelNameChecked(false);
-      } else {
-        setChannelNameCheckMessage('사용 가능한 채널 이름입니다.');
-        setIsChannelNameChecked(true);
-      }
-    } catch (error) {
-      setChannelNameCheckMessage('중복 체크에 실패했습니다.');
-      setIsChannelNameChecked(false);
-    }
+    await checkChannelNameDuplicate(
+      newChannelName,
+      checkChannelNameExists,
+      '이미 사용 중인 채널 이름입니다.',
+      '사용 가능한 채널 이름입니다.'
+    );
   };
 
-  const addHashtag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-
-      const invalidString = /[\s!@#$%^&*(),.?":{}|<>]/;
-      if (invalidString.test(hashtag)) {
-        toastTrigger(
-          '해시태그에 공백이나 특수문자를 사용할 수 없습니다.',
-          'fail'
-        );
-        return;
-      }
-
-      if (hashtags.length >= 10) {
-        toastTrigger('해시태그는 최대 10개 제한입니다.', 'fail');
-        return;
-      }
-
-      const formattedHashtag = hashtag.startsWith('#')
-        ? hashtag
-        : `#${hashtag}`;
-
-      if (hashtag && hashtags.includes(formattedHashtag)) {
-        toastTrigger('이미 있는 해시태그입니다.', 'fail');
-        return;
-      }
-
-      if (hashtag) {
-        setHashtags((prev) => [...prev, formattedHashtag]);
-        setHashtag('');
-      }
-    }
-  };
-
-  const removeHashtag = (label: string) => {
-    setHashtags((prevHashtags) => prevHashtags.filter((tag) => tag !== label));
+  const onChannelNameChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const newValue = e.target.value;
+    setNewChannelName(newValue);
+    checkChannelNameDuplicate(newValue, () => Promise.resolve(false), '', '');
   };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,14 +147,10 @@ export const ProfileUpdate = () => {
             label='채널 이름'
             placeholder='채널 이름을 입력해주세요'
             value={newChannelName}
-            onChange={(e) => {
-              setNewChannelName(e.target.value);
-              setIsChannelNameChecked(false);
-              setChannelNameCheckMessage('다시 중복검사를 진행해주세요.');
-            }}
-            validate={validateChannelName}
+            onChange={onChannelNameChange}
             width='315px'
             externalErrorMessage={channelNameCheckMessage}
+            validate={validateChannelName}
           />
           <div>
             <Button

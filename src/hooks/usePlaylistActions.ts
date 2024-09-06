@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, QueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { useUpdateUserPlaylists } from '@/api/playlistActions';
 import useToast from '@/hooks/useToast';
@@ -14,6 +14,31 @@ type QueryDataType = {
 const PAGES_QUERY: { [key: string]: string } = {
   '': 'homePlaylists',
   search: 'searchPlaylists',
+};
+
+const updatePlaylistData = (
+  queryClient: QueryClient,
+  queryKey: string,
+  playlistId: number,
+  update: (playlist: PlayListDataProps) => PlayListDataProps
+) => {
+  queryClient.setQueriesData<QueryDataType>(
+    { queryKey: [queryKey] },
+    (oldData) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          playlistsData: page.playlistsData.map((playlist) =>
+            playlist.playlistId === playlistId.toString()
+              ? update(playlist)
+              : playlist
+          ),
+        })),
+      };
+    }
+  );
 };
 
 const usePlaylistActions = (playlistId: number, initialLikes: number) => {
@@ -45,23 +70,11 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     const newIsLiked = !isLiked;
     const newLikes = newIsLiked ? initialLikes + 1 : initialLikes - 1;
 
-    queryClient.setQueriesData<QueryDataType>(
-      { queryKey: [queryKey] },
-      (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            playlistsData: page.playlistsData.map((playlist) =>
-              playlist.playlistId === playlistId.toString()
-                ? { ...playlist, isLiked: newIsLiked, likes: newLikes }
-                : playlist
-            ),
-          })),
-        };
-      }
-    );
+    updatePlaylistData(queryClient, queryKey, playlistId, (playlist) => ({
+      ...playlist,
+      isLiked: newIsLiked,
+      likes: newLikes,
+    }));
 
     if (newIsLiked) {
       addLikedPlaylistItem(playlistId);
@@ -94,23 +107,10 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
 
     const newIsAdded = !isAdded;
 
-    queryClient.setQueriesData<QueryDataType>(
-      { queryKey: [queryKey] },
-      (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page) => ({
-            ...page,
-            playlistsData: page.playlistsData.map((playlist) =>
-              playlist.playlistId === playlistId.toString()
-                ? { ...playlist, isAdded: newIsAdded }
-                : playlist
-            ),
-          })),
-        };
-      }
-    );
+    updatePlaylistData(queryClient, queryKey, playlistId, (playlist) => ({
+      ...playlist,
+      isAdded: newIsAdded,
+    }));
 
     if (newIsAdded) {
       addSavedPlaylistItem(playlistId);

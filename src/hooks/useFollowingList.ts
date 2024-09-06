@@ -50,5 +50,6 @@ export const useFollowingList = (userId: string) => {
   return {
     followingList,
     handleUserMinusClick,
+    setFollowingList,
   };
 };

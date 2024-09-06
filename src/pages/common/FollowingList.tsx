@@ -10,13 +10,20 @@ import useModalStore from '@/stores/useModalStore';
 
 const FollowingList = () => {
   const { userId } = useParams();
-  const { followingList } = useFollowingList(userId || '');
+  const { followingList, setFollowingList } = useFollowingList(userId || '');
   const { removeFollowing } = useAuthStore.getState();
   const { openModal } = useModalStore(); // 모달 스토어 가져오기
 
   const handleUnfollow = async (uid: string) => {
     if (userId) {
-      await removeFollowing(userId, uid); // 팔로잉 삭제 함수 호출
+      try {
+        await removeFollowing(userId, uid); // 팔로잉 삭제 함수 호출
+        setFollowingList((prevList) =>
+          prevList.filter((user) => user.uid !== uid)
+        ); // 상태 업데이트
+      } catch (error) {
+        console.error('Error unfollowing user:', error);
+      }
     }
   };
 
@@ -34,7 +41,7 @@ const FollowingList = () => {
       <div css={rootContainer}>
         <div css={numberingContainer}>
           {followingList.length === 0
-            ? '아무도 없습니다.' // 팔로잉 리스트가 비어 있을 경우
+            ? '팔로우중인 채널이 없습니다' // 팔로잉 리스트가 비어 있을 경우
             : `총 ${followingList.length} 명`}{' '}
           {/* 팔로잉 리스트가 있을 경우 */}
         </div>

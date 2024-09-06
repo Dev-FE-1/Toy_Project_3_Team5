@@ -10,7 +10,6 @@ import MiniPlaylist from '@/components/MiniPlaylist';
 import Modal from '@/components/Modal';
 import AddedVideo, { AddedLinkProps } from '@/components/playlist/AddedVideo';
 import Profile from '@/components/Profile';
-import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import useDetailForm from '@/hooks/useDetailForm';
@@ -50,7 +49,6 @@ const Detail = () => {
   );
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [autoPlay, setAutoPlay] = useState<boolean>(true);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
   const { isFollowing, handleFollowToggle } = useFollowToggle(loginId);
@@ -231,13 +229,6 @@ const Detail = () => {
               color={isAdded ? 'primary' : 'gray'}
               fillColor={isAdded ? 'primary' : undefined}
               label='저장'
-            />
-          </div>
-          <div css={oneLineStyle}>
-            <Toggle
-              enabled={autoPlay}
-              setEnabled={setAutoPlay}
-              label={{ active: '다음으로 재생될 영상', inactive: '' }}
             />
           </div>
           <div css={videoListInfoStyle(true)}>

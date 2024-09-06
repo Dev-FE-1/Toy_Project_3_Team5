@@ -19,7 +19,7 @@ export const tagging = (value: string) => {
   return '';
 };
 
-export const convertUnitNumber = (value: number): string => {
+export const convertUnitNumber = (value: number, fixed: number = 2): string => {
   let result = value.toString();
 
   const units = [
@@ -31,7 +31,7 @@ export const convertUnitNumber = (value: number): string => {
   units.some((unit) => {
     if (value > unit.divNum) {
       return (result =
-        parseFloat(Number(value / unit.divNum).toFixed(2)) + unit.text);
+        parseFloat(Number(value / unit.divNum).toFixed(fixed)) + unit.text);
     }
   });
 

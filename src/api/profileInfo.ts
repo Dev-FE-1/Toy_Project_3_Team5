@@ -7,6 +7,23 @@ import {
   getDoc,
 } from 'firebase/firestore';
 import { db } from '@/firebase/firbaseConfig';
+import { ApiResponse, UserProps } from '@/types/api';
+
+export const getUserInfo = async (
+  userId: string
+): Promise<ApiResponse<UserProps>> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const docSnap = await getDoc(userDocRef);
+
+    if (!!!docSnap) throw new Error('사용자 정보 불러오기 실패');
+
+    return { status: 'success', result: docSnap.data() as UserProps };
+  } catch (err) {
+    console.error(err);
+    return { status: 'fail' };
+  }
+};
 
 const getUserComments = async (userId: string) => {
   try {

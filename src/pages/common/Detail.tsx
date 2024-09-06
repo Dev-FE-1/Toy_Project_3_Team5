@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { ExternalLink, Heart, ListPlus, X } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { addComment } from '@/api/comment';
 import { getVideoInfo } from '@/api/video';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
@@ -14,9 +13,7 @@ import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import useDetailForm from '@/hooks/useDetailForm';
-import useToast from '@/hooks/useToast';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { CommentProps, PlayListDataProps } from '@/types/playlistType';
+import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 import { makeEmbedUrl } from '@/utils/videoUtils';
 
@@ -26,57 +23,6 @@ import { makeEmbedUrl } from '@/utils/videoUtils';
  *  2.1. 자동재생은 지원하지 않음.
  */
 
-const fetchTestData = {
-  likes: 0,
-  regDate: '2024-09-04T03:02:17.304Z',
-  userId: 'kimisadev27',
-  tags: ['#윤하', '#데뷔20주년', '#태양물고기'],
-  isPublic: true,
-  title: '윤하노래 모음',
-  description:
-    '유튜브에 윤하 검색해서 나오는 영상 5개 유튜브에 윤하 검색해서 나오는 영상 5개 유튜브에 윤하 검색해서 나오는 영상 5개 유튜브에 윤하 검색해서 나오는 영상 5개 유튜브에 윤하 검색해서 나오는 영상 5개 유튜브에 윤하 검색해서 나오는 영상 5개 유튜브에 윤하 검색해서 나오는 영상 5개 ',
-  ownerChannelName: 'dj킴믹스',
-  thumbnail:
-    'https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/playlist%2F55%2Fthumbnail.png?alt=media&token=8d1388c8-97e5-4403-8c7c-85985631ac45',
-  links: [
-    'https://www.youtube.com/watch?v=ECD3nPW0WL8&ab_channel=%ED%8D%BC%EC%8A%A4%EB%84%90Personal',
-    'https://www.youtube.com/watch?v=ehX7MAhc5iA&pp=ygUG7Jyk7ZWY',
-    'https://www.youtube.com/watch?v=j1uXcHwLhHM&list=RDEMbm5uPcQwbWpV_Z02LESnXQ&start_radio=1',
-    'https://www.youtube.com/watch?v=kZEucEyXSQE&t=5s&pp=ygUG7Jyk7ZWY',
-    'https://www.youtube.com/watch?v=rVuq_24eEMs&pp=ygUG7Jyk7ZWY',
-  ],
-};
-
-const test = {
-  url: 'https://www.youtube.com/watch?v=ehX7MAhc5iA',
-  version: '1.0',
-  thumbnail_height: 360,
-  provider_name: 'YouTube',
-  width: 200,
-  thumbnail_width: 480,
-  title: '윤하(YOUNHA) - 태양물고기 M/V',
-  author_name: 'YOUNHA OFFICIAL',
-  thumbnail_url: 'https://i.ytimg.com/vi/ehX7MAhc5iA/hqdefault.jpg',
-  author_url: 'https://www.youtube.com/@YOUNHAOFFICIAL',
-  html: '<iframe src="https://www.youtube.com/embed/ehX7MAhc5iA?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="윤하(YOUNHA) - 태양물고기 M/V"></iframe>',
-  height: 113,
-  type: 'video',
-  provider_url: 'https://www.youtube.com/',
-};
-
-const COMMENT_TEST_DATA = [
-  {
-    content: '너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!',
-    imgUrl: '',
-    userName: 'dev.meryoung',
-  },
-  {
-    content: '너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!',
-    imgUrl: '',
-    userName: 'dev.meryoung',
-  },
-];
-
 const MAX_LENGTH = {
   videoTitle: 20,
   playlistTitle: 20,
@@ -84,27 +30,16 @@ const MAX_LENGTH = {
   channelName: 10,
 };
 
-interface DetailForms {
-  comment: string;
-}
-
-const INIT_VALUES: DetailForms = {
-  comment: '',
-};
-
 const Detail = () => {
-  const { playlistId } = useParams();
-  const { userId } = useAuthStore();
-  const { toastTrigger } = useToast();
-
-  const playlistInfo: PlayListDataProps = fetchTestData;
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
   const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
-  const [commentList, setCommentList] = useState<CommentProps[]>([]);
-  const [inputComment, setInputComment] = useState<string>('');
 
   const { values, onChanges, onKeydowns, onClicks, validations } =
     useDetailForm();
+
+  const { detailInfo, fetchPlaylistInfo, fetchOwnerInfo } = usePlaylistInfo();
+
+  const { playlistInfo, comments, ownerInfo } = detailInfo;
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
@@ -113,21 +48,13 @@ const Detail = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    (async () => {
-      // const { result } = await getVideoInfo(playlistInfo.links);
-      // if (!!!result) return;
-      // setCurrentVideo(result);
-
-      playlistInfo.links.map(async (link, index) => {
-        const { result } = await getVideoInfo(link);
-        if (result) videoList.push(result);
-        if (index === 0) setCurrentVideo(result);
-      });
-
-      // const embedCode = makeEmbedUrl(result.videoId, 'youtube');
-      // setEmbedLink(embedCode);
-    })();
-  }, []);
+    fetchOwnerInfo();
+    playlistInfo.links.map(async (link, index) => {
+      const { result } = await getVideoInfo(link);
+      if (result) videoList.push(result);
+      if (index === 0) setCurrentVideo(result);
+    });
+  }, [playlistInfo]);
 
   return (
     <div css={containerStyle}>
@@ -214,10 +141,10 @@ const Detail = () => {
             <Profile alt='이미지' src={''} size='sm' />
             <div css={userInfoTwoLineStyle}>
               <span className='channelName'>
-                {omittedText('여행자', MAX_LENGTH.channelName)}
+                {omittedText(ownerInfo.channelName, MAX_LENGTH.channelName)}
               </span>
               <span className='counter'>
-                {convertUnitNumber(183933)} 팔로워
+                {convertUnitNumber(ownerInfo.channelFollowing.length, 1)} 팔로워
               </span>
             </div>
             <Button
@@ -236,7 +163,7 @@ const Detail = () => {
             />
             <IconButton
               IconComponent={ExternalLink}
-              onClick={() => {}}
+              onClick={onClicks.copy}
               color='black'
               label='공유'
             />
@@ -472,12 +399,6 @@ const commentHeader = css`
     color: ${colors.gray05};
     padding-left: 5px;
   }
-`;
-
-const a = css`
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
 `;
 
 const commentInputStyle = css`

@@ -14,7 +14,7 @@ import { HeaderProps } from '@/types/header';
 
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const [searchText, setSearchText] = useState<string>('');
-  const { user, profileImage } = useAuthStore();
+  const { userId, user, profileImage } = useAuthStore();
   const { keyword } = useParams<{ keyword?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
 
   const onProfileClick = () => {
     if (user) {
-      navigate(ROUTES.PROFILE(user.uid));
+      navigate(ROUTES.PROFILE(userId));
     } else {
       navigate(ROUTES.SIGN_IN);
     }

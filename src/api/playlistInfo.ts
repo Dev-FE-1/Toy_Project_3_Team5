@@ -1,5 +1,7 @@
+import firebase from 'firebase/compat/app';
 import {
   collection,
+  deleteDoc,
   doc,
   DocumentData,
   getDoc,
@@ -9,7 +11,13 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import {
+  deleteObject,
+  getDownloadURL,
+  listAll,
+  ref,
+  uploadBytes,
+} from 'firebase/storage';
 import { COLLECTION, db, storage, STORAGE } from '@/firebase/firbaseConfig';
 import { ApiResponse } from '@/types/api';
 import { PlayListDataProps } from '@/types/playlistType';
@@ -72,7 +80,19 @@ export const updatePlaylist = async (
   return { status: 'success', result: true };
 };
 
-export const deletePlaylist = async () => {};
+export const deletePlaylist = async (
+  playlistId: number
+): Promise<ApiResponse<boolean>> => {
+  const docRef = doc(db, COLLECTION.playlist, `${playlistId}`);
+  try {
+    await deleteDoc(docRef);
+    await removeThumbnail(`${playlistId}`);
+    return { status: 'success', result: true };
+  } catch (err) {
+    console.error(err);
+    return { status: 'fail' };
+  }
+};
 
 const getNextPlaylistId = (
   docs: QueryDocumentSnapshot<DocumentData, DocumentData>[]
@@ -91,4 +111,25 @@ const uploadThumbnail = async (file: File, docId: string) => {
   const url = await getDownloadURL(result.ref);
 
   return url;
+};
+
+const removeThumbnail = async (docId: string): Promise<boolean> => {
+  const path = `${STORAGE.playlist}/${docId}`;
+  const locationRef = ref(storage, path);
+
+  try {
+    listAll(locationRef).then((dir) => {
+      dir.items.forEach(async (fileRef) => {
+        await deleteObject(fileRef);
+      });
+      dir.prefixes.forEach(async (folderRef) => {
+        await deleteObject(folderRef);
+      });
+    });
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
 };

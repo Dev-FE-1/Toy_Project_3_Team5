@@ -28,10 +28,16 @@ const Navbar: React.FC = () => {
   return (
     <nav css={navbarStyle}>
       {navList.map((list, idx) => {
-        const isActive =
-          list.to === ROUTES.ROOT
-            ? location.pathname === list.to
-            : location.pathname.startsWith(list.to);
+        let isActive = false;
+
+        if (list.to === ROUTES.ROOT) {
+          isActive = location.pathname === list.to;
+        } else if (list.label === '마이플리') {
+          const playlistBaseRoute = '/playlist';
+          isActive = location.pathname.startsWith(playlistBaseRoute);
+        } else {
+          isActive = location.pathname.startsWith(list.to);
+        }
 
         const onClick = () => {
           if (list.label === '마이플리' && userId) {

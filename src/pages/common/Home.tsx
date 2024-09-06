@@ -1,84 +1,72 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/react';
+import { useFetchHomePlaylists } from '@/api/homePlaylists';
+import folderIcon from '@/assets/folderIcon.png';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import TextFilter from '@/components/TextFilter';
+import { fontSize } from '@/constants/font';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+
+const PAGE_SIZE = 5;
+const SORT_OPTIONS = ['최신순', '좋아요순', '댓글순'];
 
 const Home: React.FC = () => {
   const [selectedIndex, setselectedIndex] = useState<number>(0);
+  const selectedOption = SORT_OPTIONS[selectedIndex];
 
-  const options = ['최신순', '좋아요', '댓글순'];
-  const dummyPlaylist = [
-    {
-      title: '[Playlist] 브리즈번 도시 산책',
-      userName: 'LEEPLAY',
-      tags: ['#팝송'],
-      numberOfComments: 15,
-      numberOfLikes: 221,
-      publicity: false,
-      links: [
-        'https://i.ytimg.com/vi/Tz4DKO6BIwY/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLBVTHHAexsNORQm82qsgAKfgKGZhw',
-      ],
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useFetchHomePlaylists(selectedOption, PAGE_SIZE);
+
+  const playlists = data?.pages.flatMap((page) => page.playlistsData) || [];
+
+  const infiniteScrollRef = useInfiniteScroll(
+    async (entry, observer) => {
+      observer.unobserve(entry.target);
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
     },
     {
-      title: '[Playlist] 뉴욕 거리를 거닐며 듣던 앤더슨 팩의 음악',
-      userName: 'LEEPLAY',
-      tags: ['#팝송'],
-      numberOfComments: 250,
-      numberOfLikes: 1010,
-      publicity: false,
-      links: [
-        'https://i.ytimg.com/vi/uIdJ3BjhkaU/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDOjIY2I1A4SarbZqTLHlIXzHb5JQ',
-      ],
-    },
-    {
-      title: '[Playlist] 당신에게도 인생 공간이 있나요?',
-      userName: 'LEEPLAY',
-      tags: ['#팝송'],
-      numberOfComments: 70,
-      numberOfLikes: 751,
-      publicity: false,
-      links: [
-        'https://i.ytimg.com/vi/BW8Fjueha8s/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLAXPRcUbkcee6Vlo-u1h45egXLe_Q',
-      ],
-    },
-    {
-      title: '[Playlist] 어느 봄날의 망원동 산책',
-      userName: 'LEEPLAY',
-      tags: ['#팝송'],
-      numberOfComments: 12,
-      numberOfLikes: 99,
-      publicity: false,
-      links: [
-        'https://i.ytimg.com/vi/wBWzGaxcsgY/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCzSO3mzmW4WH4_R6Onw_VCLstmeg',
-      ],
-    },
-    {
-      title:
-        '[Playlist] 여름에 향수 대신 뿌리는 플레이리스트 (Sunni Colón Playlist)',
-      userName: 'LEEPLAY',
-      tags: ['#팝송'],
-      numberOfComments: 32,
-      numberOfLikes: 447,
-      publicity: false,
-      links: [
-        'https://i.ytimg.com/vi/QWmC_MDk5Jc/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLBx0CXzx6OA30JR0DZc9bsC90xtGA',
-      ],
-    },
-  ];
+      root: null,
+      rootMargin: '0px 0px -20px 0px',
+      threshold: 0.5,
+    }
+  );
 
   return (
     <div css={containerStyle}>
       <div css={textFilterWrapperStyle}>
         <TextFilter
-          options={options}
+          options={SORT_OPTIONS}
           selectedIndex={selectedIndex}
           setSelectedIndex={setselectedIndex}
         />
       </div>
       <div css={playlistWrapperStyle}>
-        {dummyPlaylist.map((list, idx) => (
-          <PlaylistCard key={idx} playlistItem={list} size='large' />
-        ))}
+        {playlists.length === 0 && !isFetching ? (
+          <div css={emptyWrapperStyle}>
+            <img src={folderIcon} alt='폴더 아이콘' />
+            <div>
+              <p>정렬 조건에 해당하는 플리가 없습니다.</p>
+            </div>
+          </div>
+        ) : (
+          playlists.map((playlistItem) => (
+            <PlaylistCard
+              key={playlistItem.playlistId}
+              size='large'
+              playlistItem={playlistItem}
+            />
+          ))
+        )}
+        <div css={loadingWrapperStyle}>
+          {isFetching && playlists.length >= PAGE_SIZE && <LoadingSpinner />}
+        </div>
+        <div
+          ref={infiniteScrollRef}
+          style={{ minHeight: '72px', width: '100%' }}
+        />
       </div>
     </div>
   );
@@ -100,6 +88,35 @@ const playlistWrapperStyle = css`
   display: flex;
   flex-direction: column;
   gap: 20px;
+`;
+
+const emptyWrapperStyle = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 80px;
+
+  p {
+    font-size: ${fontSize.md};
+    line-height: 2.2rem;
+  }
+
+  div {
+    text-align: center;
+  }
+
+  img {
+    width: 50%;
+  }
+`;
+
+const loadingWrapperStyle = css`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default Home;

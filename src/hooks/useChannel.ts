@@ -2,29 +2,37 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/firebase/firbaseConfig';
 
-interface FollowingChannel {
+interface Channel {
   id: string;
   profileImg: string;
   channelName: string;
   uid?: string;
 }
 
-const useChannel = (channelId: string) => {
-  const [channels, setChannels] = useState<FollowingChannel[]>([]);
+type ListType = 'following' | 'follower';
+
+const useChannel = (channelId: string, listType: ListType) => {
+  const [channels, setChannels] = useState<Channel[]>([]);
 
   useEffect(() => {
     const userDocRef = doc(db, 'users', channelId);
 
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
-        const { channelFollowing } = doc.data() as {
+        const userData = doc.data() as {
           channelFollowing: string[];
+          channelFollower: string[];
         };
 
-        if (channelFollowing && channelFollowing.length > 0) {
+        const listToFetch =
+          listType === 'following'
+            ? userData.channelFollowing
+            : userData.channelFollower;
+
+        if (listToFetch && listToFetch.length > 0) {
           const usersQuery = query(
             collection(db, 'users'),
-            where('uid', 'in', channelFollowing)
+            where('uid', 'in', listToFetch)
           );
 
           const unsubscribeUsers = onSnapshot(usersQuery, (querySnapshot) => {
@@ -39,6 +47,8 @@ const useChannel = (channelId: string) => {
           });
 
           return () => unsubscribeUsers();
+        } else {
+          setChannels([]);
         }
       } else {
         console.log('No such user document!');
@@ -47,7 +57,7 @@ const useChannel = (channelId: string) => {
     });
 
     return () => unsubscribe();
-  }, [channelId]);
+  }, [channelId, listType]);
 
   return channels;
 };

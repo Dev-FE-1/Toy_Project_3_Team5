@@ -32,9 +32,7 @@ interface AuthState {
   addSavedPlaylistItem: (playlistId: number) => void;
   removeLikedPlaylistItem: (playlistId: number) => void;
   removeSavedPlaylistItem: (playlistId: number) => void;
-  // 팔로잉 리스트 업데이트 함수 추가
   removeFollowing: (userId: string, uidToRemove: string) => Promise<void>;
-  // 팔로워 리스트 업데이트 함수 추가
   removeFollower: (userId: string, uidToRemove: string) => Promise<void>;
 }
 
@@ -96,7 +94,7 @@ export const useAuthStore = create<AuthState>(
         set((state) => ({
           savedPlaylist: state.savedPlaylist.filter((i) => i !== playlistId),
         })),
-      // 팔로잉 리스트 업데이트 함수 추가
+
       removeFollowing: async (userId: string, uidToRemove: string) => {
         const userDocRef = doc(db, 'users', userId);
         await updateDoc(userDocRef, {
@@ -108,7 +106,7 @@ export const useAuthStore = create<AuthState>(
           ),
         }));
       },
-      // 팔로잉 리스트 업데이트 함수 추가
+
       removeFollower: async (userId: string, uidToRemove: string) => {
         const userDocRef = doc(db, 'users', userId);
         await updateDoc(userDocRef, {

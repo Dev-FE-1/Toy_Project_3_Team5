@@ -4,56 +4,35 @@ import { useParams } from 'react-router-dom';
 import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
-import { useAuthStore } from '@/stores/useAuthStore';
-import useModalStore from '@/stores/useModalStore';
+import useList from '@/hooks/useList';
 
-const ProfileFollower = () => {
+const FollowerList = () => {
   const { userId } = useParams();
-  const { channelFollower, removeFollower } = useAuthStore.getState();
-  const { openModal } = useModalStore();
-
-  const handleRemoveFollower = async (uid: string) => {
-    if (userId) {
-      try {
-        await removeFollower(userId, uid);
-      } catch (error) {
-        console.error('팔로워 제거 중 오류 발생:', error);
-      }
-    }
-  };
-
-  const handleUserMinusClick = (uid: string) => {
-    openModal({
-      type: 'confirm',
-      title: '팔로워 삭제 확인',
-      content: '정말로 이 유저를 팔로워에서 삭제하시겠습니까?',
-      onAction: () => handleRemoveFollower(uid),
-    });
-  };
+  const { list: followerList, handleUserMinusClick } = useList(
+    userId || '',
+    'follower'
+  );
 
   return (
     <>
       <div css={rootContainer}>
         <div css={numberingContainer}>
-          {channelFollower.length === 0
-            ? '팔로워가 없습니다'
-            : `총 ${channelFollower.length} 명`}
+          {followerList.length === 0
+            ? '팔로워가 없습니다' // 팔로워 리스트가 비어 있을 경우
+            : `총 ${followerList.length} 명`}{' '}
+          {/* 팔로워 리스트가 있을 경우 */}
         </div>
         <div css={profileListContainer}>
-          {channelFollower.length > 0 &&
-            channelFollower.map((uid, index) => (
+          {followerList.length > 0 &&
+            followerList.map((data, index) => (
               <div key={index} css={profileItem}>
                 <span css={profileContainerStyle}>
-                  <Profile
-                    src={'/src/assets/defaultThumbnail.jpg'}
-                    alt='Profile Image'
-                    size='sm'
-                  />
-                  <span>{uid}</span>
+                  <Profile src={data.src} alt={data.alt} size={data.size} />
+                  <span>{data.name}</span>
                 </span>
                 <button
                   css={userMinusStyle}
-                  onClick={() => handleUserMinusClick(uid)}
+                  onClick={() => handleUserMinusClick(data.uid)} // 삭제 확인 모달 열기
                 >
                   <UserMinus css={userMinusStyle} />
                 </button>
@@ -103,4 +82,4 @@ const userMinusStyle = css`
   border: none;
 `;
 
-export default ProfileFollower;
+export default FollowerList;

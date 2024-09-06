@@ -4,23 +4,21 @@ import { useParams } from 'react-router-dom';
 import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
-import { useFollowingList } from '@/hooks/useFollowingList';
+import useList from '@/hooks/useList';
 import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
 
 const FollowingList = () => {
   const { userId } = useParams();
-  const { followingList, setFollowingList } = useFollowingList(userId || '');
+  const { list: followingList, setList } = useList(userId || '', 'following');
   const { removeFollowing } = useAuthStore.getState();
-  const { openModal } = useModalStore(); // 모달 스토어 가져오기
+  const { openModal } = useModalStore();
 
   const handleUnfollow = async (uid: string) => {
     if (userId) {
       try {
-        await removeFollowing(userId, uid); // 팔로잉 삭제 함수 호출
-        setFollowingList((prevList) =>
-          prevList.filter((user) => user.uid !== uid)
-        ); // 상태 업데이트
+        await removeFollowing(userId, uid);
+        setList((prevList) => prevList.filter((user) => user.uid !== uid));
       } catch (error) {
         console.error('Error unfollowing user:', error);
       }
@@ -32,7 +30,7 @@ const FollowingList = () => {
       type: 'confirm', // 모달 타입 설정
       title: '언팔로우 확인',
       content: '정말로 이 유저를 언팔로우 하시겠습니까?',
-      onAction: () => handleUnfollow(uid), // 확인 버튼 클릭 시 실행할 함수
+      onAction: () => handleUnfollow(uid),
     });
   };
 
@@ -41,9 +39,8 @@ const FollowingList = () => {
       <div css={rootContainer}>
         <div css={numberingContainer}>
           {followingList.length === 0
-            ? '팔로우중인 채널이 없습니다' // 팔로잉 리스트가 비어 있을 경우
+            ? '팔로우중인 채널이 없습니다'
             : `총 ${followingList.length} 명`}{' '}
-          {/* 팔로잉 리스트가 있을 경우 */}
         </div>
         <div css={profileListContainer}>
           {followingList.length > 0 &&
@@ -55,7 +52,7 @@ const FollowingList = () => {
                 </span>
                 <button
                   css={userMinusStyle}
-                  onClick={() => handleUserMinusClick(data.uid)} // 삭제 확인 모달 열기
+                  onClick={() => handleUserMinusClick(data.uid)}
                 >
                   <UserMinus css={userMinusStyle} />
                 </button>

@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { doc, updateDoc, increment } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase/firbaseConfig';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 type PlaylistType = 'liked' | 'saved';
 
-const updateUserPlaylists = async (
+export const updateUserPlaylists = async (
   userId: string,
   playlistType: PlaylistType,
   playlistData: number[]
@@ -20,14 +20,14 @@ const updateUserPlaylists = async (
   await updateDoc(userDocRef, updateData);
 };
 
-const updatePlaylistLikes = async (
+export const updatePlaylistLikes = async (
   playlistId: number,
-  incrementValue: number
+  newLikes: number
 ) => {
   const playlistDocRef = doc(db, 'playlist', playlistId.toString());
 
   await updateDoc(playlistDocRef, {
-    likes: increment(incrementValue),
+    likes: newLikes,
   });
 };
 
@@ -39,11 +39,11 @@ export const useUpdateUserPlaylists = () => {
     mutationFn: async ({
       playlistType,
       playlistId,
-      isPlus,
+      newLikes,
     }: {
       playlistType: PlaylistType;
       playlistId: number;
-      isPlus?: boolean;
+      newLikes?: number;
     }) => {
       if (!user) {
         throw new Error('로그인이 필요합니다.');
@@ -54,9 +54,8 @@ export const useUpdateUserPlaylists = () => {
 
       await updateUserPlaylists(userId, playlistType, playlistData);
 
-      if (isPlus) {
-        const incrementValue = isPlus ? 1 : -1;
-        await updatePlaylistLikes(playlistId, incrementValue);
+      if (newLikes !== undefined) {
+        await updatePlaylistLikes(playlistId, newLikes);
       }
     },
     onSuccess: () => {

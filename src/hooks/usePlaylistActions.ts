@@ -26,9 +26,10 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     }
 
     const newIsLiked = !isLiked;
-
     setIsLiked(newIsLiked);
-    setLikes((prevLikes) => (newIsLiked ? prevLikes + 1 : prevLikes - 1));
+
+    const newLikes = newIsLiked ? likes + 1 : likes - 1;
+    setLikes(newLikes);
 
     if (newIsLiked) {
       addLikedPlaylistItem(playlistId);
@@ -39,7 +40,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     await updatePlaylists({
       playlistType: 'liked',
       playlistId,
-      isPlus: newIsLiked,
+      newLikes,
     });
   };
 

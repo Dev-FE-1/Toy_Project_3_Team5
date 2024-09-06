@@ -138,7 +138,7 @@ const Detail = () => {
             )}
           </div>
           <div css={oneLineStyle}>
-            <Profile alt='이미지' src={''} size='sm' />
+            <Profile alt='이미지' src={ownerInfo.profileImg} size='sm' />
             <div css={userInfoTwoLineStyle}>
               <span className='channelName'>
                 {omittedText(ownerInfo.channelName, MAX_LENGTH.channelName)}

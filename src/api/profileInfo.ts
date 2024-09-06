@@ -53,6 +53,23 @@ const getMyPlaylistCount = async (userId: string) => {
   }
 };
 
+const getMyHashtag = async (userId: string) => {
+  const userDoc = doc(db, 'users', userId);
+  const userSnapshot = await getDoc(userDoc);
+  if (userSnapshot.exists()) {
+    const userData = userSnapshot.data();
+    const hashtags = userData.tags;
+    return hashtags;
+  }
+};
+
+const updateProfileTags = async (userId: string, tags: string[]) => {
+  const userDoc = doc(db, 'users', userId);
+  await updateDoc(userDoc, {
+    tags,
+  });
+};
+
 const uploadImage = async (file: File, userId: string) => {
   const path = `profile/${userId}/${file.name}`;
   const locationRef = ref(storage, path);
@@ -80,4 +97,6 @@ export {
   getPlaylistTitle,
   getMyPlaylistCount,
   updateProfileImage,
+  getMyHashtag,
+  updateProfileTags,
 };

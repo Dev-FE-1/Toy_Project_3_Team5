@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import { Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { updateProfileImage } from '@/api/profileInfo';
+import {
+  updateProfileImage,
+  getMyHashtag,
+  updateProfileTags,
+} from '@/api/profileInfo';
 import Button from '@/components/Button';
+import HashTag from '@/components/HashTag';
 import InputBox from '@/components/InputBox';
+import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
@@ -14,12 +20,41 @@ import { useAuthStore } from '@/stores/useAuthStore';
 
 export const ProfileUpdate = () => {
   const { profileImage, channelName, userId } = useAuthStore();
+
   const [hashtag, setHashtag] = useState<string>('');
+  const [hashtags, setHashtags] = useState<string[]>([]);
+
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
 
   const navigate = useNavigate();
   const { toastTrigger } = useToast();
+
+  useEffect(() => {
+    const fetchHashtags = async () => {
+      const fetchedHashtags = await getMyHashtag(userId);
+      setHashtags(fetchedHashtags);
+    };
+
+    fetchHashtags();
+  }, [userId]);
+
+  const addHashtag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (hashtag && !hashtags.includes(hashtag)) {
+        const formattedHashtag = hashtag.startsWith('#')
+          ? hashtag
+          : `#${hashtag}`;
+        setHashtags((prev) => [...prev, formattedHashtag]);
+        setHashtag('');
+      }
+    }
+  };
+
+  const removeHashtag = (label: string) => {
+    setHashtags((prevHashtags) => prevHashtags.filter((tag) => tag !== label));
+  };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,6 +70,10 @@ export const ProfileUpdate = () => {
 
     if (selectedImage && userId) {
       await updateProfileImage(userId, { profileImageFile: selectedImage });
+    }
+
+    if (userId) {
+      await updateProfileTags(userId, hashtags);
     }
 
     navigate(ROUTES.PROFILE(userId));
@@ -82,17 +121,29 @@ export const ProfileUpdate = () => {
           label='해시태그 (최대 10개)'
           placeholder='#'
           value={hashtag}
-          onChange={() => {}}
-          width='315px'
+          onChange={(e) => setHashtag(e.target.value)}
+          onKeyDown={addHashtag}
         />
-        <Button
-          label='프로필 저장'
-          onClick={onProfileSave}
-          type='submit'
-          size='lg'
-          fullWidth={true}
+        <HashTag
+          margin='3px'
+          tags={hashtags.map((tag, index) => ({
+            id: index,
+            label: tag,
+            removable: true,
+          }))}
+          onRemove={removeHashtag}
         />
+        <div style={{ marginTop: '20px' }}>
+          <Button
+            label='프로필 저장'
+            onClick={onProfileSave}
+            type='submit'
+            size='lg'
+            fullWidth={true}
+          />
+        </div>
       </form>
+      <Modal />
     </div>
   );
 };

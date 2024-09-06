@@ -49,6 +49,7 @@ const HashTag: React.FC<TagProps> = ({
               css={removeButtonStyle}
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 onRemove(tag.label);
               }}
             >

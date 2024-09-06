@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'react-router-dom';
 import { useUpdateUserPlaylists } from '@/api/playlistActions';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { PlayListDataProps } from '@/types/playlistType';
+
+const PAGES_QUERY: { [key: string]: string } = {
+  '': 'homePlaylists',
+  search: 'searchPlaylists',
+};
 
 const usePlaylistActions = (playlistId: number, initialLikes: number) => {
+  const queryClient = useQueryClient();
   const {
     likedPlaylist,
     savedPlaylist,
@@ -14,10 +22,13 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     removeSavedPlaylistItem,
   } = useAuthStore();
   const { updatePlaylists } = useUpdateUserPlaylists();
-  const [isLiked, setIsLiked] = useState(likedPlaylist.includes(playlistId));
-  const [isAdded, setIsAdded] = useState(savedPlaylist.includes(playlistId));
-  const [likes, setLikes] = useState<number>(initialLikes);
   const { toastTrigger } = useToast();
+  const location = useLocation();
+  const page = location.pathname.split('/')[1];
+  const queryKey = PAGES_QUERY[page];
+
+  const isLiked = likedPlaylist.includes(playlistId);
+  const isAdded = savedPlaylist.includes(playlistId);
 
   const toggleLike = async () => {
     if (!user) {
@@ -26,10 +37,23 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     }
 
     const newIsLiked = !isLiked;
-    setIsLiked(newIsLiked);
+    const newLikes = newIsLiked ? initialLikes + 1 : initialLikes - 1;
 
-    const newLikes = newIsLiked ? likes + 1 : likes - 1;
-    setLikes(newLikes);
+    queryClient.setQueriesData({ queryKey: [queryKey] }, (oldData: any) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page: any) => ({
+          ...page,
+          playlistsData: page.playlistsData.map(
+            (playlist: PlayListDataProps) =>
+              playlist.playlistId === playlistId.toString()
+                ? { ...playlist, isLiked: newIsLiked, likes: newLikes }
+                : playlist
+          ),
+        })),
+      };
+    });
 
     if (newIsLiked) {
       addLikedPlaylistItem(playlistId);
@@ -37,21 +61,46 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
       removeLikedPlaylistItem(playlistId);
     }
 
-    await updatePlaylists({
-      playlistType: 'liked',
-      playlistId,
-      newLikes,
-    });
+    try {
+      await updatePlaylists({
+        playlistType: 'liked',
+        playlistId,
+        newLikes,
+      });
+    } catch (error) {
+      toastTrigger('좋아요 업데이트에 실패했습니다.');
+      if (newIsLiked) {
+        removeLikedPlaylistItem(playlistId);
+      } else {
+        addLikedPlaylistItem(playlistId);
+      }
+      queryClient.invalidateQueries({ queryKey: ['homePlaylists'] });
+    }
   };
 
-  const toggleSave = () => {
+  const toggleSave = async () => {
     if (!user) {
       toastTrigger('로그인이 필요합니다.');
       return;
     }
 
     const newIsAdded = !isAdded;
-    setIsAdded(newIsAdded);
+
+    queryClient.setQueriesData({ queryKey: [queryKey] }, (oldData: any) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page: any) => ({
+          ...page,
+          playlistsData: page.playlistsData.map(
+            (playlist: PlayListDataProps) =>
+              playlist.playlistId === playlistId.toString()
+                ? { ...playlist, isAdded: newIsAdded }
+                : playlist
+          ),
+        })),
+      };
+    });
 
     if (newIsAdded) {
       addSavedPlaylistItem(playlistId);
@@ -59,15 +108,20 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
       removeSavedPlaylistItem(playlistId);
     }
 
-    updatePlaylists({ playlistType: 'saved', playlistId });
+    try {
+      await updatePlaylists({ playlistType: 'saved', playlistId });
+    } catch (error) {
+      toastTrigger('저장 상태 업데이트에 실패했습니다.');
+      if (newIsAdded) {
+        removeSavedPlaylistItem(playlistId);
+      } else {
+        addSavedPlaylistItem(playlistId);
+      }
+      queryClient.invalidateQueries({ queryKey: ['homePlaylists'] });
+    }
   };
 
-  useEffect(() => {
-    setIsLiked(likedPlaylist.includes(playlistId));
-    setIsAdded(savedPlaylist.includes(playlistId));
-  }, [likedPlaylist, savedPlaylist, playlistId]);
-
-  return { isLiked, isAdded, toggleLike, toggleSave, likes };
+  return { isLiked, isAdded, toggleLike, toggleSave, likes: initialLikes };
 };
 
 export default usePlaylistActions;

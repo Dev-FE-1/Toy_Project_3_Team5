@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import { ExternalLink, Heart, ListPlus, X } from 'lucide-react';
+import { ExternalLink, Heart, ListPlus, ListX, X } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import { CommentWithProfileApiProps, removeComment } from '@/api/comment';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
@@ -14,6 +15,7 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import useDetailForm from '@/hooks/useDetailForm';
 import { useFollowToggle } from '@/hooks/useFollowToggle';
+import usePlaylistActions from '@/hooks/usePlaylistActions';
 import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -31,6 +33,7 @@ const MAX_LENGTH = {
 const COMMENT_PLUS_SIZE = 5;
 
 const Detail = () => {
+  const { playlistId } = useParams<{ playlistId: string }>();
   const { profileImage, userId: loginId } = useAuthStore();
   const { toastTrigger } = useToast();
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
@@ -51,6 +54,9 @@ const Detail = () => {
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
   const { isFollowing, handleFollowToggle } = useFollowToggle(loginId);
+
+  const { isLiked, isAdded, toggleLike, toggleSave, likes } =
+    usePlaylistActions(playlistId ? +playlistId : 0, playlistInfo.likes);
 
   const [commentsPlus, setCommentsPlus] = useState<number>(COMMENT_PLUS_SIZE);
   const onCommentsPlus = () => {
@@ -198,7 +204,7 @@ const Detail = () => {
             {!!!ownerInfo.isMyChannel && (
               <Button
                 label={isFollowing ? '팔로우 취소' : '팔로우'}
-                color={isFollowing ? 'gray' : 'black'}
+                color={isFollowing ? 'gray' : 'primary'}
                 size='sm'
                 onClick={handleFollowToggle}
               />
@@ -207,10 +213,12 @@ const Detail = () => {
           <div css={userInfoStyle}>
             <IconButton
               IconComponent={Heart}
-              onClick={() => {}}
-              label='5000'
-              color='black'
+              onClick={toggleLike}
+              color={isLiked ? 'red' : 'gray'}
+              fillColor={isLiked ? 'red' : undefined}
+              label={`${likes !== null ? likes : playlistInfo.likes}`}
             />
+
             <IconButton
               IconComponent={ExternalLink}
               onClick={onClicks.copy}
@@ -218,9 +226,10 @@ const Detail = () => {
               label='공유'
             />
             <IconButton
-              IconComponent={ListPlus}
-              onClick={() => {}}
-              color='black'
+              IconComponent={isAdded ? ListX : ListPlus}
+              onClick={toggleSave}
+              color={isAdded ? 'primary' : 'gray'}
+              fillColor={isAdded ? 'primary' : undefined}
               label='저장'
             />
           </div>

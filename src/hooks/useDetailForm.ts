@@ -49,6 +49,10 @@ const useDetailForm = () => {
         toastTrigger('댓글등록이 실패했습니다.', 'fail');
       }
     },
+    copy: () => {
+      navigator.clipboard.writeText(window.location.href);
+      toastTrigger('링크가 복사되었습니다.');
+    },
   };
 
   const validations = {

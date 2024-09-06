@@ -20,43 +20,40 @@ interface MiniPlaylistProps {
 const defaultImg = '/src/assets/defaultThumbnail.jpg';
 
 const MiniPlaylist = ({ isActive, videoInfo, onClose }: MiniPlaylistProps) => (
-  <div onClick={onClose}>
-    <Transition
-      show={isActive}
-      appear={isActive}
-      as={Fragment}
-      enterFrom='transition-enter-from'
-      enterTo='transition-enter-to'
-      leaveFrom='transition-leave-from'
-      leaveTo='transition-leave-to'
-    >
-      <div css={toastStyle}>
-        <img
-          css={thumbnailStyle}
-          src={videoInfo.thumbnail ? videoInfo.thumbnail : defaultImg}
-        />
-        <div css={infoStyle}>
-          <span css={messageStyle} className='subject'>
-            {videoInfo.subject}
-          </span>
-          <span css={messageStyle} className='playlistName'>
-            {videoInfo.playlistName}
-          </span>
-        </div>
-        <div css={buttonStyle}>
-          <ChevronUp />
-        </div>
+  <Transition
+    show={isActive}
+    appear={isActive}
+    as={Fragment}
+    enterFrom='transition-enter-from'
+    enterTo='transition-enter-to'
+    leaveFrom='transition-leave-from'
+    leaveTo='transition-leave-to'
+  >
+    <div css={toastStyle} onClick={onClose}>
+      <img
+        css={thumbnailStyle}
+        src={videoInfo.thumbnail ? videoInfo.thumbnail : defaultImg}
+      />
+      <div css={infoStyle}>
+        <span css={messageStyle} className='subject'>
+          {videoInfo.subject}
+        </span>
+        <span css={messageStyle} className='playlistName'>
+          {videoInfo.playlistName}
+        </span>
       </div>
-    </Transition>
-  </div>
+      <div css={buttonStyle}>
+        <ChevronUp />
+      </div>
+    </div>
+  </Transition>
 );
 
 const toastStyle = css`
   max-width: 430px;
-  width: calc(100vw - 32px);
+  /* width: calc(100vw - 32px - 40px); */
   position: fixed;
-  left: 50%;
-  margin-left: calc((-1) * (100vw - 32px) / 2);
+  margin: 0px 20px;
   bottom: 96px;
   display: flex;
   justify-content: center;

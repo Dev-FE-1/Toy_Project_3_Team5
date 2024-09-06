@@ -1,57 +1,69 @@
-import React from 'react';
 import { css } from '@emotion/react';
 import { UserMinus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
-import TabButton from '@/components/TabButton';
 import { fontSize } from '@/constants/font';
-import ROUTES from '@/constants/route';
+import { useFollowingList } from '@/hooks/useFollowingList';
+import { useAuthStore } from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
 
-const ProfileFollowing = () => {
+const FollowingList = () => {
   const { userId } = useParams();
+  const { followingList, setFollowingList } = useFollowingList(userId || '');
+  const { removeFollowing } = useAuthStore.getState();
+  const { openModal } = useModalStore(); // 모달 스토어 가져오기
 
-  // mockdata 배열 정의
-  const mockdata = [
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'John Doe',
-    },
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'Jane Smith',
-    },
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'Emily Davis',
-    },
-  ];
+  const handleUnfollow = async (uid: string) => {
+    if (userId) {
+      try {
+        await removeFollowing(userId, uid); // 팔로잉 삭제 함수 호출
+        setFollowingList((prevList) =>
+          prevList.filter((user) => user.uid !== uid)
+        ); // 상태 업데이트
+      } catch (error) {
+        console.error('Error unfollowing user:', error);
+      }
+    }
+  };
+
+  const handleUserMinusClick = (uid: string) => {
+    openModal({
+      type: 'confirm', // 모달 타입 설정
+      title: '언팔로우 확인',
+      content: '정말로 이 유저를 언팔로우 하시겠습니까?',
+      onAction: () => handleUnfollow(uid), // 확인 버튼 클릭 시 실행할 함수
+    });
+  };
 
   return (
     <>
       <div css={rootContainer}>
-        <div css={numberingContainer}>총 {mockdata.length} 명</div>
+        <div css={numberingContainer}>
+          {followingList.length === 0
+            ? '팔로우중인 채널이 없습니다' // 팔로잉 리스트가 비어 있을 경우
+            : `총 ${followingList.length} 명`}{' '}
+          {/* 팔로잉 리스트가 있을 경우 */}
+        </div>
         <div css={profileListContainer}>
-          {mockdata.map((data, index) => (
-            <div key={index} css={profileItem}>
-              <span css={profileContainerStyle}>
-                <Profile src={data.src} alt={data.alt} size={data.size} />
-                <span>{data.name}</span>
-              </span>
-              <button css={userMinusStyle}>
-                <UserMinus css={userMinusStyle} />
-              </button>
-            </div>
-          ))}
+          {followingList.length > 0 &&
+            followingList.map((data, index) => (
+              <div key={index} css={profileItem}>
+                <span css={profileContainerStyle}>
+                  <Profile src={data.src} alt={data.alt} size={data.size} />
+                  <span>{data.name}</span>
+                </span>
+                <button
+                  css={userMinusStyle}
+                  onClick={() => handleUserMinusClick(data.uid)} // 삭제 확인 모달 열기
+                >
+                  <UserMinus css={userMinusStyle} />
+                </button>
+              </div>
+            ))}
         </div>
       </div>
-
-      <div>hello {userId} 파라미터 체크중</div>
+      <Modal />
     </>
   );
 };
@@ -60,8 +72,6 @@ const rootContainer = css`
   display: flex;
   flex-direction: column;
 `;
-
-const tabBtnContainer = css``;
 
 const numberingContainer = css`
   padding-left: 20px;
@@ -95,4 +105,4 @@ const userMinusStyle = css`
   border: none;
 `;
 
-export default ProfileFollowing;
+export default FollowingList;

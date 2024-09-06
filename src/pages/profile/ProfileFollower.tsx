@@ -1,54 +1,67 @@
-import React from 'react';
 import { css } from '@emotion/react';
 import { UserMinus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
+import { useAuthStore } from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
+
 const ProfileFollower = () => {
   const { userId } = useParams();
+  const { channelFollower, removeFollower } = useAuthStore.getState();
+  const { openModal } = useModalStore();
 
-  // mockdata 배열 정의
-  const mockdata = [
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'John Doe',
-    },
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'Jane Smith',
-    },
-    {
-      src: '/src/assets/defaultThumbnail.jpg',
-      alt: 'Profile Image',
-      size: 'sm' as const,
-      name: 'Emily Davis',
-    },
-  ];
+  const handleRemoveFollower = async (uid: string) => {
+    if (userId) {
+      try {
+        await removeFollower(userId, uid);
+      } catch (error) {
+        console.error('팔로워 제거 중 오류 발생:', error);
+      }
+    }
+  };
+
+  const handleUserMinusClick = (uid: string) => {
+    openModal({
+      type: 'confirm',
+      title: '팔로워 삭제 확인',
+      content: '정말로 이 유저를 팔로워에서 삭제하시겠습니까?',
+      onAction: () => handleRemoveFollower(uid),
+    });
+  };
 
   return (
     <>
       <div css={rootContainer}>
-        <div css={numberingContainer}>총 {mockdata.length} 명</div>
+        <div css={numberingContainer}>
+          {channelFollower.length === 0
+            ? '팔로워가 없습니다'
+            : `총 ${channelFollower.length} 명`}
+        </div>
         <div css={profileListContainer}>
-          {mockdata.map((data, index) => (
-            <div key={index} css={profileItem}>
-              <span css={profileContainerStyle}>
-                <Profile src={data.src} alt={data.alt} size={data.size} />
-                <span>{data.name}</span>
-              </span>
-              <button css={userMinusStyle}>
-                <UserMinus css={userMinusStyle} />
-              </button>
-            </div>
-          ))}
+          {channelFollower.length > 0 &&
+            channelFollower.map((uid, index) => (
+              <div key={index} css={profileItem}>
+                <span css={profileContainerStyle}>
+                  <Profile
+                    src={'/src/assets/defaultThumbnail.jpg'}
+                    alt='Profile Image'
+                    size='sm'
+                  />
+                  <span>{uid}</span>
+                </span>
+                <button
+                  css={userMinusStyle}
+                  onClick={() => handleUserMinusClick(uid)}
+                >
+                  <UserMinus css={userMinusStyle} />
+                </button>
+              </div>
+            ))}
         </div>
       </div>
-
-      <div>hello {userId} 파라미터 체크중</div>
+      <Modal />
     </>
   );
 };
@@ -57,8 +70,6 @@ const rootContainer = css`
   display: flex;
   flex-direction: column;
 `;
-
-const tabBtnContainer = css``;
 
 const numberingContainer = css`
   padding-left: 20px;

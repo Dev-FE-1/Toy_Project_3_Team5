@@ -34,6 +34,8 @@ interface AuthState {
   removeSavedPlaylistItem: (playlistId: number) => void;
   // 팔로잉 리스트 업데이트 함수 추가
   removeFollowing: (userId: string, uidToRemove: string) => Promise<void>;
+  // 팔로워 리스트 업데이트 함수 추가
+  removeFollower: (userId: string, uidToRemove: string) => Promise<void>;
 }
 
 type AuthPersist = (
@@ -102,6 +104,18 @@ export const useAuthStore = create<AuthState>(
         });
         set((state) => ({
           channelFollowing: state.channelFollowing.filter(
+            (uid) => uid !== uidToRemove
+          ),
+        }));
+      },
+      // 팔로잉 리스트 업데이트 함수 추가
+      removeFollower: async (userId: string, uidToRemove: string) => {
+        const userDocRef = doc(db, 'users', userId);
+        await updateDoc(userDocRef, {
+          channelFollower: arrayRemove(uidToRemove),
+        });
+        set((state) => ({
+          channelFollower: state.channelFollower.filter(
             (uid) => uid !== uidToRemove
           ),
         }));

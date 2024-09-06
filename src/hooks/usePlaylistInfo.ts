@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { CommentWithProfileApiProps, getPlaylistComment } from '@/api/comment';
 import { getPlaylistInfo } from '@/api/playlistInfo';
 import { getUserInfo } from '@/api/profileInfo';
+import { getVideoInfo } from '@/api/video';
+import { AddedLinkProps } from '@/components/playlist/AddedVideo';
 import { UserProps } from '@/types/api';
 import { PlayListDataProps } from '@/types/playlistType';
 
@@ -42,6 +44,7 @@ export const usePlaylistInfo = () => {
   const [playlistInfo, setPlaylistInfo] = useState<PlayListDataProps>(
     INIT_VALUES.playlistInfo
   );
+  const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
   const [ownerInfo, setOwnerInfo] = useState<UserProps>(INIT_VALUES.ownerInfo);
   const [commentList, setCommentList] = useState<CommentWithProfileApiProps[]>(
     INIT_VALUES.comments
@@ -67,6 +70,15 @@ export const usePlaylistInfo = () => {
     }
   }, [playlistInfo]);
 
+  const convertLinkToVideoInfo = useCallback(
+    async (link: string) => {
+      await getVideoInfo(link).then(({ result }) => {
+        if (result) setVideoList((prev) => [...prev, result]);
+      });
+    },
+    [playlistInfo]
+  );
+
   const fetchCommentInfo = useCallback(async () => {
     const { status, result } = await getPlaylistComment(Number(playlistId));
     if (status === 'fail') {
@@ -84,6 +96,12 @@ export const usePlaylistInfo = () => {
   }, []);
 
   useEffect(() => {
+    playlistInfo.links.map((link) => {
+      convertLinkToVideoInfo(link);
+    });
+  }, [playlistInfo]);
+
+  useEffect(() => {
     setDetailInfo({
       ...detailInfo,
       playlistInfo,
@@ -96,6 +114,7 @@ export const usePlaylistInfo = () => {
 
   return {
     detailInfo,
+    videoList,
     fetchPlaylistInfo,
     fetchOwnerInfo,
     fetchCommentInfo,

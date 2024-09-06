@@ -12,10 +12,12 @@ const useDetailForm = () => {
 
   interface VALUES {
     comment: string;
+    currentVideoIndex: number;
   }
 
   const INIT_VALUES: VALUES = {
     comment: '',
+    currentVideoIndex: 0,
   };
 
   const [values, setValues] = useState<VALUES>(INIT_VALUES);
@@ -23,7 +25,6 @@ const useDetailForm = () => {
     comment: (e: React.ChangeEvent<HTMLInputElement>) => {
       setValues({ ...values, comment: e.target.value });
     },
-    search: () => {},
   };
   const onKeydowns = {
     comment: (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -52,6 +53,9 @@ const useDetailForm = () => {
     copy: () => {
       navigator.clipboard.writeText(window.location.href);
       toastTrigger('링크가 복사되었습니다.');
+    },
+    video: (index: number) => {
+      setValues({ ...values, currentVideoIndex: index });
     },
   };
 

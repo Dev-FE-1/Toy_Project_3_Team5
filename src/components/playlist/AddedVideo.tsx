@@ -16,6 +16,8 @@ export interface AddedLinkProps extends VideoProps {
   onRemove?: (videoId: string) => void;
   isDragNDrop?: boolean;
   onDragNDrop?: () => void;
+  onClick?: () => void;
+  isActive?: boolean;
 }
 
 const AddedVideo: React.FC<AddedLinkProps> = ({
@@ -29,8 +31,10 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
   userName,
   isDragNDrop = false,
   onDragNDrop,
+  onClick = () => {},
+  isActive = false,
 }) => (
-  <div css={videoItemStyle}>
+  <div css={videoItemStyle(isActive)} onClick={onClick}>
     {isDragNDrop && onDragNDrop !== undefined && (
       <IconButton
         IconComponent={AlignJustify}
@@ -55,15 +59,21 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
   </div>
 );
 
-const videoItemStyle = css`
+const videoItemStyle = (isActive: boolean) => css`
   display: flex;
   width: calc(100vw - 40px);
   /* max-width: calc(430px - 40px); */
   max-width: 100%;
   margin-bottom: 10px;
-  border: 1px solid ${colors.gray02};
+  border: 2px solid ${colors.gray02};
   border-radius: 5px;
   padding: 5px;
+
+  ${isActive &&
+  css`
+    background-color: ${colors.gray02};
+    border: 2px solid ${colors.primaryLight};
+  `}
 `;
 
 const videoLinkStyle = css`

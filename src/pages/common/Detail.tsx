@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { ExternalLink, Heart, ListPlus, X } from 'lucide-react';
 import { CommentWithProfileApiProps, removeComment } from '@/api/comment';
-import { getVideoInfo } from '@/api/video';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
 import IconButton from '@/components/IconButton';
@@ -21,12 +20,6 @@ import { getProfileImg } from '@/utils/profileUtils';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 import { makeEmbedUrl } from '@/utils/videoUtils';
 
-/**
- * 1. 현재 playlistInfo 데이터 호출
- * 2. ui에 데이터 출력
- *  2.1. 자동재생은 지원하지 않음.
- */
-
 const MAX_LENGTH = {
   videoTitle: 20,
   playlistTitle: 20,
@@ -40,11 +33,11 @@ const Detail = () => {
   const { profileImage, userId: loginId } = useAuthStore();
   const { toastTrigger } = useToast();
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
-  const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
 
   const { values, onChanges, onClicks } = useDetailForm();
 
-  const { detailInfo, fetchOwnerInfo, fetchCommentInfo } = usePlaylistInfo();
+  const { detailInfo, videoList, fetchOwnerInfo, fetchCommentInfo } =
+    usePlaylistInfo();
 
   const { playlistInfo, comments, ownerInfo } = detailInfo;
   const [isCommentReload, setIsCommentReload] = useState<boolean>(false);
@@ -56,8 +49,6 @@ const Detail = () => {
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
   const [commentsPlus, setCommentsPlus] = useState<number>(COMMENT_PLUS_SIZE);
   const onCommentsPlus = () => {
     setCommentsPlus((prev) => prev + COMMENT_PLUS_SIZE);
@@ -68,23 +59,15 @@ const Detail = () => {
       const { status } = await removeComment(docId);
       if (status === 'success') {
         toastTrigger('댓글이 삭제되었습니다.');
-        // comments.filter((comment) => comment.docId !== docId);
         setCommentList((prev) =>
           prev.filter((comment) => comment.docId !== docId)
         );
-        // setIsCommentReload(true);
       }
     }
   };
 
   useEffect(() => {
     fetchOwnerInfo();
-
-    playlistInfo.links.map(async (link, index) => {
-      const { result } = await getVideoInfo(link);
-      if (result) videoList.push(result);
-      if (index === 0) setCurrentVideo(result);
-    });
   }, [playlistInfo]);
 
   useEffect(() => {
@@ -98,6 +81,14 @@ const Detail = () => {
     setCommentList(comments);
   }, [comments]);
 
+  useEffect(() => {
+    setCurrentVideo(videoList[values.currentVideoIndex]);
+  }, [values.currentVideoIndex]);
+
+  useEffect(() => {
+    setCurrentVideo(videoList[0]);
+  }, [videoList]);
+
   return (
     <div css={containerStyle}>
       {currentVideo && (
@@ -108,7 +99,6 @@ const Detail = () => {
             allow='autoplay; picture-in-picture; web-share'
             allowFullScreen
             title={currentVideo.title}
-            ref={iframeRef}
           />
         </div>
       )}
@@ -132,7 +122,7 @@ const Detail = () => {
             <div css={headerDetailStyle}>
               <span className='title'>{playlistInfo.title}</span>
               <span className='counter'>
-                {1}/{playlistInfo.links.length}
+                {values.currentVideoIndex + 1}/{playlistInfo.links.length}
               </span>
             </div>
             <IconButton
@@ -223,7 +213,7 @@ const Detail = () => {
               label={{ active: '다음으로 재생될 영상', inactive: '' }}
             />
           </div>
-          <div css={videoListInfoStyle(true, 1)}>
+          <div css={videoListInfoStyle(true)}>
             {videoList &&
               videoList.map((video, index) => (
                 <AddedVideo
@@ -233,9 +223,12 @@ const Detail = () => {
                   link={video.link}
                   title={video.title}
                   userName={video.userName}
-                  isDragNDrop={false}
                   isRemovable={false}
                   isLinkView={false}
+                  onClick={() => {
+                    onClicks.video(index);
+                  }}
+                  isActive={index === values.currentVideoIndex}
                 />
               ))}
           </div>
@@ -433,7 +426,7 @@ const userInfoStyle = css`
   border-bottom: 1px solid ${colors.gray02};
 `;
 
-const videoListInfoStyle = (isScroll: boolean, currentIndex: number) => css`
+const videoListInfoStyle = (isScroll: boolean) => css`
   ${oneLineStyle};
   flex-direction: column;
 
@@ -443,10 +436,6 @@ const videoListInfoStyle = (isScroll: boolean, currentIndex: number) => css`
     overflow-y: auto;
     overflow-x: hidden;
   `}
-
-  &>div:nth-child(${currentIndex}) {
-    background-color: ${colors.gray02};
-  }
 `;
 
 const commentContainer = css`

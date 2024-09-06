@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { css } from '@emotion/react';
 import {
   Heart,
@@ -9,15 +9,17 @@ import {
   ListPlus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { deletePlaylist } from '@/api/playlistInfo';
 import IconButton from '@/components/IconButton';
 import KebabButton from '@/components/KebabButton';
 import Modal from '@/components/Modal';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import usePlaylistActions from '@/hooks/usePlaylistActions';
 import useToast from '@/hooks/useToast';
-import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
+import { useVisibilityStore } from '@/stores/useVisibilityStore';
 import { PlayListDataProps } from '@/types/playlistType';
 import { omittedText } from '@/utils/textUtils';
 
@@ -30,6 +32,7 @@ interface PlaylistCardProps {
   showLikeButton?: boolean;
   showLockButton?: boolean;
   showKebabMenu?: boolean;
+  onDelete?: (playlistId: number) => void; // 명시적으로 타입 정의
 }
 
 const MAXLENGTH = 50;
@@ -41,42 +44,58 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   showLikeButton = false,
   showLockButton = false,
   showKebabMenu = false,
+  onDelete,
 }) => {
-  const { openModal } = useModalStore();
   const navigate = useNavigate();
-  const [isLiked, setIsLiked] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
-  const [isLocked, setIsLocked] = useState(!playlistItem.isPublic);
+  const { openModal } = useModalStore();
+  const { visibilities, toggleVisibility, setInitialVisibility } =
+    useVisibilityStore();
+  const { isLiked, isAdded, toggleLike, toggleSave, likes } =
+    usePlaylistActions(
+      playlistItem.playlistId ? +playlistItem.playlistId : 0,
+      playlistItem.likes
+    );
+  const isPublic = playlistItem.playlistId
+    ? visibilities[playlistItem.playlistId]
+    : false;
 
   const onCardClick = (): void => {
-    navigate(ROUTES.DETAIL());
+    navigate(ROUTES.DETAIL(playlistItem.playlistId));
   };
 
   const onEditBtnClick = (): void => {
-    navigate(ROUTES.PLAYLIST_MODIFY());
+    navigate(ROUTES.PLAYLIST_MODIFY(playlistItem.playlistId));
   };
 
   const onDeleteBtnClick = () => {
     openModal({
       type: 'delete',
       title: '플레이리스트 삭제',
-      content: '{플레이리스트명}을 삭제하시겠습니까?',
-      onAction: () => {
-        ('');
+      content: `'${playlistItem.description}'을 삭제하시겠습니까?`,
+      onAction: async () => {
+        if (playlistItem.playlistId) {
+          const playlistIdNumber = Number(playlistItem.playlistId);
+          if (isNaN(playlistIdNumber)) {
+            toastTrigger('올바르지 않은 플레이리스트 ID입니다.');
+            return;
+          }
+          const response = await deletePlaylist(playlistIdNumber);
+          if (response.status === 'success') {
+            toastTrigger('플레이리스트가 삭제되었습니다.');
+            if (onDelete) {
+              onDelete(playlistIdNumber);
+            }
+          } else {
+            toastTrigger('플레이리스트 삭제에 실패했습니다.');
+          }
+        } else {
+          toastTrigger('플레이리스트 ID가 없습니다.');
+        }
       },
     });
   };
+
   const { toastTrigger } = useToast();
-
-  const { user } = useAuthStore();
-
-  const onClickHeart = () => {
-    if (!user) {
-      toastTrigger('로그인이 필요합니다.');
-    } else {
-      setIsLiked(!isLiked);
-    }
-  };
 
   const menuItems = [
     {
@@ -88,6 +107,18 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
       onClick: onDeleteBtnClick,
     },
   ];
+
+  useEffect(() => {
+    if (playlistItem.playlistId) {
+      setInitialVisibility(playlistItem.playlistId, playlistItem.isPublic);
+    }
+  }, [playlistItem.playlistId, playlistItem.isPublic, setInitialVisibility]);
+
+  const handleToggleVisibility = () => {
+    if (playlistItem.playlistId) {
+      toggleVisibility(playlistItem.playlistId);
+    }
+  };
 
   const renderLargeCard = () => (
     <article css={largeCardStyles}>
@@ -120,11 +151,11 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
           <div className='icon'>
             <IconButton
               IconComponent={Heart}
-              onClick={onClickHeart}
+              onClick={toggleLike}
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
             />
-            {playlistItem.likes}
+            {likes !== null ? likes : playlistItem.likes}
           </div>
           <div className='icon'>
             <MessageSquareMore />
@@ -167,22 +198,22 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         {showAddButton && (
           <IconButton
             IconComponent={isAdded ? ListX : ListPlus}
-            onClick={() => setIsAdded(!isAdded)}
+            onClick={toggleSave}
             color='gray'
           />
         )}
         {showLikeButton && (
           <IconButton
             IconComponent={Heart}
-            onClick={onClickHeart}
+            onClick={toggleLike}
             color={isLiked ? 'red' : 'gray'}
             fillColor={isLiked ? 'red' : undefined}
           />
         )}
         {showLockButton && (
           <IconButton
-            IconComponent={isLocked ? LockKeyhole : LockKeyholeOpen}
-            onClick={() => setIsLocked(!isLocked)}
+            IconComponent={isPublic ? LockKeyholeOpen : LockKeyhole}
+            onClick={handleToggleVisibility}
             color='gray'
           />
         )}

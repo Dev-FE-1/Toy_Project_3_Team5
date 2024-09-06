@@ -26,7 +26,7 @@ interface AuthState {
   isFirstLogin: boolean;
   setUser: (user: User | null) => void;
   clearUser: () => void;
-  fetchUserData: (id: string) => void;
+  fetchUserData: (userId: string) => void;
   addLikedPlaylistItem: (playlistId: number) => void;
   addSavedPlaylistItem: (playlistId: number) => void;
   removeLikedPlaylistItem: (playlistId: number) => void;
@@ -51,7 +51,6 @@ export const useAuthStore = create<AuthState>(
       channelFollowing: [],
       tags: [],
       isFirstLogin: true,
-
       setUser: (user) => set({ user }),
       clearUser: () =>
         set({

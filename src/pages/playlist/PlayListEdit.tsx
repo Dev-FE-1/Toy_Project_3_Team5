@@ -77,7 +77,7 @@ const PlayListEdit = () => {
       values.links.map(async (link) => {
         const { status, result } = await getVideoInfo(link);
         if (status === 'success' && result) {
-          videoList.push(result);
+          setVideoList((prev) => [...prev, result]);
         }
       });
 

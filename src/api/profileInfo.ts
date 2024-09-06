@@ -5,8 +5,14 @@ import {
   getDocs,
   doc,
   getDoc,
+  updateDoc,
 } from 'firebase/firestore';
-import { db } from '@/firebase/firbaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/firebase/firbaseConfig';
+
+interface ProfileUpdateData {
+  profileImageFile?: File;
+}
 
 const getUserComments = async (userId: string) => {
   try {
@@ -47,4 +53,31 @@ const getMyPlaylistCount = async (userId: string) => {
   }
 };
 
-export { getUserComments, getPlaylistTitle, getMyPlaylistCount };
+const uploadImage = async (file: File, userId: string) => {
+  const path = `profile/${userId}/${file.name}`;
+  const locationRef = ref(storage, path);
+  const result = await uploadBytes(locationRef, file);
+  const url = await getDownloadURL(result.ref);
+  return url;
+};
+
+const updateProfileImage = async (userId: string, data: ProfileUpdateData) => {
+  const docRef = doc(db, 'users', userId);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) {
+    return { status: 'fail', result: false };
+  }
+  const updatedData: { profileImg?: string } = {};
+  if (data.profileImageFile) {
+    const imageUrl = await uploadImage(data.profileImageFile, userId);
+    updatedData.profileImg = imageUrl;
+  }
+  await updateDoc(docRef, updatedData);
+};
+
+export {
+  getUserComments,
+  getPlaylistTitle,
+  getMyPlaylistCount,
+  updateProfileImage,
+};

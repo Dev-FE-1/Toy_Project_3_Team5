@@ -1,26 +1,63 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/react';
 import { Camera } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { updateProfileImage } from '@/api/profileInfo';
 import Button from '@/components/Button';
 import InputBox from '@/components/InputBox';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
-import { fontSize, fontWeight } from '@/constants/font';
+import { fontSize } from '@/constants/font';
+import ROUTES from '@/constants/route';
+import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export const ProfileUpdate = () => {
-  const { profileImage, channelName } = useAuthStore();
+  const { profileImage, channelName, userId } = useAuthStore();
   const [hashtag, setHashtag] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
+
+  const navigate = useNavigate();
+  const { toastTrigger } = useToast();
+
+  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+    }
+  };
+
+  const onProfileSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (selectedImage && userId) {
+      await updateProfileImage(userId, { profileImageFile: selectedImage });
+    }
+
+    navigate(ROUTES.PROFILE(userId));
+    window.location.reload();
+    toastTrigger('프로필 수정이 완료되었습니다.', 'success');
+  };
 
   return (
     <div css={containerStyle}>
       <div css={profileContainerStyle}>
-        <div css={profileStyle}>
-          <Profile src={profileImage} alt='프로필 이미지' size='xl' />
+        <label htmlFor='profileImageUpload' css={profileStyle}>
+          <Profile src={previewUrl} alt='프로필 이미지' size='xl' />
           <div css={cameraIconStyle}>
             <Camera color={colors.white} size={24} />
           </div>
-        </div>
+        </label>
+        <input
+          id='profileImageUpload'
+          type='file'
+          accept='image/*'
+          style={{ display: 'none' }}
+          onChange={onImageChange}
+        />
         <span css={profileNameStyle}>{channelName}</span>
       </div>
       <form css={formContainerStyle}>
@@ -50,7 +87,7 @@ export const ProfileUpdate = () => {
         />
         <Button
           label='프로필 저장'
-          onClick={() => {}}
+          onClick={onProfileSave}
           type='submit'
           size='lg'
           fullWidth={true}

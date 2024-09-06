@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
@@ -12,6 +12,7 @@ import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+import { PlayListDataProps } from '@/types/playlistType';
 import {
   filterPlaylistByVisibility,
   sortPlaylistsByOption,
@@ -25,6 +26,7 @@ export const PlayListHome = () => {
   const { chennelData } = useChennelData(userId);
 
   const [filterOptions, setFilterOptions] = useState<number[]>([0, 0]);
+  const [localPlaylists, setLocalPlaylists] = useState<PlayListDataProps[]>([]);
 
   const optionGroups = [
     { label: '정렬', options: ['최신순', '좋아요순', '댓글순'] },
@@ -34,10 +36,11 @@ export const PlayListHome = () => {
   const { data, fetchNextPage, hasNextPage, isFetching } =
     useFetchUserPlaylist(PAGE_SIZE);
 
-  const playlist = useMemo(
-    () => (data ? data.pages.flatMap((page) => page.playlist) : []),
-    [data]
-  );
+  useEffect(() => {
+    if (data) {
+      setLocalPlaylists(data.pages.flatMap((page) => page.playlist));
+    }
+  }, [data]);
 
   const infiniteScrollRef = useInfiniteScroll(
     async (entry, observer) => {
@@ -55,11 +58,19 @@ export const PlayListHome = () => {
 
   const filteredPlaylist = useMemo(() => {
     const filteredPlaylist = filterPlaylistByVisibility(
-      playlist,
+      localPlaylists,
       filterOptions[1]
     );
     return sortPlaylistsByOption(filteredPlaylist, filterOptions[0]);
-  }, [playlist, filterOptions]);
+  }, [localPlaylists, filterOptions]);
+
+  const onPlaylistDelete = (deletedPlaylistId: number) => {
+    setLocalPlaylists((prevPlaylists) =>
+      prevPlaylists.filter(
+        (playlist) => Number(playlist.playlistId) !== deletedPlaylistId
+      )
+    );
+  };
 
   const onAddBtnClick = (): void => {
     navigate(ROUTES.PLAYLIST_ADD(userId));
@@ -102,6 +113,7 @@ export const PlayListHome = () => {
                 playlistItem={playlistItem}
                 showLockButton={chennelData?.isMyChannel ? true : false}
                 showKebabMenu={chennelData?.isMyChannel ? true : false}
+                onDelete={onPlaylistDelete}
               />
             </li>
           ))}

@@ -1,23 +1,62 @@
 import { css } from '@emotion/react';
-import { EllipsisVertical } from 'lucide-react';
+import KebabButton from '@/components/KebabButton';
 import { fontSize, fontWeight } from '@/constants/font';
+import useModalStore from '@/stores/useModalStore';
 
-interface CommentProps {
+export interface CommentWithProfileProps {
   imgUrl: string;
   userName: string;
   content: string;
+  showKebabMenu?: boolean;
+  isEdited?: boolean;
+  docId?: string;
+  onDelete?: (commentId: string) => void;
 }
 
-const Comment: React.FC<CommentProps> = ({ imgUrl, userName, content }) => (
-  <div css={commentStyles}>
-    <img src={imgUrl} alt='프로필이미지' />
-    <div css={contentStyles}>
-      <span>{userName}</span>
-      <span>{content}</span>
+const Comment: React.FC<CommentWithProfileProps> = ({
+  imgUrl,
+  userName,
+  content,
+  showKebabMenu = false,
+  isEdited = false,
+  docId,
+  onDelete = () => {},
+}) => {
+  const { openModal } = useModalStore();
+
+  const onDeleteBtnClick = () => {
+    openModal({
+      type: 'delete',
+      title: '댓글 삭제',
+      content: `댓글을 삭제하시겠습니까?`,
+      onAction: () => {
+        if (docId) onDelete(docId);
+      },
+    });
+  };
+
+  const menuItems = [
+    // {
+    //   label: '수정',
+    //   onClick: onEditBtnClick,
+    // },
+    {
+      label: '삭제',
+      onClick: onDeleteBtnClick,
+    },
+  ];
+
+  return (
+    <div css={commentStyles}>
+      <img src={imgUrl} alt='프로필이미지' />
+      <div css={contentStyles}>
+        <span>{userName}</span>
+        <span>{content}</span>
+      </div>
+      {showKebabMenu && <KebabButton menuItems={menuItems} />}
     </div>
-    <EllipsisVertical />
-  </div>
-);
+  );
+};
 
 const commentStyles = css`
   display: flex;

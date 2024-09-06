@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { ExternalLink, Heart, ListPlus, X } from 'lucide-react';
+import { CommentWithProfileApiProps, removeComment } from '@/api/comment';
 import { getVideoInfo } from '@/api/video';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
 import IconButton from '@/components/IconButton';
 import MiniPlaylist from '@/components/MiniPlaylist';
+import Modal from '@/components/Modal';
 import AddedVideo, { AddedLinkProps } from '@/components/playlist/AddedVideo';
 import Profile from '@/components/Profile';
 import Toggle from '@/components/Toggle';
@@ -13,6 +15,9 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import useDetailForm from '@/hooks/useDetailForm';
 import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
+import useToast from '@/hooks/useToast';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { getProfileImg } from '@/utils/profileUtils';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 import { makeEmbedUrl } from '@/utils/videoUtils';
 
@@ -32,6 +37,8 @@ const MAX_LENGTH = {
 const COMMENT_PLUS_SIZE = 5;
 
 const Detail = () => {
+  const { profileImage, userId: loginId } = useAuthStore();
+  const { toastTrigger } = useToast();
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
   const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
 
@@ -41,6 +48,9 @@ const Detail = () => {
 
   const { playlistInfo, comments, ownerInfo } = detailInfo;
   const [isCommentReload, setIsCommentReload] = useState<boolean>(false);
+  const [commentList, setCommentList] = useState<CommentWithProfileApiProps[]>(
+    []
+  );
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
@@ -51,6 +61,20 @@ const Detail = () => {
   const [commentsPlus, setCommentsPlus] = useState<number>(COMMENT_PLUS_SIZE);
   const onCommentsPlus = () => {
     setCommentsPlus((prev) => prev + COMMENT_PLUS_SIZE);
+  };
+
+  const deleteComment = async (docId: string | undefined) => {
+    if (docId) {
+      const { status } = await removeComment(docId);
+      if (status === 'success') {
+        toastTrigger('댓글이 삭제되었습니다.');
+        // comments.filter((comment) => comment.docId !== docId);
+        setCommentList((prev) =>
+          prev.filter((comment) => comment.docId !== docId)
+        );
+        // setIsCommentReload(true);
+      }
+    }
   };
 
   useEffect(() => {
@@ -69,6 +93,10 @@ const Detail = () => {
       fetchCommentInfo();
     }
   }, [isCommentReload]);
+
+  useEffect(() => {
+    setCommentList(comments);
+  }, [comments]);
 
   return (
     <div css={containerStyle}>
@@ -217,10 +245,10 @@ const Detail = () => {
       <div css={commentContainer}>
         <div css={commentHeader}>
           <span className='title'>댓글</span>
-          <span className='counter'>22</span>
+          <span className='counter'>{commentList.length}</span>
         </div>
         <div css={oneLineStyle}>
-          <Profile alt='프로필' src={''} size='xs' />
+          <Profile alt='프로필' src={profileImage} size='xs' />
           <input
             css={commentInputStyle}
             placeholder='댓글 추가...'
@@ -243,22 +271,24 @@ const Detail = () => {
           />
         </div>
         <div css={commentStyle}>
-          {/* {comments && comments.length > 0 ? ( */}
-          {comments.length === 0 ? (
-            <>댓글 없어요</>
-          ) : (
-            comments
+          {commentList &&
+            commentList.length > 0 &&
+            commentList
               .slice(0, commentsPlus)
               .map((comment, index) => (
                 <Comment
                   key={`comment-${index}`}
                   content={comment.content}
-                  imgUrl={comment.userId}
-                  userName={comment.userId}
+                  imgUrl={getProfileImg(comment.userId)}
+                  userName={comment.userName}
+                  showKebabMenu={loginId === comment.userId}
+                  isEdited={comment.isEdited}
+                  docId={comment.docId}
+                  onDelete={deleteComment}
                 />
-              ))
-          )}
-          {comments.length > commentsPlus && (
+              ))}
+
+          {commentList.length > commentsPlus && (
             <Button
               label='더보기'
               onClick={onCommentsPlus}
@@ -289,6 +319,7 @@ const Detail = () => {
           }}
         />
       )}
+      <Modal />
     </div>
   );
 };

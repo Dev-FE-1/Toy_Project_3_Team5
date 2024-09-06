@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getPlaylistComment } from '@/api/comment';
+import { CommentWithProfileApiProps, getPlaylistComment } from '@/api/comment';
 import { getPlaylistInfo } from '@/api/playlistInfo';
 import { getUserInfo } from '@/api/profileInfo';
 import { UserProps } from '@/types/api';
-import { CommentProps, PlayListDataProps } from '@/types/playlistType';
+import { PlayListDataProps } from '@/types/playlistType';
 
 const INIT_VALUES: DetailInfoProps = {
   playlistInfo: {
@@ -30,7 +30,7 @@ const INIT_VALUES: DetailInfoProps = {
 
 interface DetailInfoProps {
   playlistInfo: PlayListDataProps;
-  comments: CommentProps[];
+  comments: CommentWithProfileApiProps[];
   ownerInfo: UserProps;
 }
 
@@ -43,7 +43,7 @@ export const usePlaylistInfo = () => {
     INIT_VALUES.playlistInfo
   );
   const [ownerInfo, setOwnerInfo] = useState<UserProps>(INIT_VALUES.ownerInfo);
-  const [commentList, setCommentList] = useState<CommentProps[]>(
+  const [commentList, setCommentList] = useState<CommentWithProfileApiProps[]>(
     INIT_VALUES.comments
   );
 

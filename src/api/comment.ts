@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -10,17 +11,18 @@ import {
   where,
 } from 'firebase/firestore';
 import { COLLECTION, db } from '@/firebase/firbaseConfig';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse, UserProps } from '@/types/api';
 import { CommentProps } from '@/types/playlistType';
 
-interface PlaylistComment extends CommentProps {
-  profileImg?: string;
-  channelName?: string;
+export interface CommentWithProfileApiProps extends CommentProps {
+  docId: string;
+  imgUrl: string;
+  userName: string;
 }
 
 export const getPlaylistComment = async (
   playlistId: number
-): Promise<ApiResponse<PlaylistComment[]>> => {
+): Promise<ApiResponse<CommentWithProfileApiProps[]>> => {
   try {
     const result = await getDocs(
       query(
@@ -30,10 +32,31 @@ export const getPlaylistComment = async (
       )
     );
 
-    const commentList: PlaylistComment[] = result.docs.map(
-      (doc) => ({ ...doc.data() }) as CommentProps
+    const commentList: CommentWithProfileApiProps[] = result.docs.map(
+      (doc) => ({ ...doc.data(), docId: doc.id }) as CommentWithProfileApiProps
     );
-    return { status: 'success', result: commentList };
+
+    const commentWithProfileList: CommentWithProfileApiProps[] = [
+      ...commentList,
+    ];
+
+    commentWithProfileList.map(async (comment, index) => {
+      const docRef = doc(db, COLLECTION.users, `${comment.userId}`);
+      const docSnap = await getDoc(docRef);
+      if (!!!docSnap.exists()) {
+        return { status: 'fail' };
+      }
+
+      const data = docSnap.data() as UserProps;
+
+      commentWithProfileList[index] = {
+        ...comment,
+        imgUrl: data.profileImg,
+        userName: data.channelName,
+      };
+    });
+
+    return { status: 'success', result: commentWithProfileList };
   } catch (err) {
     console.error(err);
     return { status: 'fail' };
@@ -72,17 +95,12 @@ export const modifyComment = async (
 };
 
 export const removeComment = async (
-  commentData: CommentProps
+  commentId: string
 ): Promise<ApiResponse<boolean>> => {
   try {
-    const docRef = doc(db, COLLECTION.comments, `${commentData.docId}`);
-    const docSnap = await getDoc(docRef);
-
-    if (!!!docSnap.exists()) return { status: 'fail' };
-
-    await updateDoc(docRef, { ...commentData } as Omit<CommentProps, 'docId'>);
-
-    return { status: 'success' };
+    const docRef = doc(db, COLLECTION.comments, `${commentId}`);
+    await deleteDoc(docRef);
+    return { status: 'success', result: true };
   } catch (err) {
     console.error(err);
     return { status: 'fail' };

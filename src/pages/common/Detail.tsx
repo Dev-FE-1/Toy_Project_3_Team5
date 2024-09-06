@@ -13,6 +13,7 @@ import Profile from '@/components/Profile';
 import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
+import useDetailForm from '@/hooks/useDetailForm';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { CommentProps, PlayListDataProps } from '@/types/playlistType';
@@ -83,6 +84,14 @@ const MAX_LENGTH = {
   channelName: 10,
 };
 
+interface DetailForms {
+  comment: string;
+}
+
+const INIT_VALUES: DetailForms = {
+  comment: '',
+};
+
 const Detail = () => {
   const { playlistId } = useParams();
   const { userId } = useAuthStore();
@@ -94,50 +103,14 @@ const Detail = () => {
   const [commentList, setCommentList] = useState<CommentProps[]>([]);
   const [inputComment, setInputComment] = useState<string>('');
 
+  const { values, onChanges, onKeydowns, onClicks, validations } =
+    useDetailForm();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const onChange = {
-    comment: (e: React.ChangeEvent<HTMLInputElement>) => {
-      setInputComment(e.target.value);
-    },
-  };
-  const onKeydown = {
-    comment: (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') onClick.comment();
-    },
-  };
-  const onClick = {
-    comment: async () => {
-      if (!!!validation.comment()) return;
-      const commentData: CommentProps = {
-        playlistId: Number(playlistId),
-        content: inputComment,
-        isEdited: false,
-        regDate: new Date().toISOString(),
-        userId,
-      };
-
-      const { status, result } = await addComment(commentData);
-      if (status === 'success') {
-        setInputComment('');
-        toastTrigger('댓글이 등록되었습니다.');
-      }
-    },
-  };
-  const validation = {
-    comment: (): boolean => {
-      if (isNaN(Number(playlistId))) return false;
-      if (inputComment.trim().length < 1) {
-        toastTrigger('댓글을 입력해주세요', 'fail');
-        return false;
-      }
-      return true;
-    },
-  };
 
   useEffect(() => {
     (async () => {
@@ -310,10 +283,11 @@ const Detail = () => {
           <input
             css={commentInputStyle}
             placeholder='댓글 추가...'
-            value={inputComment}
-            onChange={onChange.comment}
-            onKeyDown={onKeydown.comment}
+            value={values.comment}
+            onChange={onChanges.comment}
+            onKeyDown={onKeydowns.comment}
           />
+          <Button label='작성' onClick={onClicks.comment} color='black' />
         </div>
         <div css={commentStyle}>
           <Comment
@@ -512,6 +486,7 @@ const commentInputStyle = css`
   border-radius: 5px;
   flex-grow: 1;
   padding: 0 10px;
+  margin: 0 10px;
 `;
 
 const commentStyle = css`

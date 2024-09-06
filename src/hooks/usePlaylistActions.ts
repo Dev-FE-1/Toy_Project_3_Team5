@@ -5,6 +5,12 @@ import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { PlayListDataProps } from '@/types/playlistType';
 
+type QueryDataType = {
+  pages: {
+    playlistsData: PlayListDataProps[];
+  }[];
+};
+
 const PAGES_QUERY: { [key: string]: string } = {
   '': 'homePlaylists',
   search: 'searchPlaylists',
@@ -39,21 +45,23 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     const newIsLiked = !isLiked;
     const newLikes = newIsLiked ? initialLikes + 1 : initialLikes - 1;
 
-    queryClient.setQueriesData({ queryKey: [queryKey] }, (oldData: any) => {
-      if (!oldData) return oldData;
-      return {
-        ...oldData,
-        pages: oldData.pages.map((page: any) => ({
-          ...page,
-          playlistsData: page.playlistsData.map(
-            (playlist: PlayListDataProps) =>
+    queryClient.setQueriesData<QueryDataType>(
+      { queryKey: [queryKey] },
+      (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            playlistsData: page.playlistsData.map((playlist) =>
               playlist.playlistId === playlistId.toString()
                 ? { ...playlist, isLiked: newIsLiked, likes: newLikes }
                 : playlist
-          ),
-        })),
-      };
-    });
+            ),
+          })),
+        };
+      }
+    );
 
     if (newIsLiked) {
       addLikedPlaylistItem(playlistId);
@@ -68,7 +76,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
         newLikes,
       });
     } catch (error) {
-      toastTrigger('좋아요 업데이트에 실패했습니다.');
+      toastTrigger('좋아요를 실패했습니다.');
       if (newIsLiked) {
         removeLikedPlaylistItem(playlistId);
       } else {
@@ -86,21 +94,23 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
 
     const newIsAdded = !isAdded;
 
-    queryClient.setQueriesData({ queryKey: [queryKey] }, (oldData: any) => {
-      if (!oldData) return oldData;
-      return {
-        ...oldData,
-        pages: oldData.pages.map((page: any) => ({
-          ...page,
-          playlistsData: page.playlistsData.map(
-            (playlist: PlayListDataProps) =>
+    queryClient.setQueriesData<QueryDataType>(
+      { queryKey: [queryKey] },
+      (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            playlistsData: page.playlistsData.map((playlist) =>
               playlist.playlistId === playlistId.toString()
                 ? { ...playlist, isAdded: newIsAdded }
                 : playlist
-          ),
-        })),
-      };
-    });
+            ),
+          })),
+        };
+      }
+    );
 
     if (newIsAdded) {
       addSavedPlaylistItem(playlistId);
@@ -111,7 +121,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     try {
       await updatePlaylists({ playlistType: 'saved', playlistId });
     } catch (error) {
-      toastTrigger('저장 상태 업데이트에 실패했습니다.');
+      toastTrigger('저장에 실패했습니다.');
       if (newIsAdded) {
         removeSavedPlaylistItem(playlistId);
       } else {

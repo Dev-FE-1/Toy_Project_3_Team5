@@ -26,7 +26,7 @@ const Profile: React.FC<ProfileProps> = ({ src, alt, size = 'lg' }) => (
     `}
   >
     <img
-      src={src}
+      src={!!!src ? '/src/assets/profile_default.png' : src}
       alt={alt}
       css={css`
         width: 100%;

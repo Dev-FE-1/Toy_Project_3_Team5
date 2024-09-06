@@ -26,7 +26,7 @@ const INIT_VALUES: DetailInfoProps = {
     channelFollowing: [],
     channelName: '오너채널명',
     isMyChannel: false,
-    profileImg: '',
+    profileImg: '/src/assets/profile_default.png',
   },
 };
 

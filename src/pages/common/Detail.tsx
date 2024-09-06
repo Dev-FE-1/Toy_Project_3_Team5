@@ -13,6 +13,7 @@ import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import useDetailForm from '@/hooks/useDetailForm';
+import { useFollowToggle } from '@/hooks/useFollowToggle';
 import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -48,6 +49,8 @@ const Detail = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
+
+  const { isFollowing, handleFollowToggle } = useFollowToggle(loginId);
 
   const [commentsPlus, setCommentsPlus] = useState<number>(COMMENT_PLUS_SIZE);
   const onCommentsPlus = () => {
@@ -192,6 +195,14 @@ const Detail = () => {
               </span>
             </div>
             <div css={emptyBoxStyle}></div>
+            {!!!ownerInfo.isMyChannel && (
+              <Button
+                label={isFollowing ? '팔로우 취소' : '팔로우'}
+                color={isFollowing ? 'gray' : 'black'}
+                size='sm'
+                onClick={handleFollowToggle}
+              />
+            )}
           </div>
           <div css={userInfoStyle}>
             <IconButton

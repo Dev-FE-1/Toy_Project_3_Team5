@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  setDoc,
+} from 'firebase/firestore';
 import { Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -15,6 +23,7 @@ import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
 import ROUTES from '@/constants/route';
+import { db } from '@/firebase/firbaseConfig';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 
@@ -23,9 +32,14 @@ export const ProfileUpdate = () => {
 
   const [hashtag, setHashtag] = useState<string>('');
   const [hashtags, setHashtags] = useState<string[]>([]);
-
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(profileImage);
+
+  const [channelNameCheckMessage, setChannelNameCheckMessage] =
+    useState<string>('');
+  const [isChannelNameChecked, setIsChannelNameChecked] =
+    useState<boolean>(false);
+  const [newChannelName, setNewChannelName] = useState<string>(channelName);
 
   const navigate = useNavigate();
   const { toastTrigger } = useToast();
@@ -38,6 +52,44 @@ export const ProfileUpdate = () => {
 
     fetchHashtags();
   }, [userId]);
+
+  const checkChannelNameExists = async (
+    channelName: string
+  ): Promise<boolean> => {
+    const q = query(
+      collection(db, 'users'),
+      where('channelName', '==', channelName)
+    );
+
+    try {
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    } catch (error) {
+      throw new Error('중복 체크에 실패했습니다.');
+    }
+  };
+
+  const onChannelNameCheck = async () => {
+    if (!newChannelName || newChannelName.length < 2) {
+      setChannelNameCheckMessage('채널 이름은 2자리 이상이어야 합니다.');
+      setIsChannelNameChecked(false);
+      return;
+    }
+
+    try {
+      const exists = await checkChannelNameExists(newChannelName.trim());
+      if (exists) {
+        setChannelNameCheckMessage('이미 사용 중인 채널 이름입니다.');
+        setIsChannelNameChecked(false);
+      } else {
+        setChannelNameCheckMessage('사용 가능한 채널 이름입니다.');
+        setIsChannelNameChecked(true);
+      }
+    } catch (error) {
+      setChannelNameCheckMessage('중복 체크에 실패했습니다.');
+      setIsChannelNameChecked(false);
+    }
+  };
 
   const addHashtag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -68,17 +120,30 @@ export const ProfileUpdate = () => {
   const onProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isChannelNameChecked) {
+      toastTrigger('채널 이름 중복 검사를 진행해주세요.', 'fail');
+      return;
+    }
+
     if (selectedImage && userId) {
       await updateProfileImage(userId, { profileImageFile: selectedImage });
     }
 
     if (userId) {
       await updateProfileTags(userId, hashtags);
+      const userRef = doc(db, 'users', userId);
+      await setDoc(userRef, { channelName: newChannelName }, { merge: true });
     }
-
     navigate(ROUTES.PROFILE(userId));
     window.location.reload();
     toastTrigger('프로필 수정이 완료되었습니다.', 'success');
+  };
+
+  const validateChannelName = (value: string) => {
+    if (value.length < 2) {
+      return '채널 이름은 2자리 이상이어야 합니다';
+    }
+    return '';
   };
 
   return (
@@ -104,15 +169,21 @@ export const ProfileUpdate = () => {
           <InputBox
             label='채널 이름'
             placeholder='채널 이름을 입력해주세요'
-            value={channelName}
-            onChange={() => {}}
+            value={newChannelName}
+            onChange={(e) => {
+              setNewChannelName(e.target.value);
+              setIsChannelNameChecked(false);
+              setChannelNameCheckMessage('다시 중복검사를 진행해주세요.');
+            }}
+            validate={validateChannelName}
             width='315px'
+            externalErrorMessage={channelNameCheckMessage}
           />
-          <div style={{ marginLeft: `5px` }}>
+          <div>
             <Button
               label='중복검사'
               color='gray'
-              onClick={() => {}}
+              onClick={onChannelNameCheck}
               size='lg'
             />
           </div>
@@ -217,4 +288,6 @@ const duplicateStyle = css`
   align-items: center;
 `;
 
-const formContainerStyle = css``;
+const formContainerStyle = css`
+  max-width: 390px;
+`;

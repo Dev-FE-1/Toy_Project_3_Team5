@@ -46,6 +46,7 @@ const VideoInfoStyle = css`
   display: flex;
   flex-direction: column;
   padding: 5px 10px;
+  justify-content: space-around;
 `;
 const TitleStyle = css`
   font-size: ${fontSize.md};

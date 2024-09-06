@@ -36,10 +36,6 @@ const Comment: React.FC<CommentWithProfileProps> = ({
   };
 
   const menuItems = [
-    // {
-    //   label: '수정',
-    //   onClick: onEditBtnClick,
-    // },
     {
       label: '삭제',
       onClick: onDeleteBtnClick,
@@ -67,6 +63,7 @@ const commentStyles = css`
     width: 36px;
     height: 36px;
     border-radius: 50%;
+    object-fit: cover;
     :hover {
       cursor: pointer;
     }

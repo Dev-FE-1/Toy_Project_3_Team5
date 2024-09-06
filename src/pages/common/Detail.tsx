@@ -407,6 +407,7 @@ const userInfoTwoLineStyle = css`
   flex-direction: column;
   flex-grow: 1;
   padding: 0 10px;
+  justify-content: space-between;
 
   > .channelName {
     font-size: ${fontSize.lg};

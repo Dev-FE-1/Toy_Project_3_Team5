@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -111,9 +111,19 @@ export const ProfileUpdate = () => {
       }
     }
 
-    navigate(ROUTES.PROFILE(userId));
-    window.location.reload();
+    const userDocRef = doc(db, 'users', userId);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (userSnapshot.exists()) {
+      const updatedData = userSnapshot.data();
+      useAuthStore.setState({
+        profileImage: updatedData.profileImg || previewUrl,
+        channelName: updatedData.channelName || newChannelName,
+      });
+    }
+
     toastTrigger('프로필 수정이 완료되었습니다.', 'success');
+    navigate(ROUTES.PROFILE(userId));
   };
 
   const validateChannelName = (value: string) => {

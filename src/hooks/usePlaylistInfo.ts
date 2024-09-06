@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { getPlaylistComment } from '@/api/comment';
 import { getPlaylistInfo } from '@/api/playlistInfo';
 import { getUserInfo } from '@/api/profileInfo';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { UserProps } from '@/types/api';
 import { CommentProps, PlayListDataProps } from '@/types/playlistType';
 
@@ -37,7 +36,6 @@ interface DetailInfoProps {
 
 export const usePlaylistInfo = () => {
   const { playlistId } = useParams<{ playlistId: string }>();
-  const { userId } = useAuthStore();
 
   const [detailInfo, setDetailInfo] = useState<DetailInfoProps>(INIT_VALUES);
 
@@ -98,10 +96,8 @@ export const usePlaylistInfo = () => {
 
   return {
     detailInfo,
-    commentList,
     fetchPlaylistInfo,
     fetchOwnerInfo,
     fetchCommentInfo,
-    setDetailInfo,
   };
 };

@@ -13,8 +13,6 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import useDetailForm from '@/hooks/useDetailForm';
 import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
-import { UserProps } from '@/types/api';
-import { CommentProps, PlayListDataProps } from '@/types/playlistType';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 import { makeEmbedUrl } from '@/utils/videoUtils';
 
@@ -31,20 +29,15 @@ const MAX_LENGTH = {
   channelName: 10,
 };
 
-interface DetailInfoProps {
-  playlistInfo: PlayListDataProps;
-  comments: CommentProps[];
-  ownerInfo: UserProps;
-}
+const COMMENT_PLUS_SIZE = 5;
 
 const Detail = () => {
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
   const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
 
-  const { values, onChanges, onKeydowns, onClicks } = useDetailForm();
+  const { values, onChanges, onClicks } = useDetailForm();
 
-  const { detailInfo, fetchOwnerInfo, setDetailInfo, fetchCommentInfo } =
-    usePlaylistInfo();
+  const { detailInfo, fetchOwnerInfo, fetchCommentInfo } = usePlaylistInfo();
 
   const { playlistInfo, comments, ownerInfo } = detailInfo;
   const [isCommentReload, setIsCommentReload] = useState<boolean>(false);
@@ -54,6 +47,11 @@ const Detail = () => {
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const [commentsPlus, setCommentsPlus] = useState<number>(COMMENT_PLUS_SIZE);
+  const onCommentsPlus = () => {
+    setCommentsPlus((prev) => prev + COMMENT_PLUS_SIZE);
+  };
 
   useEffect(() => {
     fetchOwnerInfo();
@@ -245,17 +243,29 @@ const Detail = () => {
           />
         </div>
         <div css={commentStyle}>
-          {comments && comments.length > 0 ? (
-            comments.map((comment, index) => (
-              <Comment
-                key={`comment-${index}`}
-                content={comment.content}
-                imgUrl={comment.userId}
-                userName={comment.userId}
-              />
-            ))
+          {/* {comments && comments.length > 0 ? ( */}
+          {comments.length === 0 ? (
+            <>댓글 없어요</>
           ) : (
-            <>없는데요</>
+            comments
+              .slice(0, commentsPlus)
+              .map((comment, index) => (
+                <Comment
+                  key={`comment-${index}`}
+                  content={comment.content}
+                  imgUrl={comment.userId}
+                  userName={comment.userId}
+                />
+              ))
+          )}
+          {comments.length > commentsPlus && (
+            <Button
+              label='더보기'
+              onClick={onCommentsPlus}
+              size='lg'
+              fullWidth
+              color='gray'
+            />
           )}
         </div>
       </div>

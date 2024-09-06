@@ -80,7 +80,7 @@ const modalBackgroundStyles = css`
     }
 
     h3 {
-      font-size: ${fontSize.lg};
+      font-size: ${fontSize.md};
       padding: 12px 20px 0px 20px;
       text-align: center;
       line-height: 27px;

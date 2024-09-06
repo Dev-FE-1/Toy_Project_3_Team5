@@ -141,6 +141,7 @@ const fetchPlaylists = async (
       userId: data.userId,
       ownerChannelName,
       commentCount,
+      description: data.description,
     };
   });
 

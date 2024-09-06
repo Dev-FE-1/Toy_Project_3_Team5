@@ -27,6 +27,7 @@ const INIT_VALUES: DetailInfoProps = {
     channelName: '오너채널명',
     isMyChannel: false,
     profileImg: '/src/assets/profile_default.png',
+    userId: '',
   },
 };
 
@@ -66,7 +67,7 @@ export const usePlaylistInfo = () => {
       throw new Error('데이터 불러오기에 실패했습니다.');
     }
     if (result) {
-      setOwnerInfo(result);
+      setOwnerInfo({ ...result, userId: playlistInfo.userId });
     }
   }, [playlistInfo]);
 

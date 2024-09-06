@@ -11,6 +11,7 @@ export interface CommentWithProfileProps {
   isEdited?: boolean;
   docId?: string;
   onDelete?: (commentId: string) => void;
+  onClick?: () => void;
 }
 
 const Comment: React.FC<CommentWithProfileProps> = ({
@@ -21,6 +22,7 @@ const Comment: React.FC<CommentWithProfileProps> = ({
   isEdited = false,
   docId,
   onDelete = () => {},
+  onClick = () => {},
 }) => {
   const { openModal } = useModalStore();
 
@@ -44,11 +46,20 @@ const Comment: React.FC<CommentWithProfileProps> = ({
 
   return (
     <div css={commentStyles}>
-      <img src={imgUrl} alt='프로필이미지' />
-      <div css={contentStyles}>
-        <span>{userName}</span>
+      <img
+        src={imgUrl}
+        alt='프로필이미지'
+        onClick={onClick}
+        onError={({ currentTarget }) => {
+          currentTarget.onerror = null; // prevents looping
+          currentTarget.src = '/src/assets/logoIcon.png';
+        }}
+      />
+      <div css={contentStyles} onClick={onClick}>
+        <span className='userName'>{userName}</span>
         <span>{content}</span>
       </div>
+      <div css={emptyBoxStyle}></div>
       {showKebabMenu && <KebabButton menuItems={menuItems} />}
     </div>
   );
@@ -74,7 +85,11 @@ const contentStyles = css`
   gap: 6px;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  /* width: 100%; */
+
+  .userName {
+    cursor: pointer;
+  }
 
   span {
     font-size: ${fontSize.md};
@@ -83,6 +98,10 @@ const contentStyles = css`
   span:nth-of-type(1) {
     font-weight: ${fontWeight.semiBold};
   }
+`;
+
+const emptyBoxStyle = css`
+  flex-grow: 1;
 `;
 
 export default Comment;

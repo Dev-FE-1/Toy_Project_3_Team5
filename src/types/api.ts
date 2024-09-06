@@ -9,4 +9,5 @@ export interface UserProps {
   channelName: string;
   profileImg: string;
   isMyChannel: boolean;
+  userId: string;
 }

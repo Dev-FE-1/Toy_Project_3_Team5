@@ -170,8 +170,20 @@ const Detail = () => {
             )}
           </div>
           <div css={oneLineStyle}>
-            <Profile alt='이미지' src={ownerInfo.profileImg} size='sm' />
-            <div css={userInfoTwoLineStyle}>
+            <Profile
+              alt='이미지'
+              src={ownerInfo.profileImg}
+              size='sm'
+              onClick={() => {
+                onClicks.profile(ownerInfo.userId);
+              }}
+            />
+            <div
+              css={userInfoTwoLineStyle}
+              onClick={() => {
+                onClicks.profile(ownerInfo.userId);
+              }}
+            >
               <span className='channelName'>
                 {omittedText(ownerInfo.channelName, MAX_LENGTH.channelName)}
               </span>
@@ -179,12 +191,7 @@ const Detail = () => {
                 {convertUnitNumber(ownerInfo.channelFollowing.length, 1)} 팔로워
               </span>
             </div>
-            <Button
-              label='팔로우'
-              onClick={() => {}}
-              color='black'
-              shape='round'
-            />
+            <div css={emptyBoxStyle}></div>
           </div>
           <div css={userInfoStyle}>
             <IconButton
@@ -266,20 +273,21 @@ const Detail = () => {
         <div css={commentStyle}>
           {commentList &&
             commentList.length > 0 &&
-            commentList
-              .slice(0, commentsPlus)
-              .map((comment, index) => (
-                <Comment
-                  key={`comment-${index}`}
-                  content={comment.content}
-                  imgUrl={getProfileImg(comment.userId)}
-                  userName={comment.userName}
-                  showKebabMenu={loginId === comment.userId}
-                  isEdited={comment.isEdited}
-                  docId={comment.docId}
-                  onDelete={deleteComment}
-                />
-              ))}
+            commentList.slice(0, commentsPlus).map((comment, index) => (
+              <Comment
+                key={`comment-${index}`}
+                content={comment.content}
+                imgUrl={getProfileImg(comment.userId)}
+                userName={comment.userName}
+                showKebabMenu={loginId === comment.userId}
+                isEdited={comment.isEdited}
+                docId={comment.docId}
+                onDelete={deleteComment}
+                onClick={() => {
+                  onClicks.profile(comment.userId);
+                }}
+              />
+            ))}
 
           {commentList.length > commentsPlus && (
             <Button
@@ -405,9 +413,9 @@ const descStyle = css`
 const userInfoTwoLineStyle = css`
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   padding: 0 10px;
   justify-content: space-between;
+  cursor: pointer;
 
   > .channelName {
     font-size: ${fontSize.lg};
@@ -416,6 +424,9 @@ const userInfoTwoLineStyle = css`
     font-size: ${fontSize.sm};
     color: ${colors.gray05};
   }
+`;
+const emptyBoxStyle = css`
+  flex-grow: 1;
 `;
 
 const userInfoStyle = css`

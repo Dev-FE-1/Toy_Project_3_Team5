@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { addComment } from '@/api/comment';
+import ROUTES from '@/constants/route';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { CommentProps } from '@/types/playlistType';
@@ -9,6 +10,7 @@ const useDetailForm = () => {
   const { playlistId } = useParams();
   const { userId } = useAuthStore();
   const { toastTrigger } = useToast();
+  const navigate = useNavigate();
 
   interface VALUES {
     comment: string;
@@ -56,6 +58,9 @@ const useDetailForm = () => {
     },
     video: (index: number) => {
       setValues({ ...values, currentVideoIndex: index });
+    },
+    profile: (userId: string) => {
+      navigate(ROUTES.PLAYLIST(userId));
     },
   };
 

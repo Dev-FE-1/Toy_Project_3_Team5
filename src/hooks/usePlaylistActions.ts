@@ -95,7 +95,6 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
       } else {
         addLikedPlaylistItem(playlistId);
       }
-      queryClient.invalidateQueries({ queryKey: ['homePlaylists'] });
     }
   };
 
@@ -127,7 +126,6 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
       } else {
         addSavedPlaylistItem(playlistId);
       }
-      queryClient.invalidateQueries({ queryKey: ['homePlaylists'] });
     }
   };
 

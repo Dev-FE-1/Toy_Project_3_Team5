@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/firebase/firbaseConfig';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Channel {
   id: string;
@@ -13,6 +14,7 @@ type ListType = 'following' | 'follower';
 
 const useChannel = (channelId: string, listType: ListType) => {
   const [channels, setChannels] = useState<Channel[]>([]);
+  const { userId } = useAuthStore();
 
   useEffect(() => {
     const userDocRef = doc(db, 'users', channelId);
@@ -57,8 +59,7 @@ const useChannel = (channelId: string, listType: ListType) => {
     });
 
     return () => unsubscribe();
-  }, [channelId, listType]);
-
+  }, [channelId, listType, userId]);
   return channels;
 };
 

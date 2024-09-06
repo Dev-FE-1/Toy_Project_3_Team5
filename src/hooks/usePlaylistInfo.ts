@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { getPlaylistComment } from '@/api/comment';
 import { getPlaylistInfo } from '@/api/playlistInfo';
 import { getUserInfo } from '@/api/profileInfo';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -38,13 +39,15 @@ export const usePlaylistInfo = () => {
   const { playlistId } = useParams<{ playlistId: string }>();
   const { userId } = useAuthStore();
 
+  const [detailInfo, setDetailInfo] = useState<DetailInfoProps>(INIT_VALUES);
+
   const [playlistInfo, setPlaylistInfo] = useState<PlayListDataProps>(
     INIT_VALUES.playlistInfo
   );
-
-  const [detailInfo, setDetailInfo] = useState<DetailInfoProps>(INIT_VALUES);
-
   const [ownerInfo, setOwnerInfo] = useState<UserProps>(INIT_VALUES.ownerInfo);
+  const [commentList, setCommentList] = useState<CommentProps[]>(
+    INIT_VALUES.comments
+  );
 
   const fetchPlaylistInfo = useCallback(async () => {
     const { status, result } = await getPlaylistInfo(Number(playlistId));
@@ -66,9 +69,20 @@ export const usePlaylistInfo = () => {
     }
   }, [playlistInfo]);
 
+  const fetchCommentInfo = useCallback(async () => {
+    const { status, result } = await getPlaylistComment(Number(playlistId));
+    if (status === 'fail') {
+      throw new Error('데이터 불러오기에 실패했습니다.');
+    }
+    if (result) {
+      setCommentList(result);
+    }
+  }, [playlistInfo]);
+
   useEffect(() => {
     fetchPlaylistInfo();
     fetchOwnerInfo();
+    fetchCommentInfo();
   }, []);
 
   useEffect(() => {
@@ -76,8 +90,18 @@ export const usePlaylistInfo = () => {
       ...detailInfo,
       playlistInfo,
       ownerInfo,
+      comments: commentList,
     });
-  }, [playlistInfo, ownerInfo]);
+  }, [playlistInfo, ownerInfo, commentList]);
 
-  return { detailInfo, fetchPlaylistInfo, fetchOwnerInfo };
+  useEffect(() => {}, [detailInfo]);
+
+  return {
+    detailInfo,
+    commentList,
+    fetchPlaylistInfo,
+    fetchOwnerInfo,
+    fetchCommentInfo,
+    setDetailInfo,
+  };
 };

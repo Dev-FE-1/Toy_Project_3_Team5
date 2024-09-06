@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { ExternalLink, Heart, ListPlus, X } from 'lucide-react';
-import { useParams } from 'react-router-dom';
 import { getVideoInfo } from '@/api/video';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
@@ -14,6 +13,8 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import useDetailForm from '@/hooks/useDetailForm';
 import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
+import { UserProps } from '@/types/api';
+import { CommentProps, PlayListDataProps } from '@/types/playlistType';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 import { makeEmbedUrl } from '@/utils/videoUtils';
 
@@ -30,16 +31,23 @@ const MAX_LENGTH = {
   channelName: 10,
 };
 
+interface DetailInfoProps {
+  playlistInfo: PlayListDataProps;
+  comments: CommentProps[];
+  ownerInfo: UserProps;
+}
+
 const Detail = () => {
   const [currentVideo, setCurrentVideo] = useState<AddedLinkProps>();
   const [videoList, setVideoList] = useState<AddedLinkProps[]>([]);
 
-  const { values, onChanges, onKeydowns, onClicks, validations } =
-    useDetailForm();
+  const { values, onChanges, onKeydowns, onClicks } = useDetailForm();
 
-  const { detailInfo, fetchPlaylistInfo, fetchOwnerInfo } = usePlaylistInfo();
+  const { detailInfo, fetchOwnerInfo, setDetailInfo, fetchCommentInfo } =
+    usePlaylistInfo();
 
   const { playlistInfo, comments, ownerInfo } = detailInfo;
+  const [isCommentReload, setIsCommentReload] = useState<boolean>(false);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [autoPlay, setAutoPlay] = useState<boolean>(true);
@@ -49,12 +57,20 @@ const Detail = () => {
 
   useEffect(() => {
     fetchOwnerInfo();
+
     playlistInfo.links.map(async (link, index) => {
       const { result } = await getVideoInfo(link);
       if (result) videoList.push(result);
       if (index === 0) setCurrentVideo(result);
     });
   }, [playlistInfo]);
+
+  useEffect(() => {
+    if (isCommentReload) {
+      setIsCommentReload(false);
+      fetchCommentInfo();
+    }
+  }, [isCommentReload]);
 
   return (
     <div css={containerStyle}>
@@ -212,26 +228,35 @@ const Detail = () => {
             placeholder='댓글 추가...'
             value={values.comment}
             onChange={onChanges.comment}
-            onKeyDown={onKeydowns.comment}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter') {
+                onClicks.comment();
+                setIsCommentReload(true);
+              }
+            }}
           />
-          <Button label='작성' onClick={onClicks.comment} color='black' />
+          <Button
+            label='작성'
+            onClick={() => {
+              onClicks.comment();
+              setIsCommentReload(true);
+            }}
+            color='black'
+          />
         </div>
         <div css={commentStyle}>
-          <Comment
-            content='너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!'
-            imgUrl={''}
-            userName='dev.meryoung'
-          />
-          <Comment
-            content='너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!'
-            imgUrl={''}
-            userName='닉네임'
-          />
-          <Comment
-            content='너무 재밌어요!너무 재밌어요!너무 재밌어요!너무 재밌어요!'
-            imgUrl={''}
-            userName='닉네임2'
-          />
+          {comments && comments.length > 0 ? (
+            comments.map((comment, index) => (
+              <Comment
+                key={`comment-${index}`}
+                content={comment.content}
+                imgUrl={comment.userId}
+                userName={comment.userId}
+              />
+            ))
+          ) : (
+            <>없는데요</>
+          )}
         </div>
       </div>
 

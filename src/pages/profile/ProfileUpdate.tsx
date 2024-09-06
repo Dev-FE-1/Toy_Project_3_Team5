@@ -70,6 +70,12 @@ export const ProfileUpdate = () => {
   };
 
   const onChannelNameCheck = async () => {
+    if (newChannelName === channelName) {
+      setChannelNameCheckMessage('현재 채널 이름과 동일합니다.');
+      setIsChannelNameChecked(true);
+      return;
+    }
+
     if (!newChannelName || newChannelName.length < 2) {
       setChannelNameCheckMessage('채널 이름은 2자리 이상이어야 합니다.');
       setIsChannelNameChecked(false);
@@ -94,10 +100,31 @@ export const ProfileUpdate = () => {
   const addHashtag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (hashtag && !hashtags.includes(hashtag)) {
-        const formattedHashtag = hashtag.startsWith('#')
-          ? hashtag
-          : `#${hashtag}`;
+
+      const invalidString = /[\s!@#$%^&*(),.?":{}|<>]/;
+      if (invalidString.test(hashtag)) {
+        toastTrigger(
+          '해시태그에 공백이나 특수문자를 사용할 수 없습니다.',
+          'fail'
+        );
+        return;
+      }
+
+      if (hashtags.length >= 10) {
+        toastTrigger('해시태그는 최대 10개 제한입니다.', 'fail');
+        return;
+      }
+
+      const formattedHashtag = hashtag.startsWith('#')
+        ? hashtag
+        : `#${hashtag}`;
+
+      if (hashtag && hashtags.includes(formattedHashtag)) {
+        toastTrigger('이미 있는 해시태그입니다.', 'fail');
+        return;
+      }
+
+      if (hashtag) {
         setHashtags((prev) => [...prev, formattedHashtag]);
         setHashtag('');
       }
@@ -120,7 +147,7 @@ export const ProfileUpdate = () => {
   const onProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isChannelNameChecked) {
+    if (newChannelName !== channelName && !isChannelNameChecked) {
       toastTrigger('채널 이름 중복 검사를 진행해주세요.', 'fail');
       return;
     }
@@ -131,9 +158,13 @@ export const ProfileUpdate = () => {
 
     if (userId) {
       await updateProfileTags(userId, hashtags);
-      const userRef = doc(db, 'users', userId);
-      await setDoc(userRef, { channelName: newChannelName }, { merge: true });
+
+      if (newChannelName !== channelName) {
+        const userRef = doc(db, 'users', userId);
+        await setDoc(userRef, { channelName: newChannelName }, { merge: true });
+      }
     }
+
     navigate(ROUTES.PROFILE(userId));
     window.location.reload();
     toastTrigger('프로필 수정이 완료되었습니다.', 'success');

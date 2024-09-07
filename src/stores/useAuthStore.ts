@@ -7,6 +7,7 @@ import {
   where,
   getDocs,
   updateDoc,
+  arrayRemove,
 } from 'firebase/firestore';
 import { create, StateCreator } from 'zustand';
 import { persist, PersistOptions } from 'zustand/middleware';
@@ -31,6 +32,8 @@ interface AuthState {
   addSavedPlaylistItem: (playlistId: number) => void;
   removeLikedPlaylistItem: (playlistId: number) => void;
   removeSavedPlaylistItem: (playlistId: number) => void;
+  removeFollowing: (userId: string, uidToRemove: string) => Promise<void>;
+  removeFollower: (userId: string, uidToRemove: string) => Promise<void>;
 }
 
 type AuthPersist = (
@@ -91,6 +94,30 @@ export const useAuthStore = create<AuthState>(
         set((state) => ({
           savedPlaylist: state.savedPlaylist.filter((i) => i !== playlistId),
         })),
+
+      removeFollowing: async (userId: string, uidToRemove: string) => {
+        const userDocRef = doc(db, 'users', userId);
+        await updateDoc(userDocRef, {
+          channelFollowing: arrayRemove(uidToRemove),
+        });
+        set((state) => ({
+          channelFollowing: state.channelFollowing.filter(
+            (uid) => uid !== uidToRemove
+          ),
+        }));
+      },
+
+      removeFollower: async (userId: string, uidToRemove: string) => {
+        const userDocRef = doc(db, 'users', userId);
+        await updateDoc(userDocRef, {
+          channelFollower: arrayRemove(uidToRemove),
+        });
+        set((state) => ({
+          channelFollower: state.channelFollower.filter(
+            (uid) => uid !== uidToRemove
+          ),
+        }));
+      },
     }),
     {
       name: 'auth-storage',

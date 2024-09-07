@@ -1,3 +1,85 @@
-export const ProfileFollower = () => (
-  <div>ProfileFollower 해당 유저아이디의 팔로워 목록 페이지</div>
-);
+import { css } from '@emotion/react';
+import { UserMinus } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import Modal from '@/components/Modal';
+import Profile from '@/components/Profile';
+import { fontSize } from '@/constants/font';
+import useList from '@/hooks/useList';
+
+const FollowerList = () => {
+  const { userId } = useParams();
+  const { list: followerList, handleUserMinusClick } = useList(
+    userId || '',
+    'follower'
+  );
+
+  return (
+    <>
+      <div css={rootContainer}>
+        <div css={numberingContainer}>
+          {followerList.length === 0
+            ? '팔로워가 없습니다' // 팔로워 리스트가 비어 있을 경우
+            : `총 ${followerList.length} 명`}{' '}
+          {/* 팔로워 리스트가 있을 경우 */}
+        </div>
+        <div css={profileListContainer}>
+          {followerList.length > 0 &&
+            followerList.map((data, index) => (
+              <div key={index} css={profileItem}>
+                <span css={profileContainerStyle}>
+                  <Profile src={data.src} alt={data.alt} size={data.size} />
+                  <span>{data.name}</span>
+                </span>
+                <button
+                  css={userMinusStyle}
+                  onClick={() => handleUserMinusClick(data.uid)} // 삭제 확인 모달 열기
+                >
+                  <UserMinus css={userMinusStyle} />
+                </button>
+              </div>
+            ))}
+        </div>
+      </div>
+      <Modal />
+    </>
+  );
+};
+
+const rootContainer = css`
+  display: flex;
+  flex-direction: column;
+`;
+
+const numberingContainer = css`
+  padding-left: 20px;
+  padding-top: 20px;
+  font-size: ${fontSize.xs};
+`;
+
+const profileListContainer = css`
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+  padding-top: 20px;
+`;
+
+const profileItem = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+`;
+
+const profileContainerStyle = css`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const userMinusStyle = css`
+  margin-right: 10px;
+  background: none;
+  border: none;
+`;
+
+export default FollowerList;

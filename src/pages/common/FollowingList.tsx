@@ -27,7 +27,7 @@ const FollowingList = () => {
 
   const handleUserMinusClick = (uid: string) => {
     openModal({
-      type: 'confirm',
+      type: 'confirm', // 모달 타입 설정
       title: '언팔로우 확인',
       content: '정말로 이 유저를 언팔로우 하시겠습니까?',
       onAction: () => handleUnfollow(uid),

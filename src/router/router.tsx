@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import ROUTES from '@/constants/route';
 import Detail from '@/pages/common/Detail';
 import Following from '@/pages/common/Following';
+import FollowingList from '@/pages/common/FollowingList';
 import HashTag from '@/pages/common/HashTag';
 import Home from '@/pages/common/Home';
 import { NotFound } from '@/pages/common/NotFound';
@@ -18,8 +19,8 @@ import { PlayListHome } from '@/pages/playlist/PlayListHome';
 import { PlayListLikes } from '@/pages/playlist/PlayListLikes';
 import { PlayListSaved } from '@/pages/playlist/PlayListSaved';
 import { Profile } from '@/pages/profile/Profile';
-import { ProfileFollower } from '@/pages/profile/ProfileFollower';
-import { ProfileFollowing } from '@/pages/profile/ProfileFollowing';
+import ProfileFollower from '@/pages/profile/ProfileFollower';
+import ProfileFollowing from '@/pages/profile/ProfileFollowing';
 import { ProfileHome } from '@/pages/profile/ProfileHome';
 import { ProfileUpdate } from '@/pages/profile/ProfileUpdate';
 import ProtectedRoute from '@/router/ProtectedRoute';
@@ -91,6 +92,10 @@ export const router = createBrowserRouter([
             path: ROUTES.PROFILE_FOLLOWING(),
             element: <ProfileFollowing />,
           },
+          {
+            path: ROUTES.PROFILE_FOLLOWER(),
+            element: <ProfileFollower />,
+          },
         ],
       },
       {
@@ -106,20 +111,20 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: ROUTES.FOLLOWING_LIST(),
+        element: (
+          <ProtectedRoute>
+            <FollowingList />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: ROUTES.SEARCH(),
         element: <Search />,
       },
       {
         path: ROUTES.DETAIL(),
         element: <Detail />,
-      },
-      {
-        path: ROUTES.PROFILE_FOLLOWER(),
-        element: <ProfileFollower />,
-      },
-      {
-        path: ROUTES.PROFILE_FOLLOWING(),
-        element: <ProfileFollowing />,
       },
     ],
   },

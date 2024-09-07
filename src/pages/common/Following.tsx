@@ -1,26 +1,28 @@
 import { useState, useMemo } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
-import { useChannelFetch } from '@/api/followingPlaylists';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
-import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylistFetch';
+import useChannel from '@/hooks/useChannel';
+import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylist';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import { useAuthStore } from '@/stores/useAuthStore';
+
 const PAGE_SIZE = 5;
 
 const Following = () => {
   const { userId } = useAuthStore();
   const [selectedChannel, setSelectedChannel] = useState(userId);
+  const navigate = useNavigate();
 
-  const channels = useChannelFetch(selectedChannel);
+  const followingChannels = useChannel(userId, 'following');
   const { data, fetchNextPage, hasNextPage, isFetching } =
     useFollowingPlaylistFetch(selectedChannel);
-
   const playlists = useMemo(
     () => (data ? data.pages.flatMap((page) => page.playlist) : []),
     [data]
@@ -43,38 +45,31 @@ const Following = () => {
   const onFollowingChannelClick = (channelId: string) => {
     setSelectedChannel(selectedChannel === channelId ? userId : channelId);
   };
-  const followingList = channels.map((channel) => ({
-    id: channel.id,
-    alt: '썸네일',
-    src: channel.profileImg,
-    size: 'md' as const,
-    name: channel.channelName,
-  }));
+
+  const onToFollowingListPage = (userId: string) => {
+    navigate(`/profile/${userId}/following`);
+  };
 
   return (
     <div css={containerStyle}>
-      {followingList.length > 0 && (
+      {followingChannels.length > 0 && (
         <div css={followingHeaderStyle}>
           <div css={followingListStyle}>
-            {followingList.map((following) => (
-              <div key={following.id}>
+            {followingChannels.map((channel) => (
+              <div key={channel.id}>
                 <button
-                  css={followingCoverStyle(selectedChannel === following.id)}
-                  onClick={() => onFollowingChannelClick(following.id)}
+                  css={followingCoverStyle(selectedChannel === channel.id)}
+                  onClick={() => onFollowingChannelClick(channel.id)}
                 >
-                  <Profile
-                    alt={following.alt}
-                    src={following.src}
-                    size={following.size}
-                  />
+                  <Profile alt='썸네일' src={channel.profileImg} size='md' />
                 </button>
-                <p css={followingTextStyle}>{following.name}</p>
+                <p css={followingTextStyle}>{channel.channelName}</p>
               </div>
             ))}
           </div>
           <Button
             label='All'
-            onClick={() => {}}
+            onClick={() => onToFollowingListPage(userId)}
             IconComponent={Plus}
             color='primary'
             shape='text'
@@ -96,7 +91,6 @@ const Following = () => {
     </div>
   );
 };
-
 const containerStyle = css``;
 
 const followingHeaderStyle = css`

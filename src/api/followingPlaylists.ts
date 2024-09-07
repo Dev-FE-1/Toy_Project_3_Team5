@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback } from 'react';
 import {
   collection,
   query,
@@ -14,33 +13,11 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/firebase/firbaseConfig';
 import { PlayListDataProps } from '@/types/playlistType';
-interface FollowingChannel {
-  id: string;
-  profileImg: string;
-  channelName: string;
-}
 
 export interface PlaylistsResultProps {
   playlist: PlayListDataProps[];
   nextCursor: QueryDocumentSnapshot<DocumentData> | null;
 }
-export const getOwnerChannelName = async (userId: string): Promise<string> => {
-  try {
-    const userDocRef = doc(db, 'users', userId);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData?.channelName || '알 수 없는 채널';
-    } else {
-      console.log('userId에 대한 사용자 문서를 찾을 수 없습니다:', userId);
-      return '알 수 없는 채널';
-    }
-  } catch (error) {
-    console.error('채널 이름을 가져오는 동안 오류 발생:', error);
-    return '알 수 없는 채널';
-  }
-};
 
 export const fetchFollowingPlaylists = async (
   userId: string,
@@ -113,46 +90,19 @@ export const fetchFollowingPlaylists = async (
 
   return { playlist, nextCursor };
 };
-
-export const useChannelFetch = (channelId: string) => {
-  const [channels, setChannels] = useState<FollowingChannel[]>([]);
-
-  const fetchChannels = useCallback(async () => {
-    // 특정 사용자 문서 가져오기
-    const userDocRef = doc(db, 'users', channelId);
+export const getOwnerChannelName = async (userId: string): Promise<string> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
-      const { channelFollowing } = userDocSnap.data() as {
-        channelFollowing: string[];
-      };
-
-      if (channelFollowing && channelFollowing.length > 0) {
-        // users 컬렉션에서 uid가 channelFollowing 배열에 있는 경우를 찾는 쿼리
-        const usersQuery = query(
-          collection(db, 'users'),
-          where('uid', 'in', channelFollowing)
-        );
-        const querySnapshot = await getDocs(usersQuery);
-        const fetchedChannels = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          profileImg: doc.data().profileImg || '',
-          channelName: doc.data().channelName || '',
-        }));
-
-        setChannels(fetchedChannels);
-      }
+      const userData = userDocSnap.data();
+      return userData?.channelName || '알 수 없는 채널';
     } else {
-      console.log('No such user document!');
-      return [];
+      return '알 수 없는 채널';
     }
-  }, []);
-
-  useEffect(() => {
-    if (channelId) {
-      fetchChannels();
-    }
-  }, [channelId, fetchChannels]);
-
-  return channels;
+  } catch (error) {
+    console.error('채널 이름을 가져오는 동안 오류 발생:', error);
+    return '알 수 없는 채널';
+  }
 };

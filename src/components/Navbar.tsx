@@ -48,15 +48,13 @@ const Navbar: React.FC = () => {
         };
 
         return (
-          <div css={iconWrapperStyle} key={idx}>
-            <IconButton
-              key={list.label}
-              IconComponent={list.icon}
-              onClick={onClick}
-              label={list.label}
-              color={isActive ? 'primary' : 'gray'}
-            />
-          </div>
+          <IconButton
+            key={list.label}
+            IconComponent={list.icon}
+            onClick={() => navigate(list.to)}
+            label={list.label}
+            color={isActive ? 'primary' : 'gray'}
+          />
         );
       })}
     </nav>
@@ -64,7 +62,7 @@ const Navbar: React.FC = () => {
 };
 
 const navbarStyle = css`
-  width: 430px;
+  width: 426px;
   height: 60px;
   display: flex;
   justify-content: space-around;
@@ -74,13 +72,6 @@ const navbarStyle = css`
   padding: 10px 20px;
   background-color: ${colors.white};
   border-top: 1px solid ${colors.gray02};
-  z-index: 10;
-`;
-
-const iconWrapperStyle = css`
-  display: flex;
-  justify-content: center;
-  width: 60px;
 `;
 
 export default Navbar;

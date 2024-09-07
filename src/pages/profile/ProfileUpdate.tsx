@@ -145,7 +145,7 @@ export const ProfileUpdate = () => {
         <input
           id='profileImageUpload'
           type='file'
-          accept='image/*'
+          accept='image/png'
           style={{ display: 'none' }}
           onChange={onImageChange}
         />

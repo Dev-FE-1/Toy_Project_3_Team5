@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
-import { PlusSquare, SquarePlus, X } from 'lucide-react';
+import { Plus, SquarePlus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { addPlaylist } from '@/api/playlistInfo';
 import { getVideoInfo } from '@/api/video';
@@ -286,37 +286,39 @@ const PlayListAdd = () => {
         onChange={onChange.description}
         height='100px'
       />
-      <div css={linkStyle}>
-        <InputBox
-          label={TEXT.link.label}
-          placeholder={TEXT.link.placeholder}
-          labelStyle={labelStyle}
-          value={link}
-          width='360px'
-          onChange={onChange.link}
-          onKeyDown={onKeydown.link}
-          validate={validation.link}
-        />
-        <IconButton IconComponent={PlusSquare} onClick={onClick.addVideoLink} />
-      </div>
-      {videoList.length > 0 && (
-        <div css={videoListStyle}>
-          {videoList.map((video, index) => (
-            <div css={videoItemStyle} key={index}>
-              <AddedVideo
-                videoId={video.videoId}
-                imgUrl={video.imgUrl}
-                link={video.link}
-                title={video.title}
-                userName={video.userName}
-                onRemove={onClick.removeVideoLink}
-                isDragNDrop={true}
-                onDragNDrop={() => {}}
-              />
-            </div>
-          ))}
+      <section css={videoStyle}>
+        <div css={linkStyle}>
+          <InputBox
+            label={TEXT.link.label}
+            placeholder={TEXT.link.placeholder}
+            labelStyle={labelStyle}
+            value={link}
+            width='360px'
+            onChange={onChange.link}
+            onKeyDown={onKeydown.link}
+            validate={validation.link}
+          />
+          <IconButton IconComponent={Plus} onClick={onClick.addVideoLink} />
         </div>
-      )}
+        {videoList.length > 0 && (
+          <div css={videoListStyle}>
+            {videoList.map((video, index) => (
+              <div css={videoItemStyle} key={index}>
+                <AddedVideo
+                  videoId={video.videoId}
+                  imgUrl={video.imgUrl}
+                  link={video.link}
+                  title={video.title}
+                  userName={video.userName}
+                  onRemove={onClick.removeVideoLink}
+                  isDragNDrop={true}
+                  onDragNDrop={() => {}}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
       <div css={hashtagDivStyle}>
         <InputBox
           label={TEXT.hashtag.label}
@@ -391,32 +393,38 @@ const PlayListAdd = () => {
           disabled
         />
       )} */}
-      <Button
-        label={TEXT.createButton.label}
-        onClick={onClick.createPlaylist}
-        color='primary'
-        size='md'
-        fullWidth
-      />
+      <div css={createButtonStyle}>
+        <Button
+          label={TEXT.createButton.label}
+          onClick={onClick.createPlaylist}
+          color='primary'
+          size='md'
+          fullWidth
+        />
+      </div>
     </div>
   );
 };
+
+const btnHeight = '52px';
+const navHeight = '60px';
 
 const containerStyle = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 20px 20px calc(${navHeight} + ${btnHeight}) 20px;
+  gap: 16px;
 
-  & > div {
-    padding: 5px 0;
-    width: 100%;
+  .css-6gpx6l-inputContainerStyle {
+    margin-bottom: 0;
   }
 `;
 
 const labelStyle = {
-  fontSize: `${fontSize.lg}`,
-  fontWeight: `${fontWeight.bold}`,
+  fontSize: `${fontSize.md}`,
+  fontWeight: `${fontWeight.semiBold}`,
+  paddingBottom: '4px',
 };
 
 const toggleStyle = css`
@@ -435,12 +443,15 @@ const linkStyle = css`
   display: flex;
   align-self: center;
   width: 100%;
+  height: 82px;
 `;
 
 const videoListStyle = css`
-  /* width: 100%; */
-  /* overflow-y: auto;
-  overflow-x: hidden; */
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid ${colors.gray02};
+  margin-top: 8px;
+  padding-bottom: 8px;
 `;
 
 const videoItemStyle = css`
@@ -457,6 +468,7 @@ const thumbnailStyle = css`
   display: flex;
   flex-direction: column;
   width: 100%;
+  gap: 4px;
 
   & label {
     padding: 5px 0;
@@ -465,9 +477,30 @@ const thumbnailStyle = css`
 
 const previewStyle = css`
   width: 100%;
-  & > * {
-    padding: 10px 0;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+
+  .css-asypq0-smallCardStyles {
+    flex-direction: column;
+    gap: 4px;
+    font-size: ${fontSize.sm};
   }
+`;
+
+const createButtonStyle = css`
+  position: fixed;
+  bottom: 60px;
+  background: ${colors.white};
+  padding: 10px;
+  width: 430px;
+`;
+
+const videoStyle = css`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 `;
 
 export default PlayListAdd;

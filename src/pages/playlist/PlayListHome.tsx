@@ -33,7 +33,7 @@ export const PlayListHome = () => {
     { label: '공개여부', options: ['전체', '공개', '비공개'] },
   ];
 
-  const { data, fetchNextPage, hasNextPage, isFetching } =
+  const { data, fetchNextPage, hasNextPage, isFetching, refetch } =
     useFetchUserPlaylist(PAGE_SIZE);
 
   useEffect(() => {
@@ -70,6 +70,8 @@ export const PlayListHome = () => {
         (playlist) => Number(playlist.playlistId) !== deletedPlaylistId
       )
     );
+
+    refetch();
   };
 
   const onAddBtnClick = (): void => {

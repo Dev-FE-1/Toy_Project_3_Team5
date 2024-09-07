@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 import { Transition } from '@headlessui/react';
 import { ChevronUp } from 'lucide-react';
 import colors from '@/constants/colors';
-import { fontSize } from '@/constants/font';
+import { fontSize, fontWeight } from '@/constants/font';
 
 interface VideoInfoProps {
   playlistName: string;
@@ -49,18 +49,21 @@ const MiniPlaylist = ({ isActive, videoInfo, onClose }: MiniPlaylistProps) => (
   </Transition>
 );
 
+const navHeight = '60px';
+
 const toastStyle = css`
   max-width: 430px;
-  /* width: calc(100vw - 32px - 40px); */
+  min-width: 390px;
   position: fixed;
   margin: 0px 20px;
-  bottom: 96px;
+  bottom: calc(${navHeight} + 20px);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px 0;
-  border-radius: 4px;
-  background-color: ${colors.gray04};
+  border-radius: 8px;
+  background: rgba(101, 103, 109, 0.5);
+  backdrop-filter: blur(30px);
   color: ${colors.white};
   z-index: 1000;
   transition: all 0.2s ease-in;
@@ -96,6 +99,7 @@ const thumbnailStyle = css`
 const infoStyle = css`
   display: flex;
   flex-direction: column;
+  gap: 6px;
   font-size: ${fontSize.md};
   flex-grow: 1;
 `;
@@ -105,16 +109,16 @@ const buttonStyle = css`
 `;
 
 const messageStyle = css`
-  font-size: ${fontSize.md};
   font-weight: 500;
 
   &.subject {
     color: ${colors.white};
-    font-size: ${fontSize.md};
+    font-size: ${fontSize.sm};
   }
   &.playlistName {
     color: ${colors.gray02};
-    font-size: ${fontSize.md};
+    font-size: ${fontSize.sm};
+    font-weight: ${fontWeight.light};
   }
 `;
 

@@ -234,6 +234,7 @@ const Detail = () => {
                   size='sm'
                   shape='round'
                   onClick={() => {
+                    if (!!!loginId) toastTrigger('로그인이 필요합니다', 'fail');
                     handleFollowToggle();
                     fetchOwnerInfo();
                   }}

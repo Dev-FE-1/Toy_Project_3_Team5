@@ -54,7 +54,12 @@ const Detail = () => {
     ownerInfo?.userId
   );
 
-  const { isLiked, isAdded, toggleLike, toggleSave, likes } =
+  const [currentLikes, setCurrentLikes] = useState<{
+    isLiked: boolean;
+    likes: number;
+  }>({ isLiked: false, likes: 0 });
+
+  const { isLiked, isAdded, toggleLike, toggleSave, likes, setInitLikes } =
     usePlaylistActions(playlistId ? +playlistId : 0, playlistInfo.likes);
 
   const [commentsPlus, setCommentsPlus] = useState<number>(COMMENT_PLUS_SIZE);
@@ -76,6 +81,7 @@ const Detail = () => {
 
   useEffect(() => {
     fetchOwnerInfo();
+    setCurrentLikes({ ...currentLikes, likes: playlistInfo.likes });
   }, [playlistInfo]);
 
   useEffect(() => {
@@ -96,6 +102,17 @@ const Detail = () => {
   useEffect(() => {
     setCurrentVideo(videoList[0]);
   }, [videoList]);
+
+  useEffect(() => {
+    setCurrentLikes({
+      isLiked,
+      likes: isLiked ? currentLikes.likes + 1 : currentLikes.likes - 1,
+    });
+  }, [isLiked]);
+
+  useEffect(() => {
+    setInitLikes(currentLikes.likes);
+  }, [currentLikes]);
 
   return !!!isLoading ? (
     <div css={loadingStyle}>
@@ -225,10 +242,12 @@ const Detail = () => {
           <div css={userInfoStyle}>
             <IconButton
               IconComponent={Heart}
-              onClick={toggleLike}
+              onClick={() => {
+                toggleLike();
+              }}
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
-              label={`${likes !== null ? likes : playlistInfo.likes}`}
+              label={`${currentLikes.likes}`}
             />
 
             <IconButton

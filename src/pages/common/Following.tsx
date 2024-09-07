@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import EmptyImage from '@/assets/empty-image.png'; // 비어 있는 상태를 나타내는 이미지
+import folderIcon from '@/assets/folderIcon.png';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
@@ -21,6 +23,7 @@ const Following = () => {
   const navigate = useNavigate();
 
   const followingChannels = useChannel(userId, 'following');
+
   const { data, fetchNextPage, hasNextPage, isFetching } =
     useFollowingPlaylistFetch(selectedChannel);
   const playlists = useMemo(
@@ -76,22 +79,37 @@ const Following = () => {
           />
         </div>
       )}
-      <div className='scroll-container' css={playlistContainer}>
-        {playlists.map((playlist, index) => (
-          <PlaylistCard key={index} playlistItem={playlist} size='large' />
-        ))}
-        <div css={loadingSpinnerStyle}>
-          {isFetching && playlists.length >= PAGE_SIZE && <LoadingSpinner />}
-        </div>
-        <div
-          ref={infiniteScrollRef}
-          style={{ minHeight: '72px', width: '100%' }}
-        ></div>
+      <div css={playlistContainer}>
+        {playlists.length === 0 ? (
+          <div css={emptyContainer}>
+            <img src={folderIcon} alt='빈 상태' css={emptyImage} />
+            <p css={emptyMessage}>목록이 비었어요</p>
+          </div>
+        ) : (
+          <>
+            {playlists.map((playlist, index) => (
+              <PlaylistCard key={index} playlistItem={playlist} size='large' />
+            ))}
+            <div css={loadingSpinnerStyle}>
+              {isFetching && playlists.length >= PAGE_SIZE && (
+                <LoadingSpinner />
+              )}
+            </div>
+            <div
+              ref={infiniteScrollRef}
+              style={{ minHeight: '72px', width: '100%' }}
+            ></div>
+          </>
+        )}
       </div>
     </div>
   );
 };
-const containerStyle = css``;
+
+const containerStyle = css`
+  display: flex;
+  flex-direction: column;
+`;
 
 const followingHeaderStyle = css`
   display: flex;
@@ -135,9 +153,31 @@ const playlistContainer = css`
   gap: 20px;
   padding: 100px 20px 20px 20px;
 `;
+
 const loadingSpinnerStyle = css`
   display: flex;
   justify-content: center;
   align-items: center;
 `;
+
+const emptyContainer = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh; /* 화면 높이에 따라 조정 */
+  text-align: center;
+`;
+
+const emptyImage = css`
+  width: 150px; /* 적절한 크기로 조절 */
+  height: auto;
+`;
+
+const emptyMessage = css`
+  margin-top: 20px;
+  font-size: ${fontSize.lg};
+  color: ${colors.gray04};
+`;
+
 export default Following;

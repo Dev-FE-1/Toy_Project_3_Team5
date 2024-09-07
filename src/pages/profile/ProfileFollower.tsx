@@ -32,7 +32,7 @@ const FollowerList = () => {
                 </span>
                 <button
                   css={userMinusStyle}
-                  onClick={() => handleUserMinusClick(data.uid)} // 삭제 확인 모달 열기
+                  onClick={() => handleUserMinusClick(data.name)}
                 >
                   <UserMinus css={userMinusStyle} />
                 </button>
@@ -75,11 +75,5 @@ const profileContainerStyle = css`
   align-items: center;
   gap: 10px;
 `;
-
-const userMinusStyle = css`
-  margin-right: 10px;
-  background: none;
-  border: none;
-`;
-
+const userMinusStyle = css``;
 export default FollowerList;

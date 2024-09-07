@@ -14,23 +14,25 @@ const FollowingList = () => {
   const { removeFollowing } = useAuthStore.getState();
   const { openModal } = useModalStore();
 
-  const handleUnfollow = async (uid: string) => {
+  const handleUnfollow = async (removeId: string) => {
     if (userId) {
       try {
-        await removeFollowing(userId, uid);
-        setList((prevList) => prevList.filter((user) => user.uid !== uid));
+        await removeFollowing(userId, removeId);
+        setList((prevList) =>
+          prevList.filter((user) => user.name !== removeId)
+        );
       } catch (error) {
         console.error('Error unfollowing user:', error);
       }
     }
   };
 
-  const handleUserMinusClick = (uid: string) => {
+  const handleUserMinusClick = (removeId: string) => {
     openModal({
       type: 'confirm',
       title: '언팔로우 확인',
       content: '정말로 이 유저를 언팔로우 하시겠습니까?',
-      onAction: () => handleUnfollow(uid),
+      onAction: () => handleUnfollow(removeId),
     });
   };
 
@@ -52,7 +54,7 @@ const FollowingList = () => {
                 </span>
                 <button
                   css={userMinusStyle}
-                  onClick={() => handleUserMinusClick(data.uid)}
+                  onClick={() => handleUserMinusClick(data.name)}
                 >
                   <UserMinus css={userMinusStyle} />
                 </button>
@@ -95,11 +97,5 @@ const profileContainerStyle = css`
   align-items: center;
   gap: 10px;
 `;
-
-const userMinusStyle = css`
-  margin-right: 10px;
-  background: none;
-  border: none;
-`;
-
+const userMinusStyle = css``;
 export default FollowingList;

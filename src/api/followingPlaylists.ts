@@ -34,18 +34,10 @@ export const fetchFollowingPlaylists = async (
       const userData = userDocSnap.data() as DocumentData;
       const { channelFollowing } = userData;
 
-      const usersQuery = query(
-        collection(db, 'users'),
-        where('uid', 'in', channelFollowing)
-      );
-
-      const usersSnapshot = await getDocs(usersQuery);
-      const channelFollowingDocs = usersSnapshot.docs.map((doc) => doc.id);
-
-      if (channelFollowingDocs && channelFollowingDocs.length > 0) {
+      if (channelFollowing) {
         q = query(
           collection(db, 'playlist'),
-          where('userId', 'in', channelFollowingDocs),
+          where('userId', 'in', channelFollowing),
           orderBy('regDate', 'desc'),
           limit(5),
           ...(pageParam ? [startAfter(pageParam)] : [])
@@ -62,7 +54,6 @@ export const fetchFollowingPlaylists = async (
     );
   }
 
-  // q가 정의되지 않았을 경우 처리
   if (!q) {
     return { playlist: [], nextCursor: null };
   }

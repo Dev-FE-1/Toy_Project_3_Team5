@@ -8,7 +8,6 @@ interface ChannelProps {
   alt: 'Profile Image';
   size?: 'sm';
   name: string;
-  uid: string;
 }
 
 type ListType = 'following' | 'follower';
@@ -26,7 +25,6 @@ const useList = (userId: string, listType: ListType) => {
         alt: 'Profile Image',
         size: 'sm',
         name: channel.id,
-        uid: channel.uid || '',
       }))
     );
   }, [channels]);
@@ -38,7 +36,7 @@ const useList = (userId: string, listType: ListType) => {
       } else if (listType === 'follower') {
         await removeFollower(userId, uid);
       }
-      setList((prevList) => prevList.filter((user) => user.uid !== uid));
+      setList((prevList) => prevList.filter((user) => user.name !== uid));
     } catch (error) {
       console.error(`Error removing ${listType}:`, error);
     }

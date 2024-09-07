@@ -32,8 +32,8 @@ interface AuthState {
   addSavedPlaylistItem: (playlistId: number) => void;
   removeLikedPlaylistItem: (playlistId: number) => void;
   removeSavedPlaylistItem: (playlistId: number) => void;
-  removeFollowing: (userId: string, uidToRemove: string) => Promise<void>;
-  removeFollower: (userId: string, uidToRemove: string) => Promise<void>;
+  removeFollowing: (userId: string, removeChannel: string) => Promise<void>;
+  removeFollower: (userId: string, removeChannel: string) => Promise<void>;
 }
 
 type AuthPersist = (
@@ -95,26 +95,26 @@ export const useAuthStore = create<AuthState>(
           savedPlaylist: state.savedPlaylist.filter((i) => i !== playlistId),
         })),
 
-      removeFollowing: async (userId: string, uidToRemove: string) => {
+      removeFollowing: async (userId: string, removeChannel: string) => {
         const userDocRef = doc(db, 'users', userId);
         await updateDoc(userDocRef, {
-          channelFollowing: arrayRemove(uidToRemove),
+          channelFollowing: arrayRemove(removeChannel),
         });
         set((state) => ({
           channelFollowing: state.channelFollowing.filter(
-            (uid) => uid !== uidToRemove
+            (userId) => userId !== removeChannel
           ),
         }));
       },
 
-      removeFollower: async (userId: string, uidToRemove: string) => {
+      removeFollower: async (userId: string, removeChannel: string) => {
         const userDocRef = doc(db, 'users', userId);
         await updateDoc(userDocRef, {
-          channelFollower: arrayRemove(uidToRemove),
+          channelFollower: arrayRemove(removeChannel),
         });
         set((state) => ({
           channelFollower: state.channelFollower.filter(
-            (uid) => uid !== uidToRemove
+            (userId) => userId !== removeChannel
           ),
         }));
       },

@@ -162,14 +162,12 @@ export const ProfileUpdate = () => {
             externalErrorMessage={channelNameCheckMessage}
             validate={validateChannelName}
           />
-          <div>
-            <Button
-              label='중복검사'
-              color='gray'
-              onClick={onChannelNameCheck}
-              size='lg'
-            />
-          </div>
+          <Button
+            label='중복검사'
+            color='gray'
+            onClick={onChannelNameCheck}
+            size='lg'
+          />
         </div>
         <InputBox
           label='해시태그 (최대 10개)'
@@ -269,6 +267,14 @@ const profileNameStyle = css`
 const duplicateStyle = css`
   display: flex;
   align-items: center;
+  position: relative;
+
+  button {
+    height: 36px;
+    position: absolute;
+    right: 0;
+    top: 18px;
+  }
 `;
 
 const formContainerStyle = css`

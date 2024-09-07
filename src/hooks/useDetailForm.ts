@@ -67,6 +67,10 @@ const useDetailForm = () => {
   const validations = {
     comment: (): boolean => {
       if (isNaN(Number(playlistId))) return false;
+      if (!!!userId || userId.trim() === '') {
+        toastTrigger('로그인이 필요합니다.', 'fail');
+        return false;
+      }
       if (values.comment.trim().length < 1) {
         toastTrigger('댓글을 입력해주세요', 'fail');
         return false;

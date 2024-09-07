@@ -41,6 +41,21 @@ type AuthPersist = (
   options: PersistOptions<AuthState>
 ) => StateCreator<AuthState>;
 
+const INIT_VALUES = {
+  user: {
+    user: null,
+    userId: '',
+    profileImage: '',
+    channelName: '',
+    likedPlaylist: [],
+    savedPlaylist: [],
+    channelFollower: [],
+    channelFollowing: [],
+    tags: [],
+    isFirstLogin: true,
+  },
+};
+
 export const useAuthStore = create<AuthState>(
   (persist as AuthPersist)(
     (set) => ({
@@ -55,11 +70,7 @@ export const useAuthStore = create<AuthState>(
       tags: [],
       isFirstLogin: true,
       setUser: (user) => set({ user }),
-      clearUser: () =>
-        set({
-          user: null,
-          profileImage: '',
-        }),
+      clearUser: () => set(INIT_VALUES.user),
       fetchUserData: async (id) => {
         const userDocRef = doc(db, 'users', id);
         const docSnapshot = await getDoc(userDocRef);

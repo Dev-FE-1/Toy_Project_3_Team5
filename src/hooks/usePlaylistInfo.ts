@@ -5,6 +5,7 @@ import { getPlaylistInfo } from '@/api/playlistInfo';
 import { getUserInfo } from '@/api/profileInfo';
 import { getVideoInfo } from '@/api/video';
 import { AddedLinkProps } from '@/components/playlist/AddedVideo';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { UserProps } from '@/types/api';
 import { PlayListDataProps } from '@/types/playlistType';
 
@@ -38,6 +39,7 @@ interface DetailInfoProps {
 }
 
 export const usePlaylistInfo = () => {
+  const { userId: loginId } = useAuthStore();
   const { playlistId } = useParams<{ playlistId: string }>();
 
   const [detailInfo, setDetailInfo] = useState<DetailInfoProps>(INIT_VALUES);
@@ -50,6 +52,8 @@ export const usePlaylistInfo = () => {
   const [commentList, setCommentList] = useState<CommentWithProfileApiProps[]>(
     INIT_VALUES.comments
   );
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchPlaylistInfo = useCallback(async () => {
     const { status, result } = await getPlaylistInfo(Number(playlistId));
@@ -67,15 +71,24 @@ export const usePlaylistInfo = () => {
       throw new Error('데이터 불러오기에 실패했습니다.');
     }
     if (result) {
-      setOwnerInfo({ ...result, userId: playlistInfo.userId });
+      setOwnerInfo({
+        ...result,
+        userId: playlistInfo.userId,
+        isMyChannel: playlistInfo.userId === loginId,
+      });
     }
   }, [playlistInfo]);
 
   const convertLinkToVideoInfo = useCallback(
-    async (link: string) => {
-      await getVideoInfo(link).then(({ result }) => {
-        if (result) setVideoList((prev) => [...prev, result]);
-      });
+    async (links: string[]) => {
+      const tempList: AddedLinkProps[] = new Array(links.length);
+      await Promise.all(
+        links.map(async (link, index) => {
+          const { result } = await getVideoInfo(link);
+          if (result) tempList[index] = result;
+        })
+      );
+      setVideoList(tempList);
     },
     [playlistInfo]
   );
@@ -97,12 +110,16 @@ export const usePlaylistInfo = () => {
   }, []);
 
   useEffect(() => {
-    playlistInfo.links.map((link) => {
-      convertLinkToVideoInfo(link);
-    });
+    convertLinkToVideoInfo(playlistInfo.links);
   }, [playlistInfo]);
 
   useEffect(() => {
+    setIsLoading(
+      playlistInfo !== INIT_VALUES.playlistInfo &&
+        ownerInfo !== INIT_VALUES.ownerInfo &&
+        commentList !== INIT_VALUES.comments
+    );
+
     setDetailInfo({
       ...detailInfo,
       playlistInfo,
@@ -111,11 +128,10 @@ export const usePlaylistInfo = () => {
     });
   }, [playlistInfo, ownerInfo, commentList]);
 
-  useEffect(() => {}, [detailInfo]);
-
   return {
     detailInfo,
     videoList,
+    isLoading,
     fetchPlaylistInfo,
     fetchOwnerInfo,
     fetchCommentInfo,

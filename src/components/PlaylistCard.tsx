@@ -33,6 +33,7 @@ interface PlaylistCardProps {
   showLockButton?: boolean;
   showKebabMenu?: boolean;
   onDelete?: (playlistId: number) => void;
+  isPreview?: boolean;
 }
 
 const MAXLENGTH = 50;
@@ -45,6 +46,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
   showLockButton = false,
   showKebabMenu = false,
   onDelete,
+  isPreview = false,
 }) => {
   const navigate = useNavigate();
   const { openModal } = useModalStore();
@@ -60,6 +62,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
     : false;
 
   const onCardClick = (): void => {
+    if (isPreview) return;
     const restrictedRoot = /^\/playlist\/[^/]+\/add$/;
 
     if (restrictedRoot.test(location.pathname)) {
@@ -128,7 +131,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
 
   const renderLargeCard = () => (
     <article css={largeCardStyles}>
-      <div css={largeCardImgStyles} onClick={onCardClick}>
+      <div css={largeCardImgStyles(isPreview)} onClick={onCardClick}>
         <span></span>
         <figure className='img-container'>
           <img
@@ -138,10 +141,14 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
                 : playlistItem.links[0]
             }
             alt='썸네일 이미지'
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src = '/src/assets/logoIcon.png';
+            }}
           />
         </figure>
       </div>
-      <section css={largeInfoStyles}>
+      <section css={largeInfoStyles(isPreview)}>
         <h2 className='title' onClick={onCardClick}>
           {omittedText(playlistItem.title, MAXLENGTH)}
         </h2>
@@ -157,7 +164,9 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
           <div className='icon'>
             <IconButton
               IconComponent={Heart}
-              onClick={toggleLike}
+              onClick={() => {
+                if (!!!isPreview) toggleLike();
+              }}
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
             />
@@ -174,7 +183,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
 
   const renderSmallCard = () => (
     <article css={smallContainerStyles}>
-      <div css={smallCardStyles} onClick={onCardClick}>
+      <div css={smallCardStyles(isPreview)} onClick={onCardClick}>
         <figure className='img-container'>
           <img
             src={
@@ -183,6 +192,10 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
                 : playlistItem.links[0]
             }
             alt='썸네일 이미지'
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src = '/src/assets/logoIcon.png';
+            }}
           />
         </figure>
         <section css={smallInfoStyles}>
@@ -240,7 +253,7 @@ const largeCardStyles = css`
   display: flex;
 `;
 
-const largeCardImgStyles = css`
+const largeCardImgStyles = (isPreview = false) => css`
   position: relative;
   height: 210px;
   max-width: 390px;
@@ -263,9 +276,13 @@ const largeCardImgStyles = css`
     border-radius: 10px;
     border: 1px solid ${colors.white};
     overflow: hidden;
-    :hover {
-      cursor: pointer;
-    }
+    ${!!!isPreview &&
+    css`
+      :hover {
+        cursor: pointer;
+      }
+    `}
+
     img {
       width: 100%;
       height: 100%;
@@ -274,7 +291,7 @@ const largeCardImgStyles = css`
   }
 `;
 
-const largeInfoStyles = css`
+const largeInfoStyles = (isPreview = false) => css`
   gap: 6px;
   flex-direction: column;
   display: flex;
@@ -282,9 +299,12 @@ const largeInfoStyles = css`
   .title {
     font-size: ${fontSize.md};
     font-weight: ${fontWeight.medium};
-    :hover {
-      cursor: pointer;
-    }
+    ${!!!isPreview &&
+    css`
+      :hover {
+        cursor: pointer;
+      }
+    `}
   }
   .username {
     color: ${colors.gray05};
@@ -325,12 +345,16 @@ const smallContainerStyles = css`
   gap: 8px;
 `;
 
-const smallCardStyles = css`
+const smallCardStyles = (isPreview = false) => css`
   display: flex;
   gap: 10px;
-  :hover {
-    cursor: pointer;
-  }
+
+  ${!!!isPreview &&
+  css`
+    :hover {
+      cursor: pointer;
+    }
+  `}
 
   .img-container {
     width: ${smallImgSize};

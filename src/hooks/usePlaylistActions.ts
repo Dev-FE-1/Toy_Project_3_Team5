@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQueryClient, QueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { useUpdateUserPlaylists } from '@/api/playlistActions';
@@ -62,6 +63,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
 
   const isLiked = likedPlaylist.includes(playlistId);
   const isAdded = savedPlaylist.includes(playlistId);
+  const [initLikes, setInitLikes] = useState<number>(initialLikes);
 
   const toggleLike = async () => {
     if (!user) {
@@ -70,7 +72,8 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     }
 
     const newIsLiked = !isLiked;
-    const newLikes = newIsLiked ? initialLikes + 1 : initialLikes - 1;
+    const newLikes = newIsLiked ? initLikes + 1 : initLikes - 1;
+    setInitLikes(newLikes);
 
     updatePlaylistData(queryClient, queryKey, playlistId, (playlist) => ({
       ...playlist,
@@ -131,7 +134,14 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     }
   };
 
-  return { isLiked, isAdded, toggleLike, toggleSave, likes: initialLikes };
+  return {
+    isLiked,
+    isAdded,
+    toggleLike,
+    toggleSave,
+    likes: initLikes,
+    setInitLikes,
+  };
 };
 
 export default usePlaylistActions;

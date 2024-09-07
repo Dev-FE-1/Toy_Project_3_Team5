@@ -6,6 +6,7 @@ import { CommentWithProfileApiProps, removeComment } from '@/api/comment';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
 import IconButton from '@/components/IconButton';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import MiniPlaylist from '@/components/MiniPlaylist';
 import Modal from '@/components/Modal';
 import AddedVideo, { AddedLinkProps } from '@/components/playlist/AddedVideo';
@@ -18,7 +19,6 @@ import usePlaylistActions from '@/hooks/usePlaylistActions';
 import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { getProfileImg } from '@/utils/profileUtils';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 
 const MAX_LENGTH = {
@@ -38,7 +38,7 @@ const Detail = () => {
 
   const { values, onChanges, onClicks } = useDetailForm();
 
-  const { detailInfo, videoList, fetchOwnerInfo, fetchCommentInfo } =
+  const { detailInfo, videoList, isLoading, fetchOwnerInfo, fetchCommentInfo } =
     usePlaylistInfo();
 
   const { playlistInfo, comments, ownerInfo } = detailInfo;
@@ -50,9 +50,16 @@ const Detail = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
-  const { isFollowing, handleFollowToggle } = useFollowToggle(loginId);
+  const { isFollowing, handleFollowToggle } = useFollowToggle(
+    ownerInfo?.userId
+  );
 
-  const { isLiked, isAdded, toggleLike, toggleSave, likes } =
+  const [currentLikes, setCurrentLikes] = useState<{
+    isLiked: boolean;
+    likes: number;
+  }>({ isLiked: false, likes: 0 });
+
+  const { isLiked, isAdded, toggleLike, toggleSave, likes, setInitLikes } =
     usePlaylistActions(playlistId ? +playlistId : 0, playlistInfo.likes);
 
   const [commentsPlus, setCommentsPlus] = useState<number>(COMMENT_PLUS_SIZE);
@@ -74,6 +81,7 @@ const Detail = () => {
 
   useEffect(() => {
     fetchOwnerInfo();
+    setCurrentLikes({ ...currentLikes, likes: playlistInfo.likes });
   }, [playlistInfo]);
 
   useEffect(() => {
@@ -95,7 +103,23 @@ const Detail = () => {
     setCurrentVideo(videoList[0]);
   }, [videoList]);
 
-  return (
+  useEffect(() => {
+    setCurrentLikes({
+      isLiked,
+      likes: isLiked ? currentLikes.likes + 1 : currentLikes.likes - 1,
+    });
+  }, [isLiked]);
+
+  useEffect(() => {
+    setInitLikes(currentLikes.likes);
+  }, [currentLikes]);
+
+  return !!!isLoading ? (
+    <div css={loadingStyle}>
+      <LoadingSpinner />
+      로딩중...
+    </div>
+  ) : (
     <div css={containerStyle}>
       {currentVideo && (
         <div css={currentVideoStyle}>
@@ -198,7 +222,7 @@ const Detail = () => {
                   {omittedText(ownerInfo.channelName, MAX_LENGTH.channelName)}
                 </span>
                 <span className='counter'>
-                  {convertUnitNumber(ownerInfo.channelFollowing.length, 1)}
+                  {convertUnitNumber(ownerInfo.channelFollower.length, 1)}
                   팔로워
                 </span>
               </div>
@@ -209,7 +233,11 @@ const Detail = () => {
                   color={isFollowing ? 'gray' : 'primary'}
                   size='sm'
                   shape='round'
-                  onClick={handleFollowToggle}
+                  onClick={() => {
+                    if (!!!loginId) toastTrigger('로그인이 필요합니다', 'fail');
+                    handleFollowToggle();
+                    fetchOwnerInfo();
+                  }}
                 />
               )}
             </div>
@@ -218,10 +246,12 @@ const Detail = () => {
           <div css={userInfoStyle}>
             <IconButton
               IconComponent={Heart}
-              onClick={toggleLike}
+              onClick={() => {
+                toggleLike();
+              }}
               color={isLiked ? 'red' : 'gray'}
               fillColor={isLiked ? 'red' : undefined}
-              label={`${likes !== null ? likes : playlistInfo.likes}`}
+              label={`${currentLikes.likes}`}
             />
 
             <IconButton
@@ -297,7 +327,7 @@ const Detail = () => {
               <Comment
                 key={`comment-${index}`}
                 content={comment.content}
-                imgUrl={getProfileImg(comment.userId)}
+                imgUrl={comment.imgUrl}
                 userName={comment.userName}
                 showKebabMenu={loginId === comment.userId}
                 isEdited={comment.isEdited}
@@ -345,6 +375,15 @@ const Detail = () => {
   );
 };
 
+const loadingStyle = css`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  text-align: -webkit-center;
+`;
+
 const containerStyle = css`
   display: flex;
   flex-direction: column;
@@ -368,6 +407,7 @@ const currentVideoStyle = css`
     height: 242px; // 영상 상단 고정에 필요한 값
     position: fixed; // 영상 상단 고정
     z-index: 1000;
+    background-color: black;
   }
 
   .emptyVideo {

@@ -18,6 +18,8 @@ export interface AddedLinkProps extends VideoProps {
   onDragNDrop?: () => void;
   onClick?: () => void;
   isActive?: boolean;
+  embedCode?: string;
+  provider?: string;
 }
 
 const AddedVideo: React.FC<AddedLinkProps> = ({
@@ -33,6 +35,7 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
   onDragNDrop,
   onClick = () => {},
   isActive = false,
+  provider,
 }) => (
   <div css={videoItemStyle(isActive)} onClick={onClick}>
     {isDragNDrop && onDragNDrop !== undefined && (
@@ -54,7 +57,12 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
           />
         )}
       </div>
-      <Video imgUrl={imgUrl} title={title} userName={userName} />
+      <Video
+        imgUrl={imgUrl}
+        title={title}
+        userName={userName}
+        provider={provider || ''}
+      />
     </div>
   </div>
 );

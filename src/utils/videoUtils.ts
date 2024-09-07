@@ -14,9 +14,18 @@ export interface VideoInfoProps {
 
 type LinkType = 'youtube' | 'vimeo';
 
-export const getVideoId = (link: string, type: LinkType = 'youtube') => {
-  const videoId = link.match(Regex.youtube)?.[1];
-  // if (!!!videoId) return { status: 'fail' };
+export const getVideoId = (
+  link: string,
+  type: LinkType = 'youtube'
+): string => {
+  let videoId = '';
+  for (const key in Regex) {
+    const matchData = link.match(Regex[key]);
+    if (matchData) {
+      videoId = link.match(Regex[key])?.[1] as string;
+      return videoId;
+    }
+  }
   return videoId;
 };
 

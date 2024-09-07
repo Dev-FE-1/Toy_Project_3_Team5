@@ -20,7 +20,6 @@ import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { getProfileImg } from '@/utils/profileUtils';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
-import { makeEmbedUrl } from '@/utils/videoUtils';
 
 const MAX_LENGTH = {
   videoTitle: 20,
@@ -100,13 +99,16 @@ const Detail = () => {
     <div css={containerStyle}>
       {currentVideo && (
         <div css={currentVideoStyle}>
-          <iframe
-            css={iframeStyle}
-            src={`${makeEmbedUrl(currentVideo.videoId, 'youtube')}`}
-            allow='autoplay; picture-in-picture; web-share'
-            allowFullScreen
-            title={currentVideo.title}
-          />
+          <div
+            dangerouslySetInnerHTML={{
+              __html:
+                currentVideo.embedCode ||
+                `<div class='emptyVideo'>
+                  <img src='/src/assets/logoIcon.png' />
+                  영상을 불러오는 중...
+                </div>`,
+            }}
+          ></div>
         </div>
       )}
 
@@ -247,6 +249,7 @@ const Detail = () => {
                     onClicks.video(index);
                   }}
                   isActive={index === values.currentVideoIndex}
+                  provider={video.provider}
                 />
               ))}
           </div>
@@ -346,13 +349,22 @@ const currentVideoStyle = css`
   width: 430px; // 영상 상단 고정에 필요한 값
   height: 242px; // 영상 상단 고정에 필요한 값
   display: block;
-`;
 
-const iframeStyle = css`
-  width: 430px;
-  height: 242px;
-  position: fixed; // 영상 상단 고정
-  z-index: 1000;
+  > div > iframe {
+    width: 430px; // 영상 상단 고정에 필요한 값
+    height: 242px; // 영상 상단 고정에 필요한 값
+    position: fixed; // 영상 상단 고정
+    z-index: 1000;
+  }
+
+  .emptyVideo {
+    width: 200px; // 영상 상단 고정에 필요한 값
+    height: 200px; // 영상 상단 고정에 필요한 값
+
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
 `;
 
 const videoTextDivStyle = css`

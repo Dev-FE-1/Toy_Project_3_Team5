@@ -15,7 +15,6 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import { TEXT } from '@/constants/playlist';
 import ROUTES from '@/constants/route';
-import { Regex } from '@/constants/validation';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { PlayListDataProps, ThumbnailProps } from '@/types/playlistType';
@@ -84,7 +83,6 @@ const PlayListAdd = () => {
 
   const validation = {
     link: (value: string) => {
-      if (!Regex.youtube.test(value)) return TEXT.link.validmsg;
       const videoId = getVideoId(value);
       if (!!!videoId) return TEXT.link.validmsg;
       if (videoId && check.dupl.link(videoId)) return TEXT.link.validDuplmsg;
@@ -223,7 +221,7 @@ const PlayListAdd = () => {
       link: (videoId: string): boolean => {
         let result = false;
         videoList.map((video) => {
-          if (video.videoId === videoId) return (result = true);
+          if (video.videoId.toString() === videoId) return (result = true);
         });
         return result;
       },

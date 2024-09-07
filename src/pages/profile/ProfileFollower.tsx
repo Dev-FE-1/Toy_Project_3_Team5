@@ -31,10 +31,14 @@ const FollowerList = () => {
                   <Profile src={data.src} alt={data.alt} size={data.size} />
                   <span>{data.name}</span>
                 </span>
-                <IconButton
-                  IconComponent={UserMinus}
-                  onClick={() => handleUserMinusClick(data.uid)}
-                />
+
+                <button
+                  css={userMinusStyle}
+                  onClick={() => handleUserMinusClick(data.name)}
+                >
+                  <UserMinus css={userMinusStyle} />
+                </button>
+
               </div>
             ))}
         </div>
@@ -73,5 +77,7 @@ const profileContainerStyle = css`
   align-items: center;
   gap: 10px;
 `;
+
+const userMinusStyle = css``;
 
 export default FollowerList;

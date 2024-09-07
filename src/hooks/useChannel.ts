@@ -7,7 +7,6 @@ interface Channel {
   id: string;
   profileImg: string;
   channelName: string;
-  uid?: string;
 }
 
 type ListType = 'following' | 'follower';
@@ -34,7 +33,7 @@ const useChannel = (channelId: string, listType: ListType) => {
         if (listToFetch && listToFetch.length > 0) {
           const usersQuery = query(
             collection(db, 'users'),
-            where('uid', 'in', listToFetch)
+            where('__name__', 'in', listToFetch)
           );
 
           const unsubscribeUsers = onSnapshot(usersQuery, (querySnapshot) => {

@@ -4,7 +4,6 @@ import { Layout } from '@/components/Layout';
 import ROUTES from '@/constants/route';
 import Detail from '@/pages/common/Detail';
 import Following from '@/pages/common/Following';
-import FollowingList from '@/pages/common/FollowingList';
 import HashTag from '@/pages/common/HashTag';
 import Home from '@/pages/common/Home';
 import { NotFound } from '@/pages/common/NotFound';
@@ -107,14 +106,6 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Following />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: ROUTES.FOLLOWING_LIST(),
-        element: (
-          <ProtectedRoute>
-            <FollowingList />
           </ProtectedRoute>
         ),
       },

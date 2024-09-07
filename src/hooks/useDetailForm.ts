@@ -47,14 +47,14 @@ const useDetailForm = () => {
       const { status } = await addComment(commentData);
       if (status === 'success') {
         setValues({ ...values, comment: '' });
-        toastTrigger('댓글이 등록되었습니다.');
+        toastTrigger('댓글이 등록되었습니다.', 'success');
       } else {
         toastTrigger('댓글등록이 실패했습니다.', 'fail');
       }
     },
     copy: () => {
       navigator.clipboard.writeText(window.location.href);
-      toastTrigger('링크가 복사되었습니다.');
+      toastTrigger('링크가 복사되었습니다.', 'success');
     },
     video: (index: number) => {
       setValues({ ...values, currentVideoIndex: index });

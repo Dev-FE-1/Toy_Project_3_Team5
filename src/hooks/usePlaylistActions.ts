@@ -67,7 +67,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
 
   const toggleLike = async () => {
     if (!user) {
-      toastTrigger('로그인이 필요합니다.');
+      toastTrigger('로그인이 필요합니다.', 'fail');
       return;
     }
 
@@ -94,7 +94,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
         newLikes,
       });
     } catch (error) {
-      toastTrigger('좋아요를 실패했습니다.');
+      toastTrigger('좋아요를 실패했습니다.', 'fail');
       if (newIsLiked) {
         removeLikedPlaylistItem(playlistId);
       } else {
@@ -105,7 +105,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
 
   const toggleSave = async () => {
     if (!user) {
-      toastTrigger('로그인이 필요합니다.');
+      toastTrigger('로그인이 필요합니다.', 'fail');
       return;
     }
 
@@ -125,7 +125,7 @@ const usePlaylistActions = (playlistId: number, initialLikes: number) => {
     try {
       await updatePlaylists({ playlistType: 'saved', playlistId });
     } catch (error) {
-      toastTrigger('저장에 실패했습니다.');
+      toastTrigger('저장에 실패했습니다.', 'fail');
       if (newIsAdded) {
         removeSavedPlaylistItem(playlistId);
       } else {

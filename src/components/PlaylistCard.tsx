@@ -85,20 +85,20 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
         if (playlistItem.playlistId) {
           const playlistIdNumber = Number(playlistItem.playlistId);
           if (isNaN(playlistIdNumber)) {
-            toastTrigger('올바르지 않은 플레이리스트 ID입니다.');
+            toastTrigger('올바르지 않은 플레이리스트 ID입니다.', 'fail');
             return;
           }
           const response = await deletePlaylist(playlistIdNumber);
           if (response.status === 'success') {
-            toastTrigger('플레이리스트가 삭제되었습니다.');
+            toastTrigger('플레이리스트가 삭제되었습니다.', 'success');
             if (onDelete) {
               onDelete(playlistIdNumber);
             }
           } else {
-            toastTrigger('플레이리스트 삭제에 실패했습니다.');
+            toastTrigger('플레이리스트 삭제에 실패했습니다.', 'fail');
           }
         } else {
-          toastTrigger('플레이리스트 ID가 없습니다.');
+          toastTrigger('플레이리스트 ID가 없습니다.', 'fail');
         }
       },
     });

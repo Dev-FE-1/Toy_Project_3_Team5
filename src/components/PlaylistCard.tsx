@@ -141,6 +141,10 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
                 : playlistItem.links[0]
             }
             alt='썸네일 이미지'
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src = '/src/assets/logoIcon.png';
+            }}
           />
         </figure>
       </div>
@@ -188,6 +192,10 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
                 : playlistItem.links[0]
             }
             alt='썸네일 이미지'
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src = '/src/assets/logoIcon.png';
+            }}
           />
         </figure>
         <section css={smallInfoStyles}>

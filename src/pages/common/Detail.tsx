@@ -50,7 +50,9 @@ const Detail = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isFullDesc, setIsFullDesc] = useState<boolean>(false);
 
-  const { isFollowing, handleFollowToggle } = useFollowToggle(loginId);
+  const { isFollowing, handleFollowToggle } = useFollowToggle(
+    ownerInfo?.userId
+  );
 
   const { isLiked, isAdded, toggleLike, toggleSave, likes } =
     usePlaylistActions(playlistId ? +playlistId : 0, playlistInfo.likes);

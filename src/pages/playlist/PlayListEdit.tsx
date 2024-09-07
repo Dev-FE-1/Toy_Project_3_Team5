@@ -415,9 +415,9 @@ const PlayListEdit = () => {
       </div>
       <div css={previewStyle}>
         <label style={labelStyle}>{TEXT.preview.large}</label>
-        <PlaylistCard playlistItem={preview} size='large' />
+        <PlaylistCard playlistItem={preview} size='large' isPreview={true} />
         <label style={labelStyle}>{TEXT.preview.small}</label>
-        <PlaylistCard playlistItem={preview} size='small' />
+        <PlaylistCard playlistItem={preview} size='small' isPreview={true} />
       </div>
 
       <Button

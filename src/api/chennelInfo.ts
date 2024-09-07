@@ -12,18 +12,18 @@ interface ChennelDataProps {
   isMyChannel: boolean;
 }
 
-export const useChennelData = (userId: string | undefined) => {
+export const useChennelData = (channelUserId: string | undefined) => {
   const [chennelData, setChennelData] = useState<ChennelDataProps | null>(null);
   const { userId: loggedInUserId } = useAuthStore();
-  const { userId: channelOwnerId } = useParams<{ userId: string }>();
+  const { userId: urlUserId } = useParams<{ userId: string }>();
 
   const fetchChennelData = useCallback(() => {
-    if (!userId) {
+    if (!channelUserId) {
       setChennelData(null);
       return () => {};
     }
 
-    const userDocRef = doc(db, 'users', userId);
+    const userDocRef = doc(db, 'users', channelUserId);
 
     const unsubscribe = onSnapshot(
       userDocRef,
@@ -35,7 +35,7 @@ export const useChennelData = (userId: string | undefined) => {
             channelFollowing: data.channelFollowing || [],
             channelName: data.channelName || '',
             profileImg: data.profileImg || '',
-            isMyChannel: loggedInUserId === channelOwnerId,
+            isMyChannel: loggedInUserId === urlUserId,
           };
           setChennelData(selectedData);
         } else {
@@ -52,7 +52,7 @@ export const useChennelData = (userId: string | undefined) => {
     );
 
     return unsubscribe;
-  }, [userId, loggedInUserId, channelOwnerId]);
+  }, [channelUserId, loggedInUserId, urlUserId]);
 
   useEffect(() => {
     const unsubscribe = fetchChennelData();

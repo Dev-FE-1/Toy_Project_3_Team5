@@ -16,7 +16,7 @@ interface NavList {
 const navList: NavList[] = [
   { label: '홈', icon: Home, to: ROUTES.ROOT },
   { label: '인기', icon: Flame, to: ROUTES.POPULAR },
-  { label: '내 플리', icon: Library, to: ROUTES.PLAYLIST('1') },
+  { label: '마이플리', icon: Library, to: ROUTES.PLAYLIST() },
   { label: '팔로잉', icon: Users, to: ROUTES.FOLLOWING },
 ];
 

@@ -14,6 +14,8 @@ type QueryDataType = {
 const PAGES_QUERY: { [key: string]: string } = {
   '': 'homePlaylists',
   search: 'searchPlaylists',
+  popular: 'popularPlaylists',
+  following: 'followingPlaylists',
 };
 
 const updatePlaylistData = (

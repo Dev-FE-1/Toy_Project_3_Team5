@@ -33,7 +33,7 @@ const FollowerList = () => {
                 </span>
                 <IconButton
                   IconComponent={UserMinus}
-                  onClick={() => handleUserMinusClick(data.uid)}
+                  onClick={() => handleUserMinusClick(data.name)}
                 />
               </div>
             ))}
@@ -73,5 +73,7 @@ const profileContainerStyle = css`
   align-items: center;
   gap: 10px;
 `;
+
+const userMinusStyle = css``;
 
 export default FollowerList;

@@ -10,16 +10,18 @@ import {
   DocumentData,
   QueryDocumentSnapshot,
 } from 'firebase/firestore';
-import {
-  PlaylistsResultProps,
-  getOwnerChannelName,
-} from '@/api/followingPlaylists';
+import { getOwnerChannelName } from '@/api/followingPlaylists';
+import { getCommentCount } from '@/api/myplaylists';
 import { db } from '@/firebase/firbaseConfig';
+import { PlayListDataProps } from '@/types/playlistType';
 
 const fetchPlaylistsByTag = async (
   tag: string,
   pageParam: QueryDocumentSnapshot<DocumentData> | null
-): Promise<PlaylistsResultProps> => {
+): Promise<{
+  playlistsData: PlayListDataProps[];
+  nextCursor: QueryDocumentSnapshot<DocumentData> | null;
+}> => {
   let q;
 
   if (tag === '인기 급상승 동영상') {
@@ -41,10 +43,11 @@ const fetchPlaylistsByTag = async (
   const playlistPromises = querySnapshot.docs.map(async (doc) => {
     const data = doc.data();
     const ownerChannelName = await getOwnerChannelName(data.userId);
+    const commentCount = await getCommentCount(doc.id);
     return {
       playlistId: doc.id,
-      ownerChannelName,
       title: data.title,
+      description: data.description,
       isPublic: data.isPublic,
       likes: data.likes,
       links: data.links,
@@ -52,20 +55,25 @@ const fetchPlaylistsByTag = async (
       tags: data.tags,
       thumbnail: data.thumbnail,
       userId: data.userId,
-    };
+      ownerChannelName,
+      commentCount,
+    } as PlayListDataProps;
   });
 
-  const playlist = await Promise.all(playlistPromises);
+  const playlistsData = await Promise.all(playlistPromises);
   const nextCursor = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
-
-  return { playlist, nextCursor };
+  return { playlistsData, nextCursor };
 };
 
 const useTagFetch = (tag: string) =>
   useInfiniteQuery({
-    queryKey: ['playlists', tag],
-    queryFn: ({ pageParam = null }) => fetchPlaylistsByTag(tag, pageParam),
-    getNextPageParam: (lastPage: PlaylistsResultProps) => lastPage.nextCursor,
+    queryKey: ['popularPlaylists', tag],
+    queryFn: ({ pageParam = null }) =>
+      fetchPlaylistsByTag(
+        tag,
+        pageParam as QueryDocumentSnapshot<DocumentData> | null
+      ),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: null as QueryDocumentSnapshot<DocumentData> | null,
     enabled: !!tag,
   });

@@ -73,12 +73,15 @@ const PlayListEdit = () => {
       setTitle(values.title);
       setDesc(values.description ?? '');
 
-      values.links.map(async (link) => {
-        const { status, result } = await getVideoInfo(link);
-        if (status === 'success' && result) {
-          setVideoList((prev) => [...prev, result]);
-        }
-      });
+      const tempList: AddedLinkProps[] = new Array(values.links.length);
+
+      await Promise.all(
+        values.links.map(async (link, index) => {
+          const { result } = await getVideoInfo(link);
+          if (result) tempList[index] = result;
+        })
+      );
+      setVideoList(tempList);
 
       values.tags.map(async (tag) => {
         addedHashtag.push({

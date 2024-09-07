@@ -80,10 +80,15 @@ export const usePlaylistInfo = () => {
   }, [playlistInfo]);
 
   const convertLinkToVideoInfo = useCallback(
-    async (link: string) => {
-      await getVideoInfo(link).then(({ result }) => {
-        if (result) setVideoList((prev) => [...prev, result]);
-      });
+    async (links: string[]) => {
+      const tempList: AddedLinkProps[] = new Array(links.length);
+      await Promise.all(
+        links.map(async (link, index) => {
+          const { result } = await getVideoInfo(link);
+          if (result) tempList[index] = result;
+        })
+      );
+      setVideoList(tempList);
     },
     [playlistInfo]
   );
@@ -105,9 +110,10 @@ export const usePlaylistInfo = () => {
   }, []);
 
   useEffect(() => {
-    playlistInfo.links.map((link) => {
-      convertLinkToVideoInfo(link);
-    });
+    // playlistInfo.links.map((link) => {
+    //   convertLinkToVideoInfo(link);
+    // });
+    convertLinkToVideoInfo(playlistInfo.links);
   }, [playlistInfo]);
 
   useEffect(() => {

@@ -222,7 +222,7 @@ const Detail = () => {
                   {omittedText(ownerInfo.channelName, MAX_LENGTH.channelName)}
                 </span>
                 <span className='counter'>
-                  {convertUnitNumber(ownerInfo.channelFollowing.length, 1)}
+                  {convertUnitNumber(ownerInfo.channelFollower.length, 1)}
                   팔로워
                 </span>
               </div>
@@ -233,7 +233,10 @@ const Detail = () => {
                   color={isFollowing ? 'gray' : 'primary'}
                   size='sm'
                   shape='round'
-                  onClick={handleFollowToggle}
+                  onClick={() => {
+                    handleFollowToggle();
+                    fetchOwnerInfo();
+                  }}
                 />
               )}
             </div>

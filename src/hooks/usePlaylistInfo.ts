@@ -110,9 +110,6 @@ export const usePlaylistInfo = () => {
   }, []);
 
   useEffect(() => {
-    // playlistInfo.links.map((link) => {
-    //   convertLinkToVideoInfo(link);
-    // });
     convertLinkToVideoInfo(playlistInfo.links);
   }, [playlistInfo]);
 

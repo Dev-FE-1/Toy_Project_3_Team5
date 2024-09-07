@@ -53,13 +53,10 @@ const FollowingList = () => {
                   <Profile src={data.src} alt={data.alt} size={data.size} />
                   <span>{data.name}</span>
                 </span>
-                <button
-                  css={userMinusStyle}
+                <IconButton
+                  IconComponent={UserMinus}
                   onClick={() => handleUserMinusClick(data.name)}
-                >
-                  <UserMinus css={userMinusStyle} />
-                </button>
-
+                />
               </div>
             ))}
         </div>

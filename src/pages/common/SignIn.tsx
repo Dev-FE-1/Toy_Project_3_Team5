@@ -5,8 +5,10 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
+import { setDoc, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import google from '@/assets/google_icon.svg';
+import defaultProfile from '@/assets/profile_default.png';
 import Button from '@/components/Button';
 import InputBox from '@/components/InputBox';
 import Logo from '@/components/Logo';
@@ -15,10 +17,8 @@ import Toggle from '@/components/Toggle';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
-import { auth } from '@/firebase/firbaseConfig';
+import { auth, db } from '@/firebase/firbaseConfig';
 import { useAuthStore } from '@/stores/useAuthStore';
-
-const DOMAIN = '@gmail.com';
 
 export const SignIn = () => {
   const [id, setId] = useState('');
@@ -51,7 +51,7 @@ export const SignIn = () => {
     e.preventDefault();
     setErrorMessage('');
     try {
-      const email = `${id}${DOMAIN}`;
+      const email = `${id}@gmail.com`;
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -73,14 +73,47 @@ export const SignIn = () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-      if (isFirstLogin) {
+      const { user } = result;
+      const userId = user.email?.split('@')[0];
+
+      const userDocRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          channelName: user.displayName,
+          profileImg: '',
+          isFirstLogin: true,
+          likedPlaylist: [],
+          savedPlaylist: [],
+          channelFollower: [],
+          channelFollowing: [],
+          tags: [],
+        });
+      }
+
+      useAuthStore.setState({
+        user,
+        userId,
+        profileImage: user.photoURL || defaultProfile,
+        channelName: user?.displayName || '',
+        likedPlaylist: userDoc.exists() ? userDoc.data().likedPlaylist : [],
+        savedPlaylist: userDoc.exists() ? userDoc.data().savedPlaylist : [],
+        channelFollower: userDoc.exists() ? userDoc.data().channelFollower : [],
+        channelFollowing: userDoc.exists()
+          ? userDoc.data().channelFollowing
+          : [],
+        tags: userDoc.exists() ? userDoc.data().tags : [],
+        isFirstLogin: userDoc.exists() ? userDoc.data().isFirstLogin : true,
+      });
+
+      if (useAuthStore.getState().isFirstLogin) {
         navigate(ROUTES.HASH_TAG);
       } else {
         navigate(ROUTES.ROOT);
       }
     } catch (error) {
-      console.error('Google 로그인 중 오류 발생:', error);
       setErrorMessage(
         'Google 로그인 중 오류가 발생했습니다. 다시 시도해주세요.'
       );

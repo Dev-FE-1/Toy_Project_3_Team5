@@ -220,7 +220,7 @@ const PlayListEdit = () => {
       const response = await updatePlaylist(playlist, Number(playlistId));
 
       if (response.status === 'success') {
-        toastTrigger(TEXT.toast.modify);
+        toastTrigger(TEXT.toast.modify, 'success');
         navigate(ROUTES.PLAYLIST(userId));
       }
     },

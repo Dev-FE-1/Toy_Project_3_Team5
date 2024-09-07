@@ -186,7 +186,7 @@ const PlayListAdd = () => {
       const response = await addPlaylist(playlist);
 
       if (response.status === 'success') {
-        toastTrigger(TEXT.toast.create);
+        toastTrigger(TEXT.toast.create, 'success');
         navigate(ROUTES.PLAYLIST(userId));
       }
     },

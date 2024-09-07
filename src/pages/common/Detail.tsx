@@ -64,7 +64,7 @@ const Detail = () => {
     if (docId) {
       const { status } = await removeComment(docId);
       if (status === 'success') {
-        toastTrigger('댓글이 삭제되었습니다.');
+        toastTrigger('댓글이 삭제되었습니다.', 'success');
         setCommentList((prev) =>
           prev.filter((comment) => comment.docId !== docId)
         );

@@ -14,7 +14,7 @@ import IconButton from '@/components/IconButton';
 import KebabButton from '@/components/KebabButton';
 import Modal from '@/components/Modal';
 import colors from '@/constants/colors';
-import { fontSize } from '@/constants/font';
+import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import usePlaylistActions from '@/hooks/usePlaylistActions';
 import useToast from '@/hooks/useToast';
@@ -32,7 +32,7 @@ interface PlaylistCardProps {
   showLikeButton?: boolean;
   showLockButton?: boolean;
   showKebabMenu?: boolean;
-  onDelete?: (playlistId: number) => void; // 명시적으로 타입 정의
+  onDelete?: (playlistId: number) => void;
 }
 
 const MAXLENGTH = 50;
@@ -274,31 +274,39 @@ const largeInfoStyles = css`
   display: flex;
   padding: 0 10px;
   .title {
-    font-size: ${fontSize.lg};
+    font-size: ${fontSize.md};
+    font-weight: ${fontWeight.medium};
     :hover {
       cursor: pointer;
     }
   }
   .username {
     color: ${colors.gray05};
+    font-size: ${fontSize.sm};
   }
   .tags {
     display: flex;
     gap: 4px;
     font-size: ${fontSize.md};
     color: ${colors.primaryLight};
+    font-size: ${fontSize.sm};
   }
   .icons-container {
     color: ${colors.gray05};
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     .icon {
       display: flex;
       align-items: center;
-      gap: 4px;
+      font-size: ${fontSize.sm};
+      gap: 2px;
       button {
         padding: 0;
+      }
+      svg {
+        width: 22px;
+        height: 22px;
       }
     }
   }

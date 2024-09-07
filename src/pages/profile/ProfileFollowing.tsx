@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { UserMinus } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
@@ -50,12 +51,10 @@ const FollowingList = () => {
                   <Profile src={data.src} alt={data.alt} size={data.size} />
                   <span>{data.name}</span>
                 </span>
-                <button
-                  css={userMinusStyle}
+                <IconButton
+                  IconComponent={UserMinus}
                   onClick={() => handleUserMinusClick(data.uid)}
-                >
-                  <UserMinus css={userMinusStyle} />
-                </button>
+                />
               </div>
             ))}
         </div>
@@ -68,19 +67,18 @@ const FollowingList = () => {
 const rootContainer = css`
   display: flex;
   flex-direction: column;
+  padding: 20px;
+  gap: 8px;
 `;
 
 const numberingContainer = css`
-  padding-left: 20px;
-  padding-top: 20px;
-  font-size: ${fontSize.xs};
+  font-size: ${fontSize.md};
 `;
 
 const profileListContainer = css`
   display: flex;
   flex-direction: column;
-  padding-left: 20px;
-  padding-top: 20px;
+  padding-bottom: 60px;
 `;
 
 const profileItem = css`
@@ -94,12 +92,6 @@ const profileContainerStyle = css`
   display: flex;
   align-items: center;
   gap: 10px;
-`;
-
-const userMinusStyle = css`
-  margin-right: 10px;
-  background: none;
-  border: none;
 `;
 
 export default FollowingList;

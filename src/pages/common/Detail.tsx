@@ -127,89 +127,94 @@ const Detail = () => {
 
       {!!!isOpen && (
         <div css={playlistInfoStyle}>
-          <div css={oneLineStyle}>
-            <div css={headerDetailStyle}>
-              <span className='title'>{playlistInfo.title}</span>
-              <span className='counter'>
-                {values.currentVideoIndex + 1}/{playlistInfo.links.length}
-              </span>
-            </div>
-            <IconButton
-              IconComponent={X}
-              onClick={() => {
-                setIsOpen(true);
-              }}
-              color='gray'
-            />
-          </div>
-          <div css={descStyle}>
-            {isFullDesc ? (
-              <>
-                <span>{playlistInfo.description}</span>
-
-                <span
-                  className='extraText'
-                  onClick={() => {
-                    setIsFullDesc(false);
-                  }}
-                >
-                  줄이기
+          <section css={infoContainerStyle}>
+            <div css={oneLineStyle}>
+              <div css={headerDetailStyle}>
+                <span className='title'>{playlistInfo.title}</span>
+                <span className='counter'>
+                  {values.currentVideoIndex + 1}/{playlistInfo.links.length}
                 </span>
-              </>
-            ) : (
-              <>
-                <span>
-                  {omittedText(
-                    playlistInfo.description ?? '',
-                    MAX_LENGTH.description
-                  )}
-                </span>
-                {playlistInfo.description &&
-                  playlistInfo.description.length > MAX_LENGTH.description && (
-                    <span
-                      className='extraText'
-                      onClick={() => {
-                        setIsFullDesc(true);
-                      }}
-                    >
-                      더보기
-                    </span>
-                  )}
-              </>
-            )}
-          </div>
-          <div css={oneLineStyle}>
-            <Profile
-              alt='이미지'
-              src={ownerInfo.profileImg}
-              size='sm'
-              onClick={() => {
-                onClicks.profile(ownerInfo.userId);
-              }}
-            />
-            <div
-              css={userInfoTwoLineStyle}
-              onClick={() => {
-                onClicks.profile(ownerInfo.userId);
-              }}
-            >
-              <span className='channelName'>
-                {omittedText(ownerInfo.channelName, MAX_LENGTH.channelName)}
-              </span>
-              <span className='counter'>
-                {convertUnitNumber(ownerInfo.channelFollowing.length, 1)} 팔로워
-              </span>
-            </div>
-            <div css={emptyBoxStyle}></div>
-            {!!!ownerInfo.isMyChannel && (
-              <Button
-                label={isFollowing ? '팔로우 취소' : '팔로우'}
-                color={isFollowing ? 'gray' : 'primary'}
-                size='sm'
-                onClick={handleFollowToggle}
+              </div>
+              <IconButton
+                IconComponent={X}
+                onClick={() => {
+                  setIsOpen(true);
+                }}
+                color='gray'
               />
-            )}
-          </div>
+            </div>
+            <div css={descStyle}>
+              {isFullDesc ? (
+                <>
+                  <span>{playlistInfo.description}</span>
+                  <span
+                    className='extraText'
+                    onClick={() => {
+                      setIsFullDesc(false);
+                    }}
+                  >
+                    줄이기
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span>
+                    {omittedText(
+                      playlistInfo.description ?? '',
+                      MAX_LENGTH.description
+                    )}
+                  </span>
+                  {playlistInfo.description &&
+                    playlistInfo.description.length >
+                      MAX_LENGTH.description && (
+                      <span
+                        className='extraText'
+                        onClick={() => {
+                          setIsFullDesc(true);
+                        }}
+                      >
+                        더보기
+                      </span>
+                    )}
+                </>
+              )}
+            </div>
+            <div css={oneLineStyle} style={{ marginTop: '12px' }}>
+              <Profile
+                alt='이미지'
+                src={ownerInfo.profileImg}
+                size='sm'
+                onClick={() => {
+                  onClicks.profile(ownerInfo.userId);
+                }}
+              />
+              <div
+                css={userInfoTwoLineStyle}
+                onClick={() => {
+                  onClicks.profile(ownerInfo.userId);
+                }}
+              >
+                <span className='channelName'>
+                  {omittedText(ownerInfo.channelName, MAX_LENGTH.channelName)}
+                </span>
+                <span className='counter'>
+                  {convertUnitNumber(ownerInfo.channelFollowing.length, 1)}
+                  팔로워
+                </span>
+              </div>
+              <div css={emptyBoxStyle}></div>
+              {!!!ownerInfo.isMyChannel && (
+                <Button
+                  label={isFollowing ? '팔로우 취소' : '팔로우'}
+                  color={isFollowing ? 'gray' : 'primary'}
+                  size='sm'
+                  shape='round'
+                  onClick={handleFollowToggle}
+                />
+              )}
+            </div>
+          </section>
+
           <div css={userInfoStyle}>
             <IconButton
               IconComponent={Heart}
@@ -233,6 +238,7 @@ const Detail = () => {
               label='저장'
             />
           </div>
+
           <div css={videoListInfoStyle(true)}>
             {videoList &&
               videoList.map((video, index) => (
@@ -307,7 +313,7 @@ const Detail = () => {
             <Button
               label='더보기'
               onClick={onCommentsPlus}
-              size='lg'
+              size='md'
               fullWidth
               color='gray'
             />
@@ -345,6 +351,13 @@ const containerStyle = css`
   padding-bottom: 60px;
 `;
 
+const infoContainerStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+`;
+
 const currentVideoStyle = css`
   width: 430px; // 영상 상단 고정에 필요한 값
   height: 242px; // 영상 상단 고정에 필요한 값
@@ -368,7 +381,7 @@ const currentVideoStyle = css`
 `;
 
 const videoTextDivStyle = css`
-  margin: 10px 20px;
+  padding: 12px 12px 0 12px;
   z-index: 0;
   & > * {
     z-index: 0;
@@ -395,22 +408,20 @@ const playlistInfoStyle = css`
   max-width: 430px;
   border: 1px solid ${colors.gray02};
   border-radius: 10px;
-  padding: 10px;
   gap: 5px;
-  margin: 10px 20px;
+  margin: 12px;
 `;
 
 const oneLineStyle = css`
   display: flex;
   flex-direction: row;
-  margin: 10px 0;
 `;
 
 const headerDetailStyle = css`
   flex-grow: 1;
   align-content: center;
   > .title {
-    font-size: ${fontSize.md};
+    font-size: ${fontSize.lg};
     font-weight: ${fontWeight.bold};
   }
 
@@ -436,12 +447,12 @@ const descStyle = css`
 const userInfoTwoLineStyle = css`
   display: flex;
   flex-direction: column;
-  padding: 0 10px;
-  justify-content: space-between;
+  gap: 4px;
+  padding-left: 10px;
   cursor: pointer;
 
   > .channelName {
-    font-size: ${fontSize.lg};
+    font-size: ${fontSize.md};
   }
   > .counter {
     font-size: ${fontSize.sm};
@@ -459,6 +470,7 @@ const userInfoStyle = css`
   justify-content: space-evenly;
   border-top: 1px solid ${colors.gray02};
   border-bottom: 1px solid ${colors.gray02};
+  padding: 6px 0 6px 0;
 `;
 
 const videoListInfoStyle = (isScroll: boolean) => css`
@@ -470,12 +482,26 @@ const videoListInfoStyle = (isScroll: boolean) => css`
     max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
+
+    ::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: ${colors.gray06};
+      border-radius: 6px;
+    }
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
   `}
 `;
 
 const commentContainer = css`
-  margin: 20px;
+  display: flex;
+  flex-direction: column;
   max-width: 100%;
+  padding: 20px;
+  gap: 16px;
 `;
 
 const commentHeader = css`
@@ -501,9 +527,9 @@ const commentInputStyle = css`
 `;
 
 const commentStyle = css`
-  & > div {
-    margin: 10px 0;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 export default Detail;

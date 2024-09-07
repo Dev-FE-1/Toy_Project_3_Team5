@@ -169,14 +169,7 @@ export const SignUp = () => {
             width='315px'
             externalErrorMessage={idCheckMessage}
           />
-          <div style={{ marginLeft: `5px` }}>
-            <Button
-              label='중복검사'
-              color='gray'
-              size='lg'
-              onClick={onIdCheck}
-            />
-          </div>
+          <Button label='중복검사' color='gray' size='lg' onClick={onIdCheck} />
         </div>
         <InputBox
           label='비밀번호'
@@ -208,16 +201,14 @@ export const SignUp = () => {
             width='315px'
             externalErrorMessage={channelNameCheckMessage}
           />
-          <div style={{ marginLeft: `5px` }}>
-            <Button
-              label='중복검사'
-              color='gray'
-              onClick={onChannelNameCheck}
-              size='lg'
-            />
-          </div>
+          <Button
+            label='중복검사'
+            color='gray'
+            onClick={onChannelNameCheck}
+            size='lg'
+          />
         </div>
-        <div style={{ width: `390px` }}>
+        <div style={{ width: '390px', marginTop: '20px' }}>
           <Button
             label='회원가입'
             onClick={() => {}}
@@ -266,9 +257,26 @@ const signUpContainerStyle = css`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  padding: 20px;
+  gap: 4px;
+
+  .css-6gpx6l-inputContainerStyle {
+    height: 72px;
+    margin-bottom: 0;
+  }
 `;
 
 const duplicateStyle = css`
   display: flex;
   align-items: center;
+  position: relative;
+  width: 100%;
+  gap: 4px;
+
+  button {
+    height: 36px;
+    position: absolute;
+    right: 0;
+    top: 19px;
+  }
 `;

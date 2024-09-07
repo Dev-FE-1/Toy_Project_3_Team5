@@ -56,7 +56,7 @@ const Following = () => {
         <div css={followingHeaderStyle}>
           <div css={followingListStyle}>
             {followingChannels.map((channel) => (
-              <div key={channel.id}>
+              <div className='profileContainer' key={channel.id}>
                 <button
                   css={followingCoverStyle(selectedChannel === channel.id)}
                   onClick={() => onFollowingChannelClick(channel.id)}
@@ -73,6 +73,7 @@ const Following = () => {
             IconComponent={Plus}
             color='primary'
             shape='text'
+            size='lg'
           />
         </div>
       )}
@@ -95,7 +96,7 @@ const containerStyle = css``;
 
 const followingHeaderStyle = css`
   display: flex;
-  padding: 10px;
+  padding: 4px 20px 20px 20px;
   position: fixed;
   z-index: 10;
   background: ${colors.white};
@@ -106,19 +107,26 @@ const followingHeaderStyle = css`
 const followingListStyle = css`
   flex-grow: 1;
   display: flex;
-  gap: 10px;
+  gap: 6px;
   overflow: hidden;
+
+  .profileContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 `;
 
 const followingCoverStyle = (isSelected: boolean) => css`
   border-radius: 50%;
   border: ${isSelected
-    ? `2px solid ${colors.primaryNormal}`
+    ? `1px solid ${colors.primaryNormal}`
     : `1px solid ${colors.gray03}`};
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1px;
+  padding: 4px;
   background: none;
   cursor: pointer;
 `;

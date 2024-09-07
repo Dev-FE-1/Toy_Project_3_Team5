@@ -60,6 +60,12 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
     : false;
 
   const onCardClick = (): void => {
+    const restrictedRoot = /^\/playlist\/[^/]+\/add$/;
+
+    if (restrictedRoot.test(location.pathname)) {
+      return;
+    }
+
     navigate(ROUTES.DETAIL(playlistItem.playlistId));
   };
 

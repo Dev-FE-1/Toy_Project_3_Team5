@@ -4,7 +4,7 @@ import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import colors from '@/constants/colors';
-import { fontSize } from '@/constants/font';
+import { fontSize, fontWeight } from '@/constants/font';
 import { HASHTAGS } from '@/constants/hashtag';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import useTagFetch from '@/hooks/useTagFetch';
@@ -105,6 +105,8 @@ export const Popular = () => {
   );
 };
 
+const headerHeight = '157px';
+
 const contentContainerStyle = css`
   position: relative;
   display: flex;
@@ -119,31 +121,34 @@ const headerContainerStyle = css`
   position: fixed;
   z-index: 10;
   background: ${colors.white};
-  height: 200px;
   width: 430px;
+  gap: 20px;
 `;
 
 const tagContainerStyle = css`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 5px;
-  padding-left: 15px;
-  padding-right: 15px;
 `;
 
 const titleContainerStyle = css`
-  height: 100px;
   align-items: center;
-  padding-top: 30px;
-  padding-bottom: 20px;
-  padding-left: 15px;
-  font-size: ${fontSize.xxxl};
+  font-size: ${fontSize.xxl};
+  font-weight: ${fontWeight.medium};
 `;
 
 const playlistContainerStyle = css`
-  padding-top: 200px;
-  padding-left: 20px;
+  padding: calc(${headerHeight} + 20px) 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+
+  .css-1yx0w9a-largeCardStyles {
+    width: 100%;
+  }
 `;
+
 const loadingSpinnerStyle = css`
   display: flex;
   justify-content: center;

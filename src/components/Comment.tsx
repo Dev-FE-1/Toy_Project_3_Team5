@@ -67,7 +67,7 @@ const Comment: React.FC<CommentWithProfileProps> = ({
 
 const commentStyles = css`
   display: flex;
-  gap: 6px;
+  gap: 10px;
   align-items: center;
 
   img {
@@ -85,14 +85,10 @@ const contentStyles = css`
   gap: 6px;
   display: flex;
   flex-direction: column;
-  /* width: 100%; */
+  font-size: ${fontSize.sm};
 
   .userName {
     cursor: pointer;
-  }
-
-  span {
-    font-size: ${fontSize.md};
   }
 
   span:nth-of-type(1) {

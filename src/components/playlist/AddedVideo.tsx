@@ -70,17 +70,14 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
 const videoItemStyle = (isActive: boolean) => css`
   display: flex;
   width: calc(100vw - 40px);
-  /* max-width: calc(430px - 40px); */
   max-width: 100%;
-  margin-bottom: 10px;
-  border: 2px solid ${colors.gray02};
-  border-radius: 5px;
-  padding: 5px;
+  padding: 6px;
+  border-left: 4px solid rgba(255, 255, 255, 0);
 
   ${isActive &&
   css`
-    background-color: ${colors.gray02};
-    border: 2px solid ${colors.primaryLight};
+    background: rgba(63, 132, 243, 0.05);
+    border-left: 4px solid ${colors.primaryLight};
   `}
 `;
 

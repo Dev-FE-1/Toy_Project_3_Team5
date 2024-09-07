@@ -1,0 +1,23 @@
+[
+  {
+    "playlistId": 1,
+    "userId": "test1234",
+    "regDate": "2024-09-02T17:55:50.181Z",
+    "isEditted": true,
+    "content": "이거 너무 좋아요"
+  },
+  {
+    "playlistId": 1,
+    "userId": "kimisadev27",
+    "regDate": "2024-09-02T17:55:50.181Z",
+    "isEditted": false,
+    "content": "2024년 최고의 영상"
+  },
+  {
+    "playlistId": 2,
+    "userId": "test1234",
+    "regDate": "2024-09-02T17:55:50.181Z",
+    "isEditted": false,
+    "content": "이거 너무 좋아요(봇아님)"
+  }
+]

@@ -18,3 +18,22 @@ export const tagging = (value: string) => {
   }
   return '';
 };
+
+export const convertUnitNumber = (value: number, fixed: number = 2): string => {
+  let result = value.toString();
+
+  const units = [
+    { text: '억', divNum: 100000000 },
+    { text: '만', divNum: 10000 },
+    { text: '천', divNum: 1000 },
+  ];
+
+  units.some((unit) => {
+    if (value > unit.divNum) {
+      return (result =
+        parseFloat(Number(value / unit.divNum).toFixed(fixed)) + unit.text);
+    }
+  });
+
+  return result;
+};

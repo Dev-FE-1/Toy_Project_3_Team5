@@ -2,7 +2,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import ROUTES from '@/constants/route';
-import { Detail } from '@/pages/common/Detail';
+import Detail from '@/pages/common/Detail';
 import Following from '@/pages/common/Following';
 import HashTag from '@/pages/common/HashTag';
 import Home from '@/pages/common/Home';

@@ -5,6 +5,7 @@ type ProfileProps = {
   src: string;
   alt: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  onClick?: () => void;
 };
 
 const sizes = {
@@ -15,7 +16,12 @@ const sizes = {
   xl: 120,
 };
 
-const Profile: React.FC<ProfileProps> = ({ src, alt, size = 'lg' }) => (
+const Profile: React.FC<ProfileProps> = ({
+  src,
+  alt,
+  size = 'lg',
+  onClick = () => {},
+}) => (
   <div
     css={css`
       width: ${sizes[size]}px;
@@ -23,10 +29,12 @@ const Profile: React.FC<ProfileProps> = ({ src, alt, size = 'lg' }) => (
       border-radius: 50%;
       overflow: hidden;
       display: inline-block;
+      cursor: pointer;
     `}
+    onClick={onClick}
   >
     <img
-      src={src}
+      src={!!!src ? '/src/assets/logoIcon.png' : src}
       alt={alt}
       css={css`
         width: 100%;

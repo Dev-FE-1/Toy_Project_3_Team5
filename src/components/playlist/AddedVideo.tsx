@@ -10,23 +10,34 @@ import { omittedText } from '@/utils/textUtils';
 
 export interface AddedLinkProps extends VideoProps {
   videoId: string;
+  isLinkView?: boolean;
   link: string;
-  onRemove: (videoId: string) => void;
+  isRemovable?: boolean;
+  onRemove?: (videoId: string) => void;
   isDragNDrop?: boolean;
   onDragNDrop?: () => void;
+  onClick?: () => void;
+  isActive?: boolean;
+  embedCode?: string;
+  provider?: string;
 }
 
 const AddedVideo: React.FC<AddedLinkProps> = ({
   videoId,
   imgUrl,
+  isRemovable = true,
   onRemove,
+  isLinkView = true,
   link,
   title,
   userName,
   isDragNDrop = false,
   onDragNDrop,
+  onClick = () => {},
+  isActive = false,
+  provider,
 }) => (
-  <div css={videoItemStyle}>
+  <div css={videoItemStyle(isActive)} onClick={onClick}>
     {isDragNDrop && onDragNDrop !== undefined && (
       <IconButton
         IconComponent={AlignJustify}
@@ -36,27 +47,41 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
     )}
     <div css={linkInfoStyle}>
       <div css={videoLinkStyle}>
-        <p title={link}>{omittedText(link, 40)}</p>
-        <IconButton
-          IconComponent={X}
-          onClick={() => {
-            onRemove(videoId);
-          }}
-        />
+        {isLinkView && <p title={link}>{omittedText(link, 40)}</p>}
+        {isRemovable && onRemove && (
+          <IconButton
+            IconComponent={X}
+            onClick={() => {
+              onRemove(videoId);
+            }}
+          />
+        )}
       </div>
-      <Video imgUrl={imgUrl} title={title} userName={userName} />
+      <Video
+        imgUrl={imgUrl}
+        title={title}
+        userName={userName}
+        provider={provider || ''}
+      />
     </div>
   </div>
 );
 
-const videoItemStyle = css`
+const videoItemStyle = (isActive: boolean) => css`
   display: flex;
   width: calc(100vw - 40px);
-  max-width: calc(430px - 40px);
+  /* max-width: calc(430px - 40px); */
+  max-width: 100%;
   margin-bottom: 10px;
-  border: 1px solid ${colors.gray02};
+  border: 2px solid ${colors.gray02};
   border-radius: 5px;
   padding: 5px;
+
+  ${isActive &&
+  css`
+    background-color: ${colors.gray02};
+    border: 2px solid ${colors.primaryLight};
+  `}
 `;
 
 const videoLinkStyle = css`

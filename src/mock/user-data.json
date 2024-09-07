@@ -1,0 +1,24 @@
+[
+  {
+    "docId": "test1234",
+    "uid": "XyatDtCFQwRMKd8xUQjamzbgxtV2",
+    "tags": ["#재즈", "#노래"],
+    "channelName": "코딩의흐름",
+    "channelFollower": ["Q0gUDbXIfneAZnSxUF16UcXwA6D3"],
+    "channelFollowing": ["Q0gUDbXIfneAZnSxUF16UcXwA6D3"],
+    "profileImg": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/profile%2Ftest1234%2FHeartsping.jpeg?alt=media&token=aada3ec6-08ff-4613-8a04-ea1f2c7690fe",
+    "savedPlaylist": [1, 2, 3],
+    "likedPlaylist": [10, 20, 30]
+  },
+  {
+    "docId": "kimisadev27",
+    "uid": "Q0gUDbXIfneAZnSxUF16UcXwA6D3",
+    "tags": ["#태그1", "#태그2"],
+    "channelName": "성현TV",
+    "channelFollower": ["XyatDtCFQwRMKd8xUQjamzbgxtV2"],
+    "channelFollowing": ["XyatDtCFQwRMKd8xUQjamzbgxtV2"],
+    "profileImg": "https://firebasestorage.googleapis.com/v0/b/tpj3test.appspot.com/o/playlist%2F31%2Fthumbnail.png?alt=media&token=bc8f6385-8c80-4e62-ab08-bd09b6b54952",
+    "savedPlaylist": [1, 2, 3],
+    "likedPlaylist": [1, 2, 3]
+  }
+]

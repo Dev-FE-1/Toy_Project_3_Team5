@@ -50,9 +50,17 @@ const fetchPlaylists = async (
     })
   );
 
-  const filteredData = allPlaylists.filter((playlist) =>
-    playlist.title.toLowerCase().includes(keyword.toLowerCase())
-  );
+  let filteredData;
+
+  if (keyword.startsWith('#')) {
+    filteredData = allPlaylists.filter((playlist) =>
+      playlist.tags?.includes(keyword)
+    );
+  } else {
+    filteredData = allPlaylists.filter((playlist) =>
+      playlist.title.toLowerCase().includes(keyword.toLowerCase())
+    );
+  }
 
   return { filteredData, lastVisible };
 };

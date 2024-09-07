@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +47,7 @@ const Following = () => {
   };
 
   const onToFollowingListPage = (userId: string) => {
-    navigate(`/following/${userId}`);
+    navigate(`/profile/${userId}/following`);
   };
 
   return (

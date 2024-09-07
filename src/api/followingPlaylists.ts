@@ -18,23 +18,6 @@ export interface PlaylistsResultProps {
   playlist: PlayListDataProps[];
   nextCursor: QueryDocumentSnapshot<DocumentData> | null;
 }
-export const getOwnerChannelName = async (userId: string): Promise<string> => {
-  try {
-    const userDocRef = doc(db, 'users', userId);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData?.channelName || '알 수 없는 채널';
-    } else {
-      console.log('userId에 대한 사용자 문서를 찾을 수 없습니다:', userId);
-      return '알 수 없는 채널';
-    }
-  } catch (error) {
-    console.error('채널 이름을 가져오는 동안 오류 발생:', error);
-    return '알 수 없는 채널';
-  }
-};
 
 export const fetchFollowingPlaylists = async (
   userId: string,
@@ -106,4 +89,20 @@ export const fetchFollowingPlaylists = async (
   const nextCursor = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
 
   return { playlist, nextCursor };
+};
+export const getOwnerChannelName = async (userId: string): Promise<string> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      return userData?.channelName || '알 수 없는 채널';
+    } else {
+      return '알 수 없는 채널';
+    }
+  } catch (error) {
+    console.error('채널 이름을 가져오는 동안 오류 발생:', error);
+    return '알 수 없는 채널';
+  }
 };

@@ -9,6 +9,7 @@ const HEADER_FILTER = {
     { url: ROUTES.PROFILE_FOLLOWING(), title: '모든 팔로잉 목록' },
     { url: ROUTES.PLAYLIST_ADD(), title: '플레이리스트 생성' },
     { url: ROUTES.PLAYLIST_MODIFY(), title: '플레이리스트 수정' },
+    { url: ROUTES.FOLLOWING_LIST(), title: '모든 팔로잉 목록' },
   ],
   searchResult: [ROUTES.SEARCH()],
 };

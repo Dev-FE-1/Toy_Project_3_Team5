@@ -5,6 +5,7 @@ import { getPlaylistInfo } from '@/api/playlistInfo';
 import { getUserInfo } from '@/api/profileInfo';
 import { getVideoInfo } from '@/api/video';
 import { AddedLinkProps } from '@/components/playlist/AddedVideo';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { UserProps } from '@/types/api';
 import { PlayListDataProps } from '@/types/playlistType';
 
@@ -38,6 +39,7 @@ interface DetailInfoProps {
 }
 
 export const usePlaylistInfo = () => {
+  const { userId: loginId } = useAuthStore();
   const { playlistId } = useParams<{ playlistId: string }>();
 
   const [detailInfo, setDetailInfo] = useState<DetailInfoProps>(INIT_VALUES);
@@ -69,7 +71,11 @@ export const usePlaylistInfo = () => {
       throw new Error('데이터 불러오기에 실패했습니다.');
     }
     if (result) {
-      setOwnerInfo({ ...result, userId: playlistInfo.userId });
+      setOwnerInfo({
+        ...result,
+        userId: playlistInfo.userId,
+        isMyChannel: playlistInfo.userId === loginId,
+      });
     }
   }, [playlistInfo]);
 

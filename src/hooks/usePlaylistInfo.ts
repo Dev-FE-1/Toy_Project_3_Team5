@@ -51,6 +51,8 @@ export const usePlaylistInfo = () => {
     INIT_VALUES.comments
   );
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const fetchPlaylistInfo = useCallback(async () => {
     const { status, result } = await getPlaylistInfo(Number(playlistId));
     if (status === 'fail') {
@@ -103,6 +105,12 @@ export const usePlaylistInfo = () => {
   }, [playlistInfo]);
 
   useEffect(() => {
+    setIsLoading(
+      playlistInfo !== INIT_VALUES.playlistInfo &&
+        ownerInfo !== INIT_VALUES.ownerInfo &&
+        commentList !== INIT_VALUES.comments
+    );
+
     setDetailInfo({
       ...detailInfo,
       playlistInfo,
@@ -111,11 +119,10 @@ export const usePlaylistInfo = () => {
     });
   }, [playlistInfo, ownerInfo, commentList]);
 
-  useEffect(() => {}, [detailInfo]);
-
   return {
     detailInfo,
     videoList,
+    isLoading,
     fetchPlaylistInfo,
     fetchOwnerInfo,
     fetchCommentInfo,

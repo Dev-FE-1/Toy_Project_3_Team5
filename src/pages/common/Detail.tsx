@@ -6,6 +6,7 @@ import { CommentWithProfileApiProps, removeComment } from '@/api/comment';
 import Button from '@/components/Button';
 import Comment from '@/components/Comment';
 import IconButton from '@/components/IconButton';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import MiniPlaylist from '@/components/MiniPlaylist';
 import Modal from '@/components/Modal';
 import AddedVideo, { AddedLinkProps } from '@/components/playlist/AddedVideo';
@@ -38,7 +39,7 @@ const Detail = () => {
 
   const { values, onChanges, onClicks } = useDetailForm();
 
-  const { detailInfo, videoList, fetchOwnerInfo, fetchCommentInfo } =
+  const { detailInfo, videoList, isLoading, fetchOwnerInfo, fetchCommentInfo } =
     usePlaylistInfo();
 
   const { playlistInfo, comments, ownerInfo } = detailInfo;
@@ -95,7 +96,12 @@ const Detail = () => {
     setCurrentVideo(videoList[0]);
   }, [videoList]);
 
-  return (
+  return !!!isLoading ? (
+    <div css={loadingStyle}>
+      <LoadingSpinner />
+      로딩중...
+    </div>
+  ) : (
     <div css={containerStyle}>
       {currentVideo && (
         <div css={currentVideoStyle}>
@@ -344,6 +350,15 @@ const Detail = () => {
     </div>
   );
 };
+
+const loadingStyle = css`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  text-align: -webkit-center;
+`;
 
 const containerStyle = css`
   display: flex;

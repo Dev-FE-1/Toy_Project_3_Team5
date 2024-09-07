@@ -368,6 +368,7 @@ const currentVideoStyle = css`
     height: 242px; // 영상 상단 고정에 필요한 값
     position: fixed; // 영상 상단 고정
     z-index: 1000;
+    background-color: black;
   }
 
   .emptyVideo {

@@ -36,27 +36,25 @@ export const getPlaylistComment = async (
       (doc) => ({ ...doc.data(), docId: doc.id }) as CommentWithProfileApiProps
     );
 
-    const commentWithProfileList: CommentWithProfileApiProps[] = [
-      ...commentList,
-    ];
+    await Promise.all(
+      commentList.map(async (comment, index) => {
+        const docRef = doc(db, COLLECTION.users, `${comment.userId}`);
+        const docSnap = await getDoc(docRef);
+        if (!!!docSnap.exists()) {
+          return { status: 'fail' };
+        }
 
-    commentWithProfileList.map(async (comment, index) => {
-      const docRef = doc(db, COLLECTION.users, `${comment.userId}`);
-      const docSnap = await getDoc(docRef);
-      if (!!!docSnap.exists()) {
-        return { status: 'fail' };
-      }
+        const data = docSnap.data() as UserProps;
 
-      const data = docSnap.data() as UserProps;
+        commentList[index] = {
+          ...comment,
+          imgUrl: data.profileImg,
+          userName: data.channelName,
+        };
+      })
+    );
 
-      commentWithProfileList[index] = {
-        ...comment,
-        imgUrl: data.profileImg,
-        userName: data.channelName,
-      };
-    });
-
-    return { status: 'success', result: commentWithProfileList };
+    return { status: 'success', result: commentList };
   } catch (err) {
     console.error(err);
     return { status: 'fail' };

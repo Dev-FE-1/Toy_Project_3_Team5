@@ -19,7 +19,6 @@ import usePlaylistActions from '@/hooks/usePlaylistActions';
 import { usePlaylistInfo } from '@/hooks/usePlaylistInfo';
 import useToast from '@/hooks/useToast';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { getProfileImg } from '@/utils/profileUtils';
 import { convertUnitNumber, omittedText } from '@/utils/textUtils';
 
 const MAX_LENGTH = {
@@ -303,7 +302,7 @@ const Detail = () => {
               <Comment
                 key={`comment-${index}`}
                 content={comment.content}
-                imgUrl={getProfileImg(comment.userId)}
+                imgUrl={comment.imgUrl}
                 userName={comment.userName}
                 showKebabMenu={loginId === comment.userId}
                 isEdited={comment.isEdited}

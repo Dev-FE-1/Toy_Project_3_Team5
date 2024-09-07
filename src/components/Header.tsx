@@ -10,6 +10,7 @@ import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
 import ROUTES from '@/constants/route';
 import { useAuthStore } from '@/stores/useAuthStore';
+import useModalStore from '@/stores/useModalStore';
 import { HeaderProps } from '@/types/header';
 
 const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
@@ -18,6 +19,7 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
   const { keyword } = useParams<{ keyword?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { openModal, closeModal } = useModalStore();
 
   useEffect(() => {
     if (location.pathname.startsWith('/search/') && keyword) {
@@ -42,12 +44,28 @@ const Header: React.FC<HeaderProps> = ({ type, headerTitle }) => {
     }
   };
 
+  const onModifyBackButton = () => {
+    if (headerTitle === '프로필 수정') {
+      openModal({
+        type: 'confirm',
+        title: '알림',
+        content: '프로필 변경사항을 적용하지 않으시겠습니까?',
+        onAction: () => {
+          closeModal();
+          navigate(-1);
+        },
+      });
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <header css={headerStyle}>
       {type === 'main' ? (
         <Logo logoWidth={100} clickable={true} />
       ) : (
-        <IconButton IconComponent={ChevronLeft} onClick={() => navigate(-1)} />
+        <IconButton IconComponent={ChevronLeft} onClick={onModifyBackButton} />
       )}
       {type !== 'detail' ? (
         <>

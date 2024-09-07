@@ -5,9 +5,16 @@ import {
   getDocs,
   doc,
   getDoc,
+  updateDoc,
 } from 'firebase/firestore';
-import { db } from '@/firebase/firbaseConfig';
+
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/firebase/firbaseConfig';
 import { ApiResponse, UserProps } from '@/types/api';
+
+interface ProfileUpdateData {
+  profileImageFile?: File;
+}
 
 export const getUserInfo = async (
   userId: string
@@ -64,4 +71,50 @@ const getMyPlaylistCount = async (userId: string) => {
   }
 };
 
-export { getUserComments, getPlaylistTitle, getMyPlaylistCount };
+const getMyHashtag = async (userId: string) => {
+  const userDoc = doc(db, 'users', userId);
+  const userSnapshot = await getDoc(userDoc);
+  if (userSnapshot.exists()) {
+    const userData = userSnapshot.data();
+    const hashtags = userData.tags;
+    return hashtags;
+  }
+};
+
+const updateProfileTags = async (userId: string, tags: string[]) => {
+  const userDoc = doc(db, 'users', userId);
+  await updateDoc(userDoc, {
+    tags,
+  });
+};
+
+const uploadImage = async (file: File, userId: string) => {
+  const path = `profile/${userId}/${file.name}`;
+  const locationRef = ref(storage, path);
+  const result = await uploadBytes(locationRef, file);
+  const url = await getDownloadURL(result.ref);
+  return url;
+};
+
+const updateProfileImage = async (userId: string, data: ProfileUpdateData) => {
+  const docRef = doc(db, 'users', userId);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) {
+    return { status: 'fail', result: false };
+  }
+  const updatedData: { profileImg?: string } = {};
+  if (data.profileImageFile) {
+    const imageUrl = await uploadImage(data.profileImageFile, userId);
+    updatedData.profileImg = imageUrl;
+  }
+  await updateDoc(docRef, updatedData);
+};
+
+export {
+  getUserComments,
+  getPlaylistTitle,
+  getMyPlaylistCount,
+  updateProfileImage,
+  getMyHashtag,
+  updateProfileTags,
+};

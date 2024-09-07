@@ -1,15 +1,7 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  setDoc,
-  getDoc,
-} from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Header from '@/components/Header';
@@ -18,7 +10,9 @@ import Toast from '@/components/Toast';
 import colors from '@/constants/colors';
 import ROUTES from '@/constants/route';
 import { auth, db } from '@/firebase/firbaseConfig';
+import { useCheckDuplicate } from '@/hooks/useCheckDuplicate';
 import useToast from '@/hooks/useToast';
+import { checkIdExists, checkChannelNameExists } from '@/utils/checkDuplicate';
 
 export const SignUp = () => {
   const [id, setId] = useState<string>('');
@@ -26,102 +20,70 @@ export const SignUp = () => {
   const [passwordConfirm, setPasswordConfirm] = useState<string>('');
   const [channelName, setChannelName] = useState<string>('');
 
-  const [idCheckMessage, setIdCheckMessage] = useState<string>('');
-  const [channelNameCheckMessage, setChannelNameCheckMessage] =
-    useState<string>('');
-
-  const [isIdChecked, setIsIdChecked] = useState<boolean>(false);
-  const [isChannelNameChecked, setIsChannelNameChecked] =
-    useState<boolean>(false);
+  const {
+    message: idCheckMessage,
+    isChecked: isIdChecked,
+    checkDuplicate: checkIdDuplicate,
+  } = useCheckDuplicate();
+  const {
+    message: channelNameCheckMessage,
+    isChecked: isChannelNameChecked,
+    checkDuplicate: checkChannelNameDuplicate,
+  } = useCheckDuplicate();
 
   const navigate = useNavigate();
-
   const { toastTrigger } = useToast();
-
-  const checkChannelNameExists = async (
-    channelName: string
-  ): Promise<boolean> => {
-    const q = query(
-      collection(db, 'users'),
-      where('channelName', '==', channelName)
-    );
-
-    try {
-      const querySnapshot = await getDocs(q);
-      return !querySnapshot.empty;
-    } catch (error) {
-      throw new Error('중복 체크에 실패했습니다.');
-    }
-  };
-
-  const checkIdExists = async (id: string): Promise<boolean> => {
-    try {
-      const docRef = doc(db, 'users', id);
-      const docSnap = await getDoc(docRef);
-      return docSnap.exists();
-    } catch (error) {
-      throw new Error('중복 체크에 실패했습니다.');
-    }
-  };
 
   const onIdCheck = async () => {
     const idValidationMessage = validateId(id);
     if (idValidationMessage) {
-      setIdCheckMessage(idValidationMessage);
-      setIsIdChecked(false);
-      return;
+      checkIdDuplicate(
+        id,
+        () => Promise.resolve(false),
+        idValidationMessage,
+        ''
+      );
+    } else {
+      await checkIdDuplicate(
+        id,
+        checkIdExists,
+        '이미 사용 중인 아이디입니다.',
+        '사용 가능한 아이디입니다.'
+      );
     }
-
-    try {
-      const idExists = await checkIdExists(id);
-      if (idExists) {
-        setIdCheckMessage('이미 사용 중인 아이디입니다.');
-        setIsIdChecked(false);
-      } else {
-        setIdCheckMessage('사용 가능한 아이디입니다.');
-        setIsIdChecked(true);
-      }
-    } catch (error) {}
   };
 
   const onChannelNameCheck = async () => {
     const channelNameValidation = validateChannelName(channelName);
     if (channelNameValidation) {
-      setChannelNameCheckMessage(channelNameValidation);
-      setIsChannelNameChecked(false);
-      return;
+      checkChannelNameDuplicate(
+        channelName,
+        () => Promise.resolve(false),
+        channelNameValidation,
+        ''
+      );
+    } else {
+      await checkChannelNameDuplicate(
+        channelName.trim(),
+        checkChannelNameExists,
+        '이미 사용 중인 채널 이름입니다.',
+        '사용 가능한 채널 이름입니다.'
+      );
     }
-
-    try {
-      const exists = await checkChannelNameExists(channelName.trim());
-      if (exists) {
-        setChannelNameCheckMessage('이미 사용 중인 채널 이름입니다.');
-        setIsChannelNameChecked(false);
-      } else {
-        setChannelNameCheckMessage('사용 가능한 채널 이름입니다.');
-        setIsChannelNameChecked(true);
-      }
-    } catch (error) {}
   };
 
   const onChannelNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setChannelName(e.target.value);
-    setIsChannelNameChecked(false);
-    setChannelNameCheckMessage(
-      e.target.value === '' ? '' : '다시 중복검사를 진행해주세요.'
-    );
+    checkChannelNameDuplicate('', () => Promise.resolve(false), '', '');
   };
 
   const onIdChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setId(e.target.value);
-    setIsIdChecked(false);
-    setIdCheckMessage(
-      e.target.value === '' ? '' : '다시 중복검사를 진행해주세요.'
-    );
+    checkIdDuplicate('', () => Promise.resolve(false), '', '');
   };
 
   const onSignUp = async (e: React.FormEvent) => {
@@ -134,34 +96,27 @@ export const SignUp = () => {
 
     const email = `${id}@gmail.com`;
 
-    try {
-      const idExists = await checkIdExists(id);
-      if (idExists) {
-        setIdCheckMessage('이미 사용 중인 아이디입니다.');
-        return;
-      }
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const { user } = userCredential;
 
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const { user } = userCredential;
+    await setDoc(doc(db, 'users', id), {
+      uid: user.uid,
+      channelName,
+      channelFollower: [],
+      channelFollowing: [],
+      savedPlaylist: [],
+      likedPlaylist: [],
+      profileImg: '',
+      tags: [],
+      isFirstLogin: true,
+    });
 
-      await setDoc(doc(db, 'users', id), {
-        uid: user.uid,
-        channelName,
-        channelFollower: [],
-        channelFollowing: [],
-        savedPlaylist: [],
-        likedPlaylist: [],
-        profileImg: '',
-        tags: [],
-        isFirstLogin: true,
-      });
-      navigate(ROUTES.SIGN_IN);
-      toastTrigger('회원가입이 완료되었습니다! 🥳', 'success');
-    } catch (error) {}
+    navigate(ROUTES.SIGN_IN);
+    toastTrigger('회원가입이 완료되었습니다! 🥳', 'success');
   };
 
   const validateId = (value: string) => {

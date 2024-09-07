@@ -5,9 +5,12 @@ import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
 import useList from '@/hooks/useList';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const FollowerList = () => {
   const { userId } = useParams();
+  const { userId: loggedInUserId } = useAuthStore();
+  const isOwner = userId === loggedInUserId;
   const { list: followerList, handleUserMinusClick } = useList(
     userId || '',
     'follower'
@@ -30,12 +33,14 @@ const FollowerList = () => {
                   <Profile src={data.src} alt={data.alt} size={data.size} />
                   <span>{data.name}</span>
                 </span>
-                <button
-                  css={userMinusStyle}
-                  onClick={() => handleUserMinusClick(data.name)}
-                >
-                  <UserMinus css={userMinusStyle} />
-                </button>
+                {isOwner && (
+                  <button
+                    css={userMinusStyle}
+                    onClick={() => handleUserMinusClick(data.name)}
+                  >
+                    <UserMinus css={userMinusStyle} />
+                  </button>
+                )}
               </div>
             ))}
         </div>

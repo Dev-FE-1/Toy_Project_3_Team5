@@ -32,7 +32,7 @@ const FollowerList = () => {
               <div key={index} css={profileItem}>
                 <span css={profileContainerStyle}>
                   <Profile src={data.src} alt={data.alt} size={data.size} />
-                  <span>{data.name}</span>
+                  <span>{data.channelName}</span>
                 </span>
 
                 {isOwner && (
@@ -79,7 +79,5 @@ const profileContainerStyle = css`
   align-items: center;
   gap: 10px;
 `;
-
-const userMinusStyle = css``;
 
 export default FollowerList;

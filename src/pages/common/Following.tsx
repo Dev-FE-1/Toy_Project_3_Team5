@@ -25,10 +25,7 @@ const Following = () => {
 
   const { data, fetchNextPage, hasNextPage, isFetching } =
     useFollowingPlaylistFetch(selectedChannel);
-  const playlists = useMemo(
-    () => (data ? data.pages.flatMap((page) => page.playlist) : []),
-    [data]
-  );
+  const playlists = data?.pages.flatMap((page) => page.playlistsData) || [];
 
   const infiniteScrollRef = useInfiniteScroll(
     async (entry, observer) => {

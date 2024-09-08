@@ -8,18 +8,20 @@ import {
   getDocs,
   startAfter,
   DocumentData,
-  QueryDocumentSnapshot,
+  Query,
 } from 'firebase/firestore';
-import {
-  PlaylistsResultProps,
-  getOwnerChannelName,
-} from '@/api/followingPlaylists';
+import { getCommentCount } from '@/api/myplaylists';
 import { db } from '@/firebase/firbaseConfig';
+import { PlayListDataProps } from '@/types/playlistType';
 
 const fetchPlaylistsByTag = async (
   tag: string,
-  pageParam: QueryDocumentSnapshot<DocumentData> | null
-): Promise<PlaylistsResultProps> => {
+  pageParam: number,
+  pageSize: number
+): Promise<{
+  playlistsData: PlayListDataProps[];
+  nextCursor: number | null;
+}> => {
   let q;
 
   if (tag === '인기 급상승 동영상') {
@@ -30,7 +32,7 @@ const fetchPlaylistsByTag = async (
       where('tags', 'array-contains', `#${tag}`),
       where('isPublic', '==', true),
       orderBy('likes', 'desc'),
-      limit(5)
+      limit(pageSize)
     );
   }
 
@@ -38,36 +40,39 @@ const fetchPlaylistsByTag = async (
     q = query(q, startAfter(pageParam));
   }
 
-  const querySnapshot = await getDocs(q);
-  const playlistPromises = querySnapshot.docs.map(async (doc) => {
-    const data = doc.data();
-    const ownerChannelName = await getOwnerChannelName(data.userId);
-    return {
-      playlistId: doc.id,
-      ownerChannelName,
-      title: data.title,
-      isPublic: data.isPublic,
-      likes: data.likes,
-      links: data.links,
-      regDate: data.regDate,
-      tags: data.tags,
-      thumbnail: data.thumbnail,
-      userId: data.userId,
-    };
-  });
+  const fetchPlaylists = async (q: Query<DocumentData>) => {
+    const querySnapshot = await getDocs(q);
 
-  const playlist = await Promise.all(playlistPromises);
-  const nextCursor = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+    return await Promise.all(
+      querySnapshot.docs.map(async (doc) => ({
+        playlistId: doc.id,
+        commentCount: await getCommentCount(doc.id),
+        ...(doc.data() as Omit<
+          PlayListDataProps,
+          'playlistId' | 'commentCount'
+        >),
+      }))
+    );
+  };
 
-  return { playlist, nextCursor };
+  const allPlaylists = await fetchPlaylists(q);
+
+  const startIndex = pageParam * pageSize;
+  const paginatedData = allPlaylists.slice(startIndex, startIndex + pageSize);
+
+  const nextCursor =
+    startIndex + pageSize < allPlaylists.length ? pageParam + 1 : null;
+
+  return { playlistsData: paginatedData, nextCursor };
 };
 
-const useTagFetch = (tag: string) =>
+const useTagFetch = (tag: string, pageSize: number = 5) =>
   useInfiniteQuery({
-    queryKey: ['playlists', tag],
-    queryFn: ({ pageParam = null }) => fetchPlaylistsByTag(tag, pageParam),
-    getNextPageParam: (lastPage: PlaylistsResultProps) => lastPage.nextCursor,
-    initialPageParam: null as QueryDocumentSnapshot<DocumentData> | null,
+    queryKey: ['popularPlaylists', tag],
+    queryFn: ({ pageParam = 0 }) =>
+      fetchPlaylistsByTag(tag, pageParam, pageSize),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: 0,
     enabled: !!tag,
   });
 

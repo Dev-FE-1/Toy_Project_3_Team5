@@ -1,10 +1,11 @@
 import { css } from '@emotion/react';
 import { UserMinus } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
+import ROUTES from '@/constants/route';
 import useList from '@/hooks/useList';
 import { useAuthStore } from '@/stores/useAuthStore';
 import useModalStore from '@/stores/useModalStore';
@@ -17,7 +18,12 @@ const FollowingList = () => {
   const { removeFollowing } = useAuthStore.getState();
   const { openModal } = useModalStore();
 
-  const handleUnfollow = async (removeId: string) => {
+  const navigate = useNavigate();
+  const onToChannel = (goToId: string): void => {
+    navigate(ROUTES.PLAYLIST(goToId));
+  };
+
+  const onUnfollow = async (removeId: string) => {
     if (userId) {
       try {
         await removeFollowing(userId, removeId);
@@ -30,12 +36,12 @@ const FollowingList = () => {
     }
   };
 
-  const handleUserMinusClick = (removeId: string) => {
+  const onserMinusClick = (removeId: string) => {
     openModal({
       type: 'confirm',
       title: '언팔로우 확인',
       content: '정말로 이 유저를 언팔로우 하시겠습니까?',
-      onAction: () => handleUnfollow(removeId),
+      onAction: () => onUnfollow(removeId),
     });
   };
 
@@ -52,14 +58,19 @@ const FollowingList = () => {
             followingList.map((data, index) => (
               <div key={index} css={profileItem}>
                 <span css={profileContainerStyle}>
-                  <Profile src={data.src} alt={data.alt} size={data.size} />
+                  <Profile
+                    src={data.src}
+                    alt={data.alt}
+                    size={data.size}
+                    onClick={() => onToChannel(data.name)}
+                  />
                   <span>{data.channelName}</span>
                 </span>
 
                 {isOwner && (
                   <IconButton
                     IconComponent={UserMinus}
-                    onClick={() => handleUserMinusClick(data.name)}
+                    onClick={() => onserMinusClick(data.name)}
                   />
                 )}
               </div>

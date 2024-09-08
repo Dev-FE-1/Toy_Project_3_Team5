@@ -14,10 +14,14 @@ export const Popular = () => {
   const [tags, setTags] = useState<string[]>(['인기 급상승 동영상']);
   const [clickedBtn, setClickedBtn] = useState<string>('인기 급상승 동영상');
   const defaultTags: string[] = ['Developer', '먹방', 'Vlog'];
-  const { tags: userTags } = useAuthStore();
+  const { tags: userTags, userId } = useAuthStore();
   const PAGE_SIZE = 5;
 
   useEffect(() => {
+    console.log(userId);
+    if (!userId) {
+      setTags(['인기 급상승 동영상', ...defaultTags]);
+    }
     if (userTags.length > 0) {
       const matchedTags = HASHTAGS.filter((tag) =>
         userTags.includes(tag.label)
@@ -48,10 +52,7 @@ export const Popular = () => {
 
   const { data, fetchNextPage, hasNextPage, isFetching } =
     useTagFetch(clickedBtn);
-  const playlists = useMemo(
-    () => (data ? data.pages.flatMap((page) => page.playlist) : []),
-    [data]
-  );
+  const playlists = data?.pages.flatMap((page) => page.playlistsData) || [];
 
   const infiniteScrollRef = useInfiniteScroll(
     async (entry, observer) => {
@@ -84,15 +85,13 @@ export const Popular = () => {
         <div css={titleContainerStyle}>#{clickedBtn}</div>
       </div>
       <div css={playlistContainerStyle}>
-        {data?.pages.map((page, pageIndex) =>
-          page.playlist.map((playlist, index) => (
-            <PlaylistCard
-              key={`${pageIndex}-${index}`}
-              playlistItem={playlist}
-              size='large'
-            />
-          ))
-        )}
+        {playlists.map((playlistItem) => (
+          <PlaylistCard
+            key={playlistItem.playlistId}
+            playlistItem={playlistItem}
+            size='large'
+          />
+        ))}
         <div css={loadingSpinnerStyle}>
           {isFetching && playlists.length >= PAGE_SIZE && <LoadingSpinner />}
         </div>

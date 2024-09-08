@@ -402,7 +402,7 @@ const currentVideoStyle = css`
   height: 242px; // 영상 상단 고정에 필요한 값
   display: block;
 
-  > div > iframe {
+  iframe {
     width: 430px; // 영상 상단 고정에 필요한 값
     height: 242px; // 영상 상단 고정에 필요한 값
     position: fixed; // 영상 상단 고정

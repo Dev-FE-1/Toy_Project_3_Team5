@@ -115,6 +115,7 @@ const PlayListEdit = () => {
 
   const validation = {
     link: (value: string) => {
+      if (value.trim().length < 1) return '';
       const videoId = getVideoId(value);
       if (!!!videoId) return TEXT.link.validmsg;
       if (videoId && check.dupl.link(videoId)) return TEXT.link.validDuplmsg;
@@ -359,6 +360,7 @@ const PlayListEdit = () => {
                 onRemove={onClick.removeVideoLink}
                 isDragNDrop={true}
                 onDragNDrop={() => {}}
+                provider={video.provider}
               />
             </div>
           ))}

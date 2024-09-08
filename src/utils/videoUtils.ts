@@ -1,10 +1,5 @@
 import { Regex } from '@/constants/validation';
 
-export interface MethodResult<T> {
-  status: 'success' | 'fail';
-  result?: T;
-}
-
 export interface VideoInfoProps {
   link: string;
   embedUrl?: string;
@@ -12,12 +7,7 @@ export interface VideoInfoProps {
   thumbnail: string;
 }
 
-type LinkType = 'youtube' | 'vimeo';
-
-export const getVideoId = (
-  link: string,
-  type: LinkType = 'youtube'
-): string => {
+export const getVideoId = (link: string): string => {
   let videoId = '';
   for (const key in Regex) {
     const matchData = link.match(Regex[key]);
@@ -27,9 +17,4 @@ export const getVideoId = (
     }
   }
   return videoId;
-};
-
-export const makeEmbedUrl = (videoId: string, type: LinkType) => {
-  if (type === 'youtube') return `https://www.youtube.com/embed/${videoId}`;
-  return `https://www.youtube.com/embed/${videoId}`;
 };

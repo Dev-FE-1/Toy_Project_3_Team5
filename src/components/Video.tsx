@@ -18,6 +18,7 @@ const MAX_LENGTH = {
 const ICON: Record<string, string> = {
   youtube: '/src/assets/youtube.png',
   vimeo: '/src/assets/vimeo.png',
+  soundcloud: '/src/assets/soundCloud.png',
   default: '/src/assets/logoIcon.png',
 };
 

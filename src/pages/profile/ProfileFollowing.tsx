@@ -11,6 +11,8 @@ import useModalStore from '@/stores/useModalStore';
 
 const FollowingList = () => {
   const { userId } = useParams();
+  const { userId: loggedInUserId } = useAuthStore();
+  const isOwner = userId === loggedInUserId;
   const { list: followingList, setList } = useList(userId || '', 'following');
   const { removeFollowing } = useAuthStore.getState();
   const { openModal } = useModalStore();
@@ -53,10 +55,13 @@ const FollowingList = () => {
                   <Profile src={data.src} alt={data.alt} size={data.size} />
                   <span>{data.name}</span>
                 </span>
-                <IconButton
-                  IconComponent={UserMinus}
-                  onClick={() => handleUserMinusClick(data.name)}
-                />
+
+                {isOwner && (
+                  <IconButton
+                    IconComponent={UserMinus}
+                    onClick={() => handleUserMinusClick(data.name)}
+                  />
+                )}
               </div>
             ))}
         </div>

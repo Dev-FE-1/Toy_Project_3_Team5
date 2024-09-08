@@ -38,6 +38,7 @@ export const fetchFollowingPlaylists = async (
         q = query(
           collection(db, 'playlist'),
           where('userId', 'in', channelFollowing),
+          where('isPublic', '==', true),
           orderBy('regDate', 'desc'),
           limit(5),
           ...(pageParam ? [startAfter(pageParam)] : [])

@@ -28,6 +28,7 @@ const fetchPlaylistsByTag = async (
     q = query(
       collection(db, 'playlist'),
       where('tags', 'array-contains', `#${tag}`),
+      where('isPublic', '==', true),
       orderBy('likes', 'desc'),
       limit(5)
     );

@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import EmptyImage from '@/assets/empty-image.png'; // 비어 있는 상태를 나타내는 이미지
 import folderIcon from '@/assets/folderIcon.png';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';

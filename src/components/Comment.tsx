@@ -59,7 +59,7 @@ const Comment: React.FC<CommentWithProfileProps> = ({
         <span className='userName' onClick={onClick}>
           {userName}
         </span>
-        <span>{content}</span>
+        <span className='content'>{content}</span>
       </div>
       <div css={emptyBoxStyle}></div>
       {showKebabMenu && <KebabButton menuItems={menuItems} />}
@@ -93,10 +93,11 @@ const contentStyles = css`
 
   .userName {
     cursor: pointer;
+    font-weight: ${fontWeight.semiBold};
   }
 
-  span:nth-of-type(1) {
-    font-weight: ${fontWeight.semiBold};
+  .content {
+    line-height: 19px;
   }
 `;
 

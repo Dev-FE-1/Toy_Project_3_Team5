@@ -80,7 +80,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
     openModal({
       type: 'delete',
       title: '플레이리스트 삭제',
-      content: `'${playlistItem.description}'을 삭제하시겠습니까?`,
+      content: `'${playlistItem.title}' 을 삭제하시겠습니까?`,
       onAction: async () => {
         if (playlistItem.playlistId) {
           const playlistIdNumber = Number(playlistItem.playlistId);

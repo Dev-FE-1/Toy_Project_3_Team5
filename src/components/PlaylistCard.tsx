@@ -312,6 +312,7 @@ const largeInfoStyles = (isPreview = false) => css`
   }
   .tags {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     font-size: ${fontSize.md};
     color: ${colors.primaryLight};
@@ -386,6 +387,7 @@ const smallInfoStyles = css`
   }
   .tags {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     font-size: ${fontSize.sm};
     color: ${colors.primaryLight};

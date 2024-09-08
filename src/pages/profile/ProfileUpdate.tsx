@@ -76,9 +76,9 @@ export const ProfileUpdate = () => {
   const onChannelNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const newValue = e.target.value;
-    setNewChannelName(newValue);
-    checkChannelNameDuplicate(newValue, () => Promise.resolve(false), '', '');
+    setNewChannelName(e.target.value);
+    setIsChannelNameChecked(false);
+    setChannelNameCheckMessage('');
   };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +145,7 @@ export const ProfileUpdate = () => {
         <input
           id='profileImageUpload'
           type='file'
-          accept='image/*'
+          accept='image/png'
           style={{ display: 'none' }}
           onChange={onImageChange}
         />

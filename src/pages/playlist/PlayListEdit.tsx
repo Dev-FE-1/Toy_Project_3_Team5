@@ -73,12 +73,15 @@ const PlayListEdit = () => {
       setTitle(values.title);
       setDesc(values.description ?? '');
 
-      values.links.map(async (link) => {
-        const { status, result } = await getVideoInfo(link);
-        if (status === 'success' && result) {
-          setVideoList((prev) => [...prev, result]);
-        }
-      });
+      const tempList: AddedLinkProps[] = new Array(values.links.length);
+
+      await Promise.all(
+        values.links.map(async (link, index) => {
+          const { result } = await getVideoInfo(link);
+          if (result) tempList[index] = result;
+        })
+      );
+      setVideoList(tempList);
 
       values.tags.map(async (tag) => {
         addedHashtag.push({
@@ -220,7 +223,7 @@ const PlayListEdit = () => {
       const response = await updatePlaylist(playlist, Number(playlistId));
 
       if (response.status === 'success') {
-        toastTrigger(TEXT.toast.modify);
+        toastTrigger(TEXT.toast.modify, 'success');
         navigate(ROUTES.PLAYLIST(userId));
       }
     },
@@ -412,9 +415,9 @@ const PlayListEdit = () => {
       </div>
       <div css={previewStyle}>
         <label style={labelStyle}>{TEXT.preview.large}</label>
-        <PlaylistCard playlistItem={preview} size='large' />
+        <PlaylistCard playlistItem={preview} size='large' isPreview={true} />
         <label style={labelStyle}>{TEXT.preview.small}</label>
-        <PlaylistCard playlistItem={preview} size='small' />
+        <PlaylistCard playlistItem={preview} size='small' isPreview={true} />
       </div>
 
       <Button

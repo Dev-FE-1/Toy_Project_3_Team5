@@ -55,8 +55,10 @@ const Comment: React.FC<CommentWithProfileProps> = ({
           currentTarget.src = '/src/assets/logoIcon.png';
         }}
       />
-      <div css={contentStyles} onClick={onClick}>
-        <span className='userName'>{userName}</span>
+      <div css={contentStyles}>
+        <span className='userName' onClick={onClick}>
+          {userName}
+        </span>
         <span>{content}</span>
       </div>
       <div css={emptyBoxStyle}></div>

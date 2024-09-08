@@ -89,7 +89,7 @@ const updateProfileTags = async (userId: string, tags: string[]) => {
 };
 
 const uploadImage = async (file: File, userId: string) => {
-  const path = `profile/${userId}/${file.name}`;
+  const path = `profile/${userId}/profile.png`;
   const locationRef = ref(storage, path);
   const result = await uploadBytes(locationRef, file);
   const url = await getDownloadURL(result.ref);

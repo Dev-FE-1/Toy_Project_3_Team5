@@ -41,9 +41,7 @@ const useChannel = (channelId: string, listType: ListType) => {
               id: doc.id,
               profileImg: doc.data().profileImg || '',
               channelName: doc.data().channelName || '',
-              uid: doc.data().uid || '',
             }));
-
             setChannels(fetchedChannels);
           });
 
@@ -52,7 +50,6 @@ const useChannel = (channelId: string, listType: ListType) => {
           setChannels([]);
         }
       } else {
-        console.log('No such user document!');
         setChannels([]);
       }
     });

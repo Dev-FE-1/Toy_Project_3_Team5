@@ -166,6 +166,7 @@ const PlayListEdit = () => {
 
   const onClick = {
     addVideoLink: async () => {
+      if (link.trim().length < 1) return;
       if (validation.link(link)) {
         return;
       }

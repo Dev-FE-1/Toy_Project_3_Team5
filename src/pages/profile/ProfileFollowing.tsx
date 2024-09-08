@@ -57,14 +57,11 @@ const FollowingList = () => {
                 </span>
 
                 {isOwner && (
-                  <button
-                    css={userMinusStyle}
+                  <IconButton
+                    IconComponent={UserMinus}
                     onClick={() => handleUserMinusClick(data.name)}
-                  >
-                    <UserMinus css={userMinusStyle} />
-                  </button>
+                  />
                 )}
-
               </div>
             ))}
         </div>

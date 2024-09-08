@@ -70,7 +70,7 @@ const Comment: React.FC<CommentWithProfileProps> = ({
 const commentStyles = css`
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: flex-start;
 
   img {
     min-width: 36px;

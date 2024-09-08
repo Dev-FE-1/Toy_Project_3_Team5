@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -23,14 +23,14 @@ const Following = () => {
 
   const followingChannels = useChannel(userId, 'following');
 
-  const { data, fetchNextPage, hasNextPage, isFetching } =
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
     useFollowingPlaylistFetch(selectedChannel);
   const playlists = data?.pages.flatMap((page) => page.playlistsData) || [];
 
   const infiniteScrollRef = useInfiniteScroll(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      if (hasNextPage && !isFetching) {
+      if (hasNextPage && !isFetchingNextPage) {
         await fetchNextPage();
       }
     },

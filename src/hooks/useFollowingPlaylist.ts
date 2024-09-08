@@ -1,5 +1,4 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import fetchFollowingPlaylists from '@/api/followingPlaylists';
 import { useAuthStore } from '@/stores/useAuthStore';
 

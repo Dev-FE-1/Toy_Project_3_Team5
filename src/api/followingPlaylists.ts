@@ -9,10 +9,12 @@ import {
   orderBy,
   doc,
   getDoc,
+  startAfter,
 } from 'firebase/firestore';
 import { getCommentCount } from '@/api/myplaylists';
 import { db } from '@/firebase/firbaseConfig';
 import { PlayListDataProps } from '@/types/playlistType';
+
 const fetchFollowingPlaylists = async (
   userId: string,
   loginUserId: string,
@@ -22,7 +24,9 @@ const fetchFollowingPlaylists = async (
   playlistsData: PlayListDataProps[];
   nextCursor: number | null;
 }> => {
-  let q;
+  let q: Query<DocumentData>;
+  const playlistCollection = collection(db, 'playlist');
+
   if (userId === loginUserId) {
     const userDocRef = doc(db, 'users', userId);
     const userDocSnap = await getDoc(userDocRef);
@@ -31,32 +35,42 @@ const fetchFollowingPlaylists = async (
       const userData = userDocSnap.data() as DocumentData;
       const { channelFollowing } = userData;
 
-      if (channelFollowing) {
+      if (channelFollowing && channelFollowing.length > 0) {
         q = query(
-          collection(db, 'playlist'),
+          playlistCollection,
           where('userId', 'in', channelFollowing),
           where('isPublic', '==', true),
           orderBy('regDate', 'desc'),
-          limit(5)
+          limit(pageSize)
         );
+      } else {
+        return { playlistsData: [], nextCursor: null };
       }
+    } else {
+      return { playlistsData: [], nextCursor: null };
     }
   } else {
     q = query(
-      collection(db, 'playlist'),
+      playlistCollection,
       where('userId', '==', userId),
+      where('isPublic', '==', true),
       orderBy('regDate', 'desc'),
-      limit(5)
+      limit(pageSize)
     );
   }
 
-  if (!q) {
-    return { playlistsData: [], nextCursor: null };
+  if (pageParam > 0) {
+    const previousQuery = query(q, limit(pageParam * pageSize));
+    const previousSnapshot = await getDocs(previousQuery);
+    const lastDoc = previousSnapshot.docs[previousSnapshot.docs.length - 1];
+
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
   }
 
   const fetchPlaylists = async (q: Query<DocumentData>) => {
     const querySnapshot = await getDocs(q);
-
     return await Promise.all(
       querySnapshot.docs.map(async (doc) => ({
         playlistId: doc.id,
@@ -70,14 +84,9 @@ const fetchFollowingPlaylists = async (
   };
 
   const allPlaylists = await fetchPlaylists(q);
+  const nextCursor = allPlaylists.length < pageSize ? null : pageParam + 1;
 
-  const startIndex = pageParam * pageSize;
-  const paginatedData = allPlaylists.slice(startIndex, startIndex + pageSize);
-
-  const nextCursor =
-    startIndex + pageSize < allPlaylists.length ? pageParam + 1 : null;
-
-  return { playlistsData: paginatedData, nextCursor };
+  return { playlistsData: allPlaylists, nextCursor };
 };
 
 export default fetchFollowingPlaylists;

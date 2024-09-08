@@ -22,23 +22,7 @@ const fetchPlaylistsByTag = async (
   playlistsData: PlayListDataProps[];
   nextCursor: number | null;
 }> => {
-  let q;
-
-  if (tag === '인기 급상승 동영상') {
-    q = query(collection(db, 'playlist'), orderBy('likes', 'desc'), limit(5));
-  } else {
-    q = query(
-      collection(db, 'playlist'),
-      where('tags', 'array-contains', `#${tag}`),
-      where('isPublic', '==', true),
-      orderBy('likes', 'desc'),
-      limit(pageSize)
-    );
-  }
-
-  if (pageParam) {
-    q = query(q, startAfter(pageParam));
-  }
+  const playlistCollection = collection(db, 'playlist');
 
   const fetchPlaylists = async (q: Query<DocumentData>) => {
     const querySnapshot = await getDocs(q);
@@ -55,15 +39,47 @@ const fetchPlaylistsByTag = async (
     );
   };
 
+  let q: Query<DocumentData>;
+
+  if (tag === '인기 급상승 동영상') {
+    q = query(
+      playlistCollection,
+      where('isPublic', '==', true),
+      orderBy('likes', 'desc'),
+      limit(pageSize)
+    );
+  } else {
+    q = query(
+      playlistCollection,
+      where('isPublic', '==', true),
+      where('tags', 'array-contains', tag),
+      orderBy('likes', 'desc'),
+      limit(pageSize)
+    );
+  }
+
+  if (pageParam > 0) {
+    const previousQuery = query(
+      playlistCollection,
+      where('isPublic', '==', true),
+      tag !== '인기 급상승 동영상'
+        ? where('tags', 'array-contains', tag)
+        : where('isPublic', '==', true),
+      orderBy('likes', 'desc'),
+      limit(pageParam * pageSize)
+    );
+    const previousSnapshot = await getDocs(previousQuery);
+    const lastDoc = previousSnapshot.docs[previousSnapshot.docs.length - 1];
+
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
+  }
+
   const allPlaylists = await fetchPlaylists(q);
+  const nextCursor = allPlaylists.length < pageSize ? null : pageParam + 1;
 
-  const startIndex = pageParam * pageSize;
-  const paginatedData = allPlaylists.slice(startIndex, startIndex + pageSize);
-
-  const nextCursor =
-    startIndex + pageSize < allPlaylists.length ? pageParam + 1 : null;
-
-  return { playlistsData: paginatedData, nextCursor };
+  return { playlistsData: allPlaylists, nextCursor };
 };
 
 const useTagFetch = (tag: string, pageSize: number = 5) =>

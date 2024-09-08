@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { css } from '@emotion/react';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -18,30 +18,30 @@ export const Popular = () => {
   const PAGE_SIZE = 5;
 
   useEffect(() => {
-    console.log(userId);
     if (!userId) {
       setTags(['인기 급상승 동영상', ...defaultTags]);
-    }
-    if (userTags.length > 0) {
-      const matchedTags = HASHTAGS.filter((tag) =>
-        userTags.includes(tag.label)
-      );
+    } else {
+      if (userTags.length > 0) {
+        const matchedTags = HASHTAGS.filter((tag) =>
+          userTags.includes(tag.label)
+        );
 
-      if (matchedTags.length > 3) {
-        const topTags = [
-          '인기 급상승 동영상',
-          ...matchedTags.slice(0, 3).map((tag) => tag.label.replace('#', '')),
-        ];
-        setTags(topTags);
-      } else {
-        const neededTags = 3 - matchedTags.length;
-        const additionalTags = defaultTags.slice(0, neededTags);
-        const topTags = [
-          '인기 급상승 동영상',
-          ...matchedTags.map((tag) => tag.label.replace('#', '')),
-          ...additionalTags,
-        ];
-        setTags(topTags);
+        if (matchedTags.length > 3) {
+          const topTags = [
+            '인기 급상승 동영상',
+            ...matchedTags.slice(0, 3).map((tag) => tag.label.replace('#', '')),
+          ];
+          setTags(topTags);
+        } else {
+          const neededTags = 3 - matchedTags.length;
+          const additionalTags = defaultTags.slice(0, neededTags);
+          const topTags = [
+            '인기 급상승 동영상',
+            ...matchedTags.map((tag) => tag.label.replace('#', '')),
+            ...additionalTags,
+          ];
+          setTags(topTags);
+        }
       }
     }
   }, [userTags]);
@@ -50,14 +50,14 @@ export const Popular = () => {
     setClickedBtn(tag);
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetching } =
-    useTagFetch(clickedBtn);
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useTagFetch(clickedBtn, PAGE_SIZE);
   const playlists = data?.pages.flatMap((page) => page.playlistsData) || [];
 
   const infiniteScrollRef = useInfiniteScroll(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      if (hasNextPage && !isFetching) {
+      if (hasNextPage && !isFetchingNextPage) {
         await fetchNextPage();
       }
     },

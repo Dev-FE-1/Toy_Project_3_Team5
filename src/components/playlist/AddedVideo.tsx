@@ -35,7 +35,7 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
   onDragNDrop,
   onClick = () => {},
   isActive = false,
-  provider,
+  provider = 'default',
 }) => (
   <div css={videoItemStyle(isActive)} onClick={onClick}>
     {isDragNDrop && onDragNDrop !== undefined && (
@@ -61,7 +61,7 @@ const AddedVideo: React.FC<AddedLinkProps> = ({
         imgUrl={imgUrl}
         title={title}
         userName={userName}
-        provider={provider || ''}
+        provider={provider}
       />
     </div>
   </div>

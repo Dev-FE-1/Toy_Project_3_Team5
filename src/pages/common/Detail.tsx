@@ -138,9 +138,7 @@ const Detail = () => {
 
       {currentVideo && (
         <div css={videoTextDivStyle}>
-          <div css={videoTitleStyle}>
-            {omittedText(currentVideo?.title, MAX_LENGTH.videoTitle)}
-          </div>
+          <div css={videoTitleStyle}>{currentVideo?.title}</div>
           <div css={playlistTagStyle}>
             {playlistInfo.tags.map((tag, index) => (
               <div key={index}>{tag}</div>
@@ -402,7 +400,7 @@ const currentVideoStyle = css`
   height: 242px; // 영상 상단 고정에 필요한 값
   display: block;
 
-  > div > iframe {
+  iframe {
     width: 430px; // 영상 상단 고정에 필요한 값
     height: 242px; // 영상 상단 고정에 필요한 값
     position: fixed; // 영상 상단 고정
@@ -429,9 +427,14 @@ const videoTextDivStyle = css`
 `;
 
 const videoTitleStyle = css`
-  padding: 5px 0;
   font-size: ${fontSize.xl};
   font-weight: ${fontWeight.extraBold};
+  margin: 5px 0;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 `;
 
 const playlistTagStyle = css`

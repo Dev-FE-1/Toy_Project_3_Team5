@@ -28,7 +28,8 @@ export const SignIn = () => {
   const navigate = useNavigate();
 
   const setUser = useAuthStore((state) => state.setUser);
-  const isFirstLogin = useAuthStore((state) => state.isFirstLogin);
+  const getIsFirstLogin = useAuthStore((state) => state.getIsFirstLogin);
+  const fetchUserData = useAuthStore((state) => state.fetchUserData);
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('savedEmail');
@@ -58,11 +59,17 @@ export const SignIn = () => {
         password
       );
       setUser(userCredential.user);
-      if (isFirstLogin) {
-        navigate(ROUTES.HASH_TAG);
-      } else {
-        navigate(ROUTES.ROOT);
-      }
+
+      fetchUserData(email);
+
+      setTimeout(() => {
+        const isFirstLogin = getIsFirstLogin();
+        if (isFirstLogin) {
+          navigate(ROUTES.HASH_TAG);
+        } else {
+          navigate(ROUTES.ROOT);
+        }
+      }, 100);
     } catch (error) {
       console.error('로그인 중 오류 발생:', error);
       setErrorMessage('아이디와 비밀번호를 확인해주세요');
@@ -76,7 +83,7 @@ export const SignIn = () => {
       const { user } = result;
       const userId = user.email?.split('@')[0];
 
-      const userDocRef = doc(db, 'users', userId);
+      const userDocRef = doc(db, 'users', `${userId}`);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {

@@ -115,6 +115,7 @@ const PlayListEdit = () => {
 
   const validation = {
     link: (value: string) => {
+      if (value.trim().length < 1) return '';
       const videoId = getVideoId(value);
       if (!!!videoId) return TEXT.link.validmsg;
       if (videoId && check.dupl.link(videoId)) return TEXT.link.validDuplmsg;
@@ -165,6 +166,7 @@ const PlayListEdit = () => {
 
   const onClick = {
     addVideoLink: async () => {
+      if (link.trim().length < 1) return;
       if (validation.link(link)) {
         return;
       }
@@ -357,8 +359,9 @@ const PlayListEdit = () => {
                 title={video.title}
                 userName={video.userName}
                 onRemove={onClick.removeVideoLink}
-                isDragNDrop={true}
+                isDragNDrop={false}
                 onDragNDrop={() => {}}
+                provider={video.provider}
               />
             </div>
           ))}

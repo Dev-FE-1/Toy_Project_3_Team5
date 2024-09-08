@@ -28,6 +28,7 @@ interface AuthState {
   setUser: (user: User | null) => void;
   clearUser: () => void;
   fetchUserData: (userId: string) => void;
+  getIsFirstLogin: () => boolean;
   addLikedPlaylistItem: (playlistId: number) => void;
   addSavedPlaylistItem: (playlistId: number) => void;
   removeLikedPlaylistItem: (playlistId: number) => void;
@@ -58,7 +59,7 @@ const INIT_VALUES = {
 
 export const useAuthStore = create<AuthState>(
   (persist as AuthPersist)(
-    (set) => ({
+    (set, get) => ({
       user: null,
       userId: '',
       profileImage: '',
@@ -76,7 +77,6 @@ export const useAuthStore = create<AuthState>(
         const docSnapshot = await getDoc(userDocRef);
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-
           set({
             profileImage: data?.profileImg || defaultProfile,
             channelName: data?.channelName || '',
@@ -85,10 +85,11 @@ export const useAuthStore = create<AuthState>(
             channelFollower: data?.channelFollower || [],
             channelFollowing: data?.channelFollowing || [],
             tags: data?.tags || [],
-            isFirstLogin: data?.isFirstLogin ?? true,
+            isFirstLogin: data?.isFirstLogin,
           });
         }
       },
+      getIsFirstLogin: () => get().isFirstLogin,
       addLikedPlaylistItem: (playlistId) =>
         set((state) => ({
           likedPlaylist: [...state.likedPlaylist, playlistId],

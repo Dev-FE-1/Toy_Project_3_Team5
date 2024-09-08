@@ -8,6 +8,7 @@ interface ChannelProps {
   alt: 'Profile Image';
   size?: 'sm';
   name: string;
+  channelName: string;
 }
 
 type ListType = 'following' | 'follower';
@@ -25,6 +26,7 @@ const useList = (userId: string, listType: ListType) => {
         alt: 'Profile Image',
         size: 'sm',
         name: channel.id,
+        channelName: channel.channelName,
       }))
     );
   }, [channels]);

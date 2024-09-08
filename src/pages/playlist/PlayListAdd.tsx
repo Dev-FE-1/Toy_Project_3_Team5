@@ -312,7 +312,7 @@ const PlayListAdd = () => {
                   title={video.title}
                   userName={video.userName}
                   onRemove={onClick.removeVideoLink}
-                  isDragNDrop={true}
+                  isDragNDrop={false}
                   onDragNDrop={() => {}}
                   provider={video.provider}
                 />

@@ -41,7 +41,7 @@ const fetchPlaylistsByTag = async (
 
   let q: Query<DocumentData>;
 
-  if (tag === '인기 급상승 동영상') {
+  if (tag === '#인기 급상승 동영상') {
     q = query(
       playlistCollection,
       where('isPublic', '==', true),
@@ -62,7 +62,7 @@ const fetchPlaylistsByTag = async (
     const previousQuery = query(
       playlistCollection,
       where('isPublic', '==', true),
-      tag !== '인기 급상승 동영상'
+      tag !== '#인기 급상승 동영상'
         ? where('tags', 'array-contains', tag)
         : where('isPublic', '==', true),
       orderBy('likes', 'desc'),

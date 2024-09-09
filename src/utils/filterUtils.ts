@@ -1,3 +1,4 @@
+import { HASHTAGS } from '@/constants/hashtag';
 import { PlayListDataProps } from '@/types/playlistType';
 
 // 공개여부 필터링
@@ -26,3 +27,16 @@ export const sortPlaylistsByOption = (
         return new Date(b.regDate).getTime() - new Date(a.regDate).getTime();
     }
   });
+
+export const randomTags = (): string[] => {
+  const randomValues = new Set();
+  while (randomValues.size < 3) {
+    randomValues.add(Math.floor(Math.random() * HASHTAGS.length));
+  }
+  const randomTagIndex: number[] = Array.from(randomValues) as number[];
+
+  const defaultTags: string[] = [...randomTagIndex.values()].map((tagindex) =>
+    HASHTAGS[tagindex].label.replace('#', '')
+  );
+  return defaultTags;
+};

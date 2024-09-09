@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import PlaylistCard from '@/components/PlaylistCard';
 import Profile from '@/components/Profile';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
+import ROUTES from '@/constants/route';
 import useChannel from '@/hooks/useChannel';
 import useFollowingPlaylistFetch from '@/hooks/useFollowingPlaylist';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
@@ -23,17 +24,14 @@ const Following = () => {
 
   const followingChannels = useChannel(userId, 'following');
 
-  const { data, fetchNextPage, hasNextPage, isFetching } =
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
     useFollowingPlaylistFetch(selectedChannel);
-  const playlists = useMemo(
-    () => (data ? data.pages.flatMap((page) => page.playlist) : []),
-    [data]
-  );
+  const playlists = data?.pages.flatMap((page) => page.playlistsData) || [];
 
   const infiniteScrollRef = useInfiniteScroll(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      if (hasNextPage && !isFetching) {
+      if (hasNextPage && !isFetchingNextPage) {
         await fetchNextPage();
       }
     },
@@ -84,6 +82,11 @@ const Following = () => {
           <div css={emptyContainer}>
             <img src={folderIcon} alt='빈 상태' css={emptyImage} />
             <p css={emptyMessage}>목록이 비었어요</p>
+            <Button
+              label='인기 플레이리스트 보러가기'
+              onClick={() => navigate(ROUTES.POPULAR)}
+              color='primary'
+            />
           </div>
         ) : (
           <>
@@ -182,7 +185,7 @@ const emptyImage = css`
 `;
 
 const emptyMessage = css`
-  margin-top: 20px;
+  margin: 20px 0;
   font-size: ${fontSize.lg};
   color: ${colors.gray04};
 `;

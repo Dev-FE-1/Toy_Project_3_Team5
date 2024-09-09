@@ -1,62 +1,32 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
 import colors from '@/constants/colors';
 import { fontSize, fontWeight } from '@/constants/font';
-import { HASHTAGS } from '@/constants/hashtag';
+import useGenerateTags from '@/hooks/useGenerateTags ';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import useTagFetch from '@/hooks/useTagFetch';
-import { useAuthStore } from '@/stores/useAuthStore';
 
 export const Popular = () => {
-  const [tags, setTags] = useState<string[]>(['인기 급상승 동영상']);
-  const [clickedBtn, setClickedBtn] = useState<string>('인기 급상승 동영상');
-  const defaultTags: string[] = ['Developer', '먹방', 'Vlog'];
-  const { tags: userTags } = useAuthStore();
+  const fixedTag = '#인기 급상승 동영상';
+  const [clickedBtn, setClickedBtn] = useState(fixedTag);
   const PAGE_SIZE = 5;
-
-  useEffect(() => {
-    if (userTags.length > 0) {
-      const matchedTags = HASHTAGS.filter((tag) =>
-        userTags.includes(tag.label)
-      );
-
-      if (matchedTags.length > 3) {
-        const topTags = [
-          '인기 급상승 동영상',
-          ...matchedTags.slice(0, 3).map((tag) => tag.label.replace('#', '')),
-        ];
-        setTags(topTags);
-      } else {
-        const neededTags = 3 - matchedTags.length;
-        const additionalTags = defaultTags.slice(0, neededTags);
-        const topTags = [
-          '인기 급상승 동영상',
-          ...matchedTags.map((tag) => tag.label.replace('#', '')),
-          ...additionalTags,
-        ];
-        setTags(topTags);
-      }
-    }
-  }, [userTags]);
+  const tags = useGenerateTags(fixedTag);
 
   const onButtonClick = (tag: string) => () => {
     setClickedBtn(tag);
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetching } =
-    useTagFetch(clickedBtn);
-  const playlists = useMemo(
-    () => (data ? data.pages.flatMap((page) => page.playlist) : []),
-    [data]
-  );
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useTagFetch(clickedBtn, PAGE_SIZE);
+  const playlists = data?.pages.flatMap((page) => page.playlistsData) || [];
 
   const infiniteScrollRef = useInfiniteScroll(
     async (entry, observer) => {
       observer.unobserve(entry.target);
-      if (hasNextPage && !isFetching) {
+      if (hasNextPage && !isFetchingNextPage) {
         await fetchNextPage();
       }
     },
@@ -74,25 +44,23 @@ export const Popular = () => {
           {tags.map((tag) => (
             <Button
               key={tag}
-              label={`#${tag}`}
+              label={`${tag}`}
               onClick={onButtonClick(tag)}
               size='lg'
               color={clickedBtn === tag ? 'primary' : 'lightGray'}
             />
           ))}
         </div>
-        <div css={titleContainerStyle}>#{clickedBtn}</div>
+        <div css={titleContainerStyle}>{clickedBtn}</div>
       </div>
       <div css={playlistContainerStyle}>
-        {data?.pages.map((page, pageIndex) =>
-          page.playlist.map((playlist, index) => (
-            <PlaylistCard
-              key={`${pageIndex}-${index}`}
-              playlistItem={playlist}
-              size='large'
-            />
-          ))
-        )}
+        {playlists.map((playlistItem) => (
+          <PlaylistCard
+            key={playlistItem.playlistId}
+            playlistItem={playlistItem}
+            size='large'
+          />
+        ))}
         <div css={loadingSpinnerStyle}>
           {isFetching && playlists.length >= PAGE_SIZE && <LoadingSpinner />}
         </div>
@@ -143,7 +111,6 @@ const playlistContainerStyle = css`
   flex-direction: column;
   align-items: center;
   gap: 20px;
-
   .css-1yx0w9a-largeCardStyles {
     width: 100%;
   }
@@ -154,3 +121,5 @@ const loadingSpinnerStyle = css`
   justify-content: center;
   align-items: center;
 `;
+
+export default Popular;

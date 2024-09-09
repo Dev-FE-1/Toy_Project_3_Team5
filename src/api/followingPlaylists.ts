@@ -4,27 +4,28 @@ import {
   where,
   DocumentData,
   getDocs,
-  startAfter,
-  QueryDocumentSnapshot,
+  Query,
   limit,
   orderBy,
   doc,
   getDoc,
+  startAfter,
 } from 'firebase/firestore';
+import { getCommentCount } from '@/api/myplaylists';
 import { db } from '@/firebase/firbaseConfig';
 import { PlayListDataProps } from '@/types/playlistType';
 
-export interface PlaylistsResultProps {
-  playlist: PlayListDataProps[];
-  nextCursor: QueryDocumentSnapshot<DocumentData> | null;
-}
-
-export const fetchFollowingPlaylists = async (
+const fetchFollowingPlaylists = async (
   userId: string,
   loginUserId: string,
-  pageParam: QueryDocumentSnapshot<DocumentData> | null
-): Promise<PlaylistsResultProps> => {
-  let q;
+  pageSize: number,
+  pageParam: number
+): Promise<{
+  playlistsData: PlayListDataProps[];
+  nextCursor: number | null;
+}> => {
+  let q: Query<DocumentData>;
+  const playlistCollection = collection(db, 'playlist');
 
   if (userId === loginUserId) {
     const userDocRef = doc(db, 'users', userId);
@@ -34,67 +35,58 @@ export const fetchFollowingPlaylists = async (
       const userData = userDocSnap.data() as DocumentData;
       const { channelFollowing } = userData;
 
-      if (channelFollowing) {
+      if (channelFollowing && channelFollowing.length > 0) {
         q = query(
-          collection(db, 'playlist'),
+          playlistCollection,
           where('userId', 'in', channelFollowing),
           where('isPublic', '==', true),
           orderBy('regDate', 'desc'),
-          limit(5),
-          ...(pageParam ? [startAfter(pageParam)] : [])
+          limit(pageSize)
         );
+      } else {
+        return { playlistsData: [], nextCursor: null };
       }
+    } else {
+      return { playlistsData: [], nextCursor: null };
     }
   } else {
     q = query(
-      collection(db, 'playlist'),
+      playlistCollection,
       where('userId', '==', userId),
+      where('isPublic', '==', true),
       orderBy('regDate', 'desc'),
-      limit(5),
-      ...(pageParam ? [startAfter(pageParam)] : [])
+      limit(pageSize)
     );
   }
 
-  if (!q) {
-    return { playlist: [], nextCursor: null };
-  }
+  if (pageParam > 0) {
+    const previousQuery = query(q, limit(pageParam * pageSize));
+    const previousSnapshot = await getDocs(previousQuery);
+    const lastDoc = previousSnapshot.docs[previousSnapshot.docs.length - 1];
 
-  const querySnapshot = await getDocs(q);
-  const playlistPromises = querySnapshot.docs.map(async (doc) => {
-    const data = doc.data();
-    const ownerChannelName = await getOwnerChannelName(data.userId);
-    return {
-      playlistId: doc.id,
-      ownerChannelName,
-      title: data.title,
-      isPublic: data.isPublic,
-      likes: data.likes,
-      links: data.links,
-      regDate: data.regDate,
-      tags: data.tags,
-      thumbnail: data.thumbnail,
-      userId: data.userId,
-    };
-  });
-
-  const playlist = await Promise.all(playlistPromises);
-  const nextCursor = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
-
-  return { playlist, nextCursor };
-};
-export const getOwnerChannelName = async (userId: string): Promise<string> => {
-  try {
-    const userDocRef = doc(db, 'users', userId);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData?.channelName || '알 수 없는 채널';
-    } else {
-      return '알 수 없는 채널';
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
     }
-  } catch (error) {
-    console.error('채널 이름을 가져오는 동안 오류 발생:', error);
-    return '알 수 없는 채널';
   }
+
+  const fetchPlaylists = async (q: Query<DocumentData>) => {
+    const querySnapshot = await getDocs(q);
+    return await Promise.all(
+      querySnapshot.docs.map(async (doc) => ({
+        playlistId: doc.id,
+        commentCount: await getCommentCount(doc.id),
+        ...(doc.data() as Omit<
+          PlayListDataProps,
+          'playlistId' | 'commentCount'
+        >),
+      }))
+    );
+  };
+
+  const allPlaylists = await fetchPlaylists(q);
+  const nextCursor = allPlaylists.length < pageSize ? null : pageParam + 1;
+
+  return { playlistsData: allPlaylists, nextCursor };
 };
+
+export default fetchFollowingPlaylists;

@@ -8,66 +8,87 @@ import {
   getDocs,
   startAfter,
   DocumentData,
-  QueryDocumentSnapshot,
+  Query,
 } from 'firebase/firestore';
-import {
-  PlaylistsResultProps,
-  getOwnerChannelName,
-} from '@/api/followingPlaylists';
+import { getCommentCount } from '@/api/myplaylists';
 import { db } from '@/firebase/firbaseConfig';
+import { PlayListDataProps } from '@/types/playlistType';
 
 const fetchPlaylistsByTag = async (
   tag: string,
-  pageParam: QueryDocumentSnapshot<DocumentData> | null
-): Promise<PlaylistsResultProps> => {
-  let q;
+  pageParam: number,
+  pageSize: number
+): Promise<{
+  playlistsData: PlayListDataProps[];
+  nextCursor: number | null;
+}> => {
+  const playlistCollection = collection(db, 'playlist');
 
-  if (tag === '인기 급상승 동영상') {
-    q = query(collection(db, 'playlist'), orderBy('likes', 'desc'), limit(5));
-  } else {
+  const fetchPlaylists = async (q: Query<DocumentData>) => {
+    const querySnapshot = await getDocs(q);
+
+    return await Promise.all(
+      querySnapshot.docs.map(async (doc) => ({
+        playlistId: doc.id,
+        commentCount: await getCommentCount(doc.id),
+        ...(doc.data() as Omit<
+          PlayListDataProps,
+          'playlistId' | 'commentCount'
+        >),
+      }))
+    );
+  };
+
+  let q: Query<DocumentData>;
+
+  if (tag === '#인기 급상승 동영상') {
     q = query(
-      collection(db, 'playlist'),
-      where('tags', 'array-contains', `#${tag}`),
+      playlistCollection,
       where('isPublic', '==', true),
       orderBy('likes', 'desc'),
-      limit(5)
+      limit(pageSize)
+    );
+  } else {
+    q = query(
+      playlistCollection,
+      where('isPublic', '==', true),
+      where('tags', 'array-contains', tag),
+      orderBy('likes', 'desc'),
+      limit(pageSize)
     );
   }
 
-  if (pageParam) {
-    q = query(q, startAfter(pageParam));
+  if (pageParam > 0) {
+    const previousQuery = query(
+      playlistCollection,
+      where('isPublic', '==', true),
+      tag !== '#인기 급상승 동영상'
+        ? where('tags', 'array-contains', tag)
+        : where('isPublic', '==', true),
+      orderBy('likes', 'desc'),
+      limit(pageParam * pageSize)
+    );
+    const previousSnapshot = await getDocs(previousQuery);
+    const lastDoc = previousSnapshot.docs[previousSnapshot.docs.length - 1];
+
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
   }
 
-  const querySnapshot = await getDocs(q);
-  const playlistPromises = querySnapshot.docs.map(async (doc) => {
-    const data = doc.data();
-    const ownerChannelName = await getOwnerChannelName(data.userId);
-    return {
-      playlistId: doc.id,
-      ownerChannelName,
-      title: data.title,
-      isPublic: data.isPublic,
-      likes: data.likes,
-      links: data.links,
-      regDate: data.regDate,
-      tags: data.tags,
-      thumbnail: data.thumbnail,
-      userId: data.userId,
-    };
-  });
+  const allPlaylists = await fetchPlaylists(q);
+  const nextCursor = allPlaylists.length < pageSize ? null : pageParam + 1;
 
-  const playlist = await Promise.all(playlistPromises);
-  const nextCursor = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
-
-  return { playlist, nextCursor };
+  return { playlistsData: allPlaylists, nextCursor };
 };
 
-const useTagFetch = (tag: string) =>
+const useTagFetch = (tag: string, pageSize: number = 5) =>
   useInfiniteQuery({
-    queryKey: ['playlists', tag],
-    queryFn: ({ pageParam = null }) => fetchPlaylistsByTag(tag, pageParam),
-    getNextPageParam: (lastPage: PlaylistsResultProps) => lastPage.nextCursor,
-    initialPageParam: null as QueryDocumentSnapshot<DocumentData> | null,
+    queryKey: ['popularPlaylists', tag],
+    queryFn: ({ pageParam = 0 }) =>
+      fetchPlaylistsByTag(tag, pageParam, pageSize),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: 0,
     enabled: !!tag,
   });
 

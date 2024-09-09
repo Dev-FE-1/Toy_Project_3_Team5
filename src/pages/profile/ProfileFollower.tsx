@@ -1,10 +1,11 @@
 import { css } from '@emotion/react';
 import { UserMinus } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import IconButton from '@/components/IconButton';
 import Modal from '@/components/Modal';
 import Profile from '@/components/Profile';
 import { fontSize } from '@/constants/font';
+import ROUTES from '@/constants/route';
 import useList from '@/hooks/useList';
 import { useAuthStore } from '@/stores/useAuthStore';
 
@@ -16,6 +17,10 @@ const FollowerList = () => {
     userId || '',
     'follower'
   );
+  const navigate = useNavigate();
+  const onToChannel = (goToId: string): void => {
+    navigate(ROUTES.PLAYLIST(goToId));
+  };
 
   return (
     <>
@@ -31,7 +36,12 @@ const FollowerList = () => {
             followerList.map((data, index) => (
               <div key={index} css={profileItem}>
                 <span css={profileContainerStyle}>
-                  <Profile src={data.src} alt={data.alt} size={data.size} />
+                  <Profile
+                    src={data.src}
+                    alt={data.alt}
+                    size={data.size}
+                    onClick={() => onToChannel(data.name)}
+                  />
                   <span>{data.channelName}</span>
                 </span>
 

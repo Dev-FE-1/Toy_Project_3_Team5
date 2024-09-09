@@ -1,10 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
-import {
-  fetchFollowingPlaylists,
-  PlaylistsResultProps,
-} from '@/api/followingPlaylists';
-
+import fetchFollowingPlaylists from '@/api/followingPlaylists';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const useFollowingPlaylistFetch = (userId: string) => {
@@ -12,10 +7,10 @@ const useFollowingPlaylistFetch = (userId: string) => {
 
   return useInfiniteQuery({
     queryKey: ['followingPlaylists', userId],
-    queryFn: ({ pageParam = null }) =>
-      fetchFollowingPlaylists(userId, loginUserId, pageParam),
-    getNextPageParam: (lastPage: PlaylistsResultProps) => lastPage.nextCursor,
-    initialPageParam: null as QueryDocumentSnapshot<DocumentData> | null,
+    queryFn: ({ pageParam = 0 }) =>
+      fetchFollowingPlaylists(userId, loginUserId, 5, pageParam),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: 0,
     enabled: !!userId,
   });
 };

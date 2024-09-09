@@ -53,7 +53,6 @@ const INIT_VALUES = {
     channelFollower: [],
     channelFollowing: [],
     tags: [],
-    isFirstLogin: true,
   },
 };
 

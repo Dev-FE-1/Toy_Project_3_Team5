@@ -319,10 +319,14 @@ const commentSelectStyle = css`
 
 const commentStyle = css`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 12px 0;
   font-size: ${fontSize.sm};
   border-bottom: 1.5px solid ${colors.gray02};
+
+  .css-13eeqks-checkBoxContainer {
+    margin-top: 7px;
+  }
 
   & > *:not(:last-child) {
     margin-right: 12px;

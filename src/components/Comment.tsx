@@ -59,7 +59,7 @@ const Comment: React.FC<CommentWithProfileProps> = ({
         <span className='userName' onClick={onClick}>
           {userName}
         </span>
-        <span>{content}</span>
+        <span className='content'>{content}</span>
       </div>
       <div css={emptyBoxStyle}></div>
       {showKebabMenu && <KebabButton menuItems={menuItems} />}
@@ -70,11 +70,13 @@ const Comment: React.FC<CommentWithProfileProps> = ({
 const commentStyles = css`
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: flex-start;
 
   img {
-    width: 36px;
-    height: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    min-height: 36px;
+    max-height: 36px;
     border-radius: 50%;
     object-fit: cover;
     :hover {
@@ -91,10 +93,11 @@ const contentStyles = css`
 
   .userName {
     cursor: pointer;
+    font-weight: ${fontWeight.semiBold};
   }
 
-  span:nth-of-type(1) {
-    font-weight: ${fontWeight.semiBold};
+  .content {
+    line-height: 19px;
   }
 `;
 

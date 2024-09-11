@@ -54,14 +54,6 @@ export const PlayListSaved = () => {
     [playlist, filterOptions]
   );
 
-  const onAddBtnClick = (): void => {
-    navigate(ROUTES.PLAYLIST_ADD(userId));
-  };
-
-  const onPopularBtnClick = (): void => {
-    navigate(ROUTES.POPULAR);
-  };
-
   return (
     <>
       <section css={homeContainerStyles}>
@@ -76,21 +68,27 @@ export const PlayListSaved = () => {
               label='플레이리스트 생성'
               IconComponent={Plus}
               shape='text'
-              onClick={onAddBtnClick}
+              onClick={() => {
+                navigate(ROUTES.PLAYLIST_ADD(userId));
+              }}
             />
           )}
         </div>
         {sortedPlaylist.length > 0 && (
           <p>총 {sortedPlaylist.length}개의 플리</p>
         )}
-        {isFetching === false && sortedPlaylist.length === 0 ? (
+        {isFetching ? (
+          <div css={loadingStyless}>
+            <LoadingSpinner />
+          </div>
+        ) : sortedPlaylist.length === 0 ? (
           <div css={emptyStateStyles}>
-            <img src='/src/assets/folderIcon.png' alt='아이콘 이미지' />
-            <div className='textContainer'>
-              <p>아직 저장한 플리가 없네요.</p>
-              <p>인기 플리로 채워볼까요?</p>
-            </div>
-            <Button label='인기 플리 구경하기' onClick={onPopularBtnClick} />
+            <p>아직 저장한 플리가 없네요.</p>
+            <p>인기 플리로 채워볼까요?</p>
+            <Button
+              label='인기 플리 구경하기'
+              onClick={() => navigate(ROUTES.POPULAR)}
+            />
           </div>
         ) : (
           <ul className='scroll-container' css={cardContainerStyles}>
@@ -103,9 +101,6 @@ export const PlayListSaved = () => {
                 />
               </li>
             ))}
-            {isFetching && sortedPlaylist.length >= PAGE_SIZE && (
-              <LoadingSpinner />
-            )}
             <div
               ref={infiniteScrollRef}
               style={{
@@ -162,7 +157,7 @@ const emptyStateStyles = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 2px;
   padding-top: 80px;
 
   p {
@@ -170,11 +165,15 @@ const emptyStateStyles = css`
     line-height: 2.2rem;
   }
 
-  .textContainer {
-    text-align: center;
-  }
-
   img {
     width: 50%;
   }
+`;
+
+const loadingStyless = css`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

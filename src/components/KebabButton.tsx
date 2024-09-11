@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { css } from '@emotion/react';
 import { EllipsisVertical } from 'lucide-react';
 import IconButton from '@/components/IconButton';
 import colors from '@/constants/colors';
 import { fontSize } from '@/constants/font';
+import useOutsideClick from '@/hooks/useOutsideClick';
 
 interface KebabButtonProps {
   menuItems: Array<{
@@ -21,16 +22,11 @@ const KebabButton: React.FC<KebabButtonProps> = ({ menuItems }) => {
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    const onOutsideClose = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('click', onOutsideClose);
-
-    return () => document.removeEventListener('click', onOutsideClose);
-  }, [isOpen]);
+  useOutsideClick(menuRef, () => {
+    if (isOpen) {
+      setIsOpen(false);
+    }
+  });
 
   return (
     <div css={kebabButtonStyle} ref={menuRef}>

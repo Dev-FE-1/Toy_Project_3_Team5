@@ -74,10 +74,6 @@ export const PlayListHome = () => {
     refetch();
   };
 
-  const onAddBtnClick = (): void => {
-    navigate(ROUTES.PLAYLIST_ADD(userId));
-  };
-
   return (
     <section css={homeContainerStyles}>
       <div className='filter-area'>
@@ -91,20 +87,23 @@ export const PlayListHome = () => {
             label='플레이리스트 생성'
             IconComponent={Plus}
             shape='text'
-            onClick={onAddBtnClick}
+            onClick={() => {
+              navigate(ROUTES.PLAYLIST_ADD(userId));
+            }}
           />
         )}
       </div>
       {filteredPlaylist.length > 0 && (
         <p>총 {filteredPlaylist.length}개의 플리</p>
       )}
-      {isFetching === false && filteredPlaylist.length === 0 ? (
+      {isFetching ? (
+        <div css={loadingStyless}>
+          <LoadingSpinner />
+        </div>
+      ) : filteredPlaylist.length === 0 ? (
         <div css={emptyStateStyles}>
-          <img src='/src/assets/folderIcon.png' alt='아이콘 이미지' />
-          <div className='textContainer'>
-            <p>아직 플리가 없네요.</p>
-            <p>나만의 플리로 채워볼까요?</p>
-          </div>
+          <p>아직 플리가 없네요.</p>
+          <p>나만의 플리로 채워볼까요?</p>
         </div>
       ) : (
         <ul className='scroll-container' css={cardContainerStyles}>
@@ -119,9 +118,6 @@ export const PlayListHome = () => {
               />
             </li>
           ))}
-          {isFetching && filteredPlaylist.length >= PAGE_SIZE && (
-            <LoadingSpinner />
-          )}
           <div
             ref={infiniteScrollRef}
             style={{
@@ -177,19 +173,24 @@ const emptyStateStyles = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 2px;
   padding-top: 80px;
+  text-align: center;
 
   p {
     font-size: ${fontSize.md};
     line-height: 2.2rem;
   }
 
-  .textContainer {
-    text-align: center;
-  }
-
   img {
     width: 50%;
   }
+`;
+
+const loadingStyless = css`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

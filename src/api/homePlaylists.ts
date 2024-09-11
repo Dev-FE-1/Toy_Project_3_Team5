@@ -1,4 +1,3 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   collection,
   getDocs,
@@ -14,7 +13,7 @@ import { getCommentCount } from '@/api/myplaylists';
 import { db } from '@/firebase/firbaseConfig';
 import { PlayListDataProps } from '@/types/playlistType';
 
-const fetchHomePlaylists = async (
+export const fetchHomePlaylists = async (
   pageParam: number,
   sortOption: string,
   pageSize: number
@@ -86,15 +85,3 @@ const fetchHomePlaylists = async (
     return { playlistsData: allPlaylists, nextCursor };
   }
 };
-
-export const useFetchHomePlaylists = (
-  sortOption: string = '최신순',
-  pageSize: number = 5
-) =>
-  useInfiniteQuery({
-    queryKey: ['homePlaylists', sortOption],
-    queryFn: ({ pageParam = 0 }) =>
-      fetchHomePlaylists(pageParam, sortOption, pageSize),
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    initialPageParam: 0,
-  });

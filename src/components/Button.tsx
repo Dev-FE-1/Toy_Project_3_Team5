@@ -94,43 +94,56 @@ const buttonStyle = (
   selectColors: ButtonColors,
   fullWidth: boolean,
   disabled: boolean
-) => css`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: ${disabled ? 'not-allowed' : 'pointer'};
-  border: none;
-  outline: none;
-  width: ${fullWidth ? '100%' : 'auto'};
-  border-radius: ${shape === 'round' ? '50px' : '6px'};
-
-  ${selectSizes}
-
-  background-color: ${disabled
+) => {
+  const backgroundColor = disabled
     ? colors.gray03
     : shape === 'text' || shape === 'line'
       ? 'transparent'
-      : selectColors.color};
-  color: ${disabled || selectColors.color === colors.gray02
-    ? colors.black
-    : shape === 'text' || shape === 'line'
-      ? selectColors.color
-      : colors.white};
-  border: ${shape === 'line' ? `1px solid ${selectColors.color}` : 'none'};
-  opacity: ${disabled ? 0.7 : 1};
+      : selectColors.color;
 
-  &:hover {
-    ${!disabled &&
-    `background-color: ${
-      shape === 'text' ? 'transparent' : selectColors.hoverColor
-    };
-    color: ${shape === 'text' ? selectColors.hoverColor : colors.white};
-    ${shape === 'line' && `border-color: ${selectColors.hoverColor}`};`}
-  }
+  const textColor =
+    disabled || selectColors.color === colors.gray02
+      ? colors.black
+      : shape === 'text' || shape === 'line'
+        ? selectColors.color
+        : colors.white;
 
-  span {
+  const borderColor = shape === 'line' ? selectColors.color : 'none';
+
+  const hoverStyles =
+    !disabled &&
+    css`
+      background-color: ${shape === 'text'
+        ? 'transparent'
+        : selectColors.hoverColor};
+      color: ${shape === 'text' ? selectColors.hoverColor : colors.white};
+      ${shape === 'line' && `border-color: ${selectColors.hoverColor}`};
+    `;
+
+  return css`
     display: inline-flex;
-  }
-`;
+    align-items: center;
+    justify-content: center;
+    cursor: ${disabled ? 'not-allowed' : 'pointer'};
+    border: ${borderColor};
+    outline: none;
+    width: ${fullWidth ? '100%' : 'auto'};
+    border-radius: ${shape === 'round' ? '50px' : '6px'};
+
+    ${selectSizes}
+
+    background-color: ${backgroundColor};
+    color: ${textColor};
+    opacity: ${disabled ? 0.7 : 1};
+
+    &:hover {
+      ${hoverStyles}
+    }
+
+    span {
+      display: inline-flex;
+    }
+  `;
+};
 
 export default Button;

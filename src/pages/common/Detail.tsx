@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
-import { ExternalLink, Heart, ListPlus, ListX, X } from 'lucide-react';
+import { ExternalLink, Heart, Bookmark, X } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { CommentWithProfileApiProps, removeComment } from '@/api/comment';
 import Button from '@/components/Button';
@@ -259,7 +259,7 @@ const Detail = () => {
               label='공유'
             />
             <IconButton
-              IconComponent={isAdded ? ListX : ListPlus}
+              IconComponent={Bookmark}
               onClick={toggleSave}
               color={isAdded ? 'primary' : 'gray'}
               fillColor={isAdded ? 'primary' : undefined}

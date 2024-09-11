@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import folderIcon from '@/assets/folderIcon.png';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PlaylistCard from '@/components/PlaylistCard';
@@ -80,7 +79,6 @@ const Following = () => {
       <div css={playlistContainer}>
         {playlists.length === 0 ? (
           <div css={emptyContainer}>
-            <img src={folderIcon} alt='빈 상태' css={emptyImage} />
             <p css={emptyMessage}>목록이 비었어요</p>
             <Button
               label='인기 플레이리스트 보러가기'

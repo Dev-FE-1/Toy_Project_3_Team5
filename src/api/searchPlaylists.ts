@@ -1,4 +1,3 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   collection,
   getDocs,
@@ -65,7 +64,7 @@ const fetchPlaylists = async (
   return { filteredData, lastVisible };
 };
 
-const fetchSearchPlaylists = async (
+export const fetchSearchPlaylists = async (
   keyword: string,
   pageParam: QueryDocumentSnapshot<DocumentData> | null,
   pageSize: number = 5
@@ -92,21 +91,3 @@ const fetchSearchPlaylists = async (
     nextCursor: allPlaylistsData.length < pageSize ? null : lastVisible,
   };
 };
-
-export const useFetchSearchPlaylists = (
-  keyword: string,
-  pageSize: number = 5
-) =>
-  useInfiniteQuery<{
-    playlistsData: PlayListDataProps[];
-    nextCursor: QueryDocumentSnapshot<DocumentData> | null;
-  }>({
-    queryKey: ['searchPlaylists', keyword],
-    queryFn: async ({ pageParam }) => {
-      const snapshot = pageParam as QueryDocumentSnapshot<DocumentData> | null;
-      return fetchSearchPlaylists(keyword, snapshot, pageSize);
-    },
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    enabled: Boolean(keyword),
-    initialPageParam: null,
-  });

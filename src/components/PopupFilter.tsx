@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { css } from '@emotion/react';
 import { ListFilter } from 'lucide-react';
 import colors from '@/constants/colors';
 import { fontWeight } from '@/constants/font';
+import useOutsideClick from '@/hooks/useOutsideClick';
 
 interface FilterOptionGroup {
   label: string;
@@ -24,24 +25,11 @@ const PopupFilter: React.FC<PopupFilterProps> = ({
   const popupRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const onClickFilterOutside = (event: MouseEvent) => {
-      const targetNode = event.target as Node;
-
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(targetNode) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(targetNode)
-      ) {
-        setFilterActive(false);
-      }
-    };
-
-    document.addEventListener('mousedown', onClickFilterOutside);
-    return () =>
-      document.removeEventListener('mousedown', onClickFilterOutside);
-  }, []);
+  useOutsideClick(popupRef, () => {
+    if (filterActive) {
+      setFilterActive(false);
+    }
+  });
 
   const toggleFilterActive = () => setFilterActive((prev) => !prev);
 

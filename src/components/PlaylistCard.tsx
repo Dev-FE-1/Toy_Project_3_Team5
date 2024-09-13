@@ -5,8 +5,7 @@ import {
   MessageSquareMore,
   LockKeyhole,
   LockKeyholeOpen,
-  ListX,
-  ListPlus,
+  Bookmark,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { deletePlaylist } from '@/api/playlistInfo';
@@ -216,9 +215,10 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({
       <div css={smallBtnStyles}>
         {showAddButton && (
           <IconButton
-            IconComponent={isAdded ? ListX : ListPlus}
+            IconComponent={Bookmark}
             onClick={toggleSave}
-            color='gray'
+            color={isAdded ? 'primary' : 'gray'}
+            fillColor={isAdded ? 'primary' : undefined}
           />
         )}
         {showLikeButton && (
